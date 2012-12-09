@@ -1,0 +1,20 @@
+<package>
+  <description brief="segbot_bringup">
+
+     segbot_bringup
+
+  </description>
+  <author>Piyush Khandelwal</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/segbot_bringup</url>
+
+  <depend package="segway_rmpX" />
+  <depend package="segbot_description" />
+  <depend package="freenect_launch" />
+  <depend package="openni_launch" />
+  <depend package="tf" />
+
+</package>
+
+

@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<robot>
+
+  <!-- Included URDF Files -->
+  <include filename="$(find segbot_description)/urdf/gazebo_common.xacro" />
+
+  <macro name="segbot_base_link_visual" >
+    <segbot_base_link_mesh />
+  </macro>
+
+  <macro name="segbot_base_link_collision" >
+    <segbot_base_link_cylinder />
+  </macro>
+
+  <macro name="segbot_castor_support_link_visual" >
+    <segbot_castor_support_link_mesh />
+  </macro>
+
+  <macro name="segbot_castor_support_link_collision" >
+    <segbot_collision_none />
+  </macro>
+
+  <macro name="segbot_castor_wheel_link_visual" >
+    <segbot_castor_wheel_link_mesh />
+  </macro>
+
+  <macro name="segbot_castor_wheel_link_collision" >
+    <segbot_collision_none />
+  </macro>
+
+  <macro name="segbot_wheel_visual" params="suffix">
+    <segbot_wheel_mesh suffix="${suffix}" />
+  </macro>
+
+  <macro name="segbot_wheel_collision" params="suffix">
+    <segbot_collision_none />
+  </macro>
+
+  <macro name="gazebo_segbot_ros_controllers">
+    <gazebo>
+      <gazebo_segbot_simple_drive_plugin />
+      <gazebo_segbot_controllers_common />
+    </gazebo>
+  </macro>
+
+</robot>
+

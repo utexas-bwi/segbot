@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+
+<robot>
+  <!-- Included URDF Files -->
+  <include filename="$(find segbot_description)/urdf/segbot_wheel.xacro" />
+  <include filename="$(find segbot_description)/urdf/kinect.urdf.xacro" />
+
+  <macro name="segbot">
+
+    <link name="base_footprint">
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.001 0.001 0.001" />
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="base_footprint_joint" type="fixed">
+      <origin xyz="0.0 0 0.2165" rpy="0 0 0" />
+      <parent link="base_footprint"/>
+      <child link="base_link" />
+    </joint>
+
+    <!-- Links and Joints (i.e., the robot) -->
+    <link name="base_link">
+      <inertial>
+        <mass value="0.01" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+          iyy="1.0" iyz="0.0" 
+          izz="1.0" />
+      </inertial>
+
+      <visual>
+        <segbot_base_link_visual />
+      </visual>
+
+      <collision>
+        <segbot_base_link_collision />
+      </collision>
+
+    </link>
+
+    <gazebo_segbot_base_link_surface />
+
+    <joint name="base_center_of_mass_joint" type="fixed">
+      <origin xyz="-0.1 0 -0.075" rpy="0 0 0" />
+      <parent link="base_link"/>
+      <child link="base_center_of_mass_link" />
+    </joint>
+
+    <link name="base_center_of_mass_link">
+      <inertial>
+        <mass value="30" />
+        <origin xyz="0 0 0" />
+        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
+          iyy="1.0" iyz="0.0" 
+          izz="1.0" />
+      </inertial>
+    </link>
+
+    <joint name="base_caster_support_joint" type="continuous">
+      <origin xyz="-0.3292 0 -0.0485" rpy="0 0 0" />
+      <parent link="base_link" />
+      <child link="base_caster_support_link"/>
+
+      <axis xyz="0 0 1" />
+      <anchor xyz="0.01 0 0" />
+      <limit effort="100" velocity="100" k_velocity="0" />
+      <joint_properties damping="0.0" friction="0.0" />
+    </joint>
+
+    <transmission type="pr2_mechanism_model/SimpleTransmission" name="base_caster_support_trans">
+      <actuator name="base_caster_support_motor" />
+      <joint name="base_caster_support_joint" />
+      <mechanicalReduction>1.0</mechanicalReduction>
+    </transmission>
+
+    <link name="base_caster_support_link">
+      <inertial>
+        <mass value="1"/>
+        <origin xyz="0 0 0" />
+        <inertia ixx="0.00375" ixy="0.0" ixz="0.0"
+          iyy="0.00375" iyz="0.0"
+          izz="0.00375" />
+      </inertial>
+
+      <visual>
+        <segbot_castor_support_link_visual />
+      </visual>
+
+      <collision>
+        <segbot_castor_support_link_collision />
+      </collision>
+
+    </link>
+
+    <joint name="caster_wheel_joint" type="continuous">
+      <origin xyz="-0.0397 0 -0.0918" rpy="0 0 0" />
+      <parent link="base_caster_support_link" />
+      <child link="caster_wheel_link" />
+
+      <axis xyz="0 1 0" />
+      <anchor xyz="0 0 0" />
+      <limit effort="100" velocity="100" k_velocity="0" />
+      <joint_properties damping="0.0" friction="0.0" />
+    </joint>
+
+    <transmission type="pr2_mechanism_model/SimpleTransmission" name="caster_wheel_trans">
+      <actuator name="caster_wheel_motor" />
+      <joint name="caster_wheel_joint" />
+      <mechanicalReduction>1.0</mechanicalReduction>
+    </transmission>
+
+    <link name="caster_wheel_link">
+      <inertial>
+        <mass value="2" /> 
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <inertia  ixx="0.003" ixy="0.0" ixz="0.0"
+          iyy="0.00581" iyz="0.0"
+          izz="0.003" />
+      </inertial>
+
+      <visual>
+        <segbot_castor_wheel_link_visual />
+      </visual>
+
+      <collision>
+        <segbot_castor_wheel_link_collision />
+      </collision>
+
+    </link>
+
+    <gazebo_castor_wheel_link_surface />
+
+    <!-- left wheel -->
+    <segbot_wheel suffix="left" parent="base_link">
+      <origin xyz="0 0.2689 0.0239" rpy="0 0 0" />
+    </segbot_wheel>
+
+    <!-- right wheel -->
+    <segbot_wheel suffix="right" parent="base_link">
+      <origin xyz="0 -0.2689 0.0239" rpy="0 0 0" />
+    </segbot_wheel>
+
+    <!-- floating kinect (for now) -->
+    <kinect turtlebot_camera_parent_name="base_link" 
+      turtlebot_calib_cam_x="0"
+      turtlebot_calib_cam_y="0"
+      turtlebot_calib_cam_z="0.3"
+      turtlebot_calib_cam_rr="0"
+      turtlebot_calib_cam_rp="0"
+      turtlebot_calib_cam_ry="0" />
+
+    <!-- ros controllers -->
+    <gazebo_segbot_ros_controllers/>
+    
+  </macro>
+</robot>

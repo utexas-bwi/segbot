@@ -1,0 +1,9 @@
+<launch>
+
+  <!--- Run the segway -->
+  <include file="$(find segbot_run)/launch/segway.launch" />
+
+  <!--- Run the wiimote joystick -->
+  <include file="$(find segbot_run)/launch/wiimote.launch" />
+
+</launch>

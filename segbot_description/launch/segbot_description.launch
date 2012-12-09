@@ -1,0 +1,12 @@
+<launch>
+
+  <arg name="use_simple_gazebo_model" default="false" />
+
+  <group unless="$(arg use_simple_gazebo_model)">
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find segbot_description)/urdf/segbot.urdf.xacro'" />
+  </group>
+  <group if="$(arg use_simple_gazebo_model)">
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find segbot_description)/urdf/segbot_simple.urdf.xacro'" />
+  </group>
+
+</launch>

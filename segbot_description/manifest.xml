@@ -1,0 +1,22 @@
+<package>
+  <description brief="segbot_description">
+
+     segbot_description
+
+  </description>
+  <author>Piyush Khandelwal</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/segbot_description</url>
+
+  <depend package="tf" />
+  <depend package="urdf" />
+  <depend package="xacro" />
+  <depend package="robot_state_publisher"/>
+  <!-- <export> -->
+  <!--   <gazebo gazebo_media_path="${prefix}" /> -->
+  <!-- </export> -->
+
+</package>
+
+

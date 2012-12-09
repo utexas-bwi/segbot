@@ -1,0 +1,12 @@
+<launch>
+
+  <!-- Run the wiimote controller -->
+  <node name="wiimote" pkg="wiimote" type="wiimote_node.py" output="screen" />
+
+  <!-- Run the joy2twist converter -->
+  <node name="joy2twist" pkg="joy2twist_segway_rmp" type="joy2twist.py">
+    <param name="linear_scalar" value="0.05" />
+    <param name="angular_scalar" value="-0.05" />
+  </node>
+
+</launch>
