@@ -12,12 +12,12 @@
 {'other': {'local-name': '/opt/ros/fuerte/stacks'}},
 
 # Segway RMP ROS Package
-{'git': {'local-name': 'segway_rmp', 'version': 'master', 'uri':'git@github.com:bwi-utexas/bwi-utexas/segway-rmp-ros-pkg.git'}},
+{'git': {'local-name': 'segway_rmp', 'version': 'master', 'uri':'git@github.com:utexas-bwi/segway-rmp-ros-pkg.git'}},
 {'git': {'local-name': 'libsegwayrmp', 'version': 'master', 'uri':'https://github.com/wjwwood/libsegwayrmp.git'}},
 {'git': {'local-name': 'serial', 'version': 'v1.0', 'uri':'https://github.com/wjwwood/serial.git'}},
   
 # Segbot base 
-{'git': {'local-name': 'segbot', 'version': 'master', 'uri': 'git@github.com:bwi-utexas/segbot.git'}}
+{'git': {'local-name': 'segbot', 'version': 'master', 'uri': 'git@github.com:utexas-bwi/segbot.git'}}
 
 ]
 
