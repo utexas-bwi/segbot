@@ -3,7 +3,7 @@
   <arg name="use_simple_gazebo_model" default="false" />
   <arg name="tf_prefix" default="" />
 
-  <include file="$(find segbot_description)/launch/segbot_description.launch">
+  <include file="$(find segbot_bringup)/launch/segbot_description.launch">
     <arg name="use_simple_gazebo_model" value="$(arg use_simple_gazebo_model)" />
   </include>
 

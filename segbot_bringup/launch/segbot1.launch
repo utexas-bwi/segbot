@@ -20,10 +20,15 @@
     <param name="invert_angular_vel_cmds" type="bool" value="false" />
 
     <!-- Set linear and angular acceleration limits in m/s^2 and degree/s^2 respectively -->
-    <!-- <param name="linear_pos_accel_limit" type="double" value="1.0" /> -->
-    <!-- <param name="linear_neg_accel_limit" type="double" value="1.0" /> -->
-    <!-- <param name="angular_pos_accel_limit" type="double" value="45.0" /> -->
-    <!-- <param name="angular_neg_accel_limit" type="double" value="45.0" /> -->
+    <param name="linear_pos_accel_limit" type="double" value="1.0" />
+    <param name="linear_neg_accel_limit" type="double" value="1.0" />
+    <param name="angular_pos_accel_limit" type="double" value="45.0" />
+    <param name="angular_neg_accel_limit" type="double" value="45.0" />
+
+    <!-- Set max linear and angular absolute velocity in m/s^2 and radians/s^2 respectively -->
+    <param name="max_linear_velocity" type="double" value="0.75" />
+    <param name="max_angular_velocity" type="double" value="0.5" />
+
     <param name="linear_odom_scale" type="double" value="2.0" />
     <param name="angular_odom_scale" type="double" value="2.0" />
 
@@ -33,7 +38,7 @@
   </node>
 
   <!-- Launch robot description -->
-  <include file="$(find segbot_description)/launch/segbot_description_tf.launch">
+  <include file="$(find segbot_bringup)/launch/segbot_description_tf.launch">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
 
