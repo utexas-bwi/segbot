@@ -11,8 +11,7 @@
 
   <depend package="segway_rmpX" />
   <depend package="segbot_description" />
-  <depend package="freenect_launch" />
-  <depend package="openni_launch" />
+  <depend package="segbot_sensors" />
   <depend package="tf" />
 
 </package>

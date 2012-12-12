@@ -1,0 +1,18 @@
+<package>
+  <description brief="segbot_sensors">
+
+     segbot_sensors
+
+  </description>
+  <author>Piyush Khandelwal</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/segbot_sensors</url>
+
+  <depend package="hokuyo_node" />
+  <depend package="freenect_launch" />
+  <depend package="openni_launch" />
+
+</package>
+
+

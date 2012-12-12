@@ -4,14 +4,16 @@
   <license>BSD</license>  
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/segbot</url>
+
   <depend stack="ros" />
   <depend stack="common_msgs" />
-  <depend stack="segway_rmp" />
+  <depend stack="segway_rmp" />     <!-- segway_rmpX -->
   <depend stack="turtlebot" />      <!-- pointcloud_to_laserscan -->
   <depend stack="robot_model" />    <!-- urdf -->
   <depend stack="xacro" />
-  <depend stack="freenect_stack" />
-  <depend stack="openni_launch" />
+  <depend stack="freenect_stack" /> <!-- freenect_launch -->
+  <depend stack="openni_launch" />  <!-- openni_launch -->
+  <depend stack="laser_drivers" />  <!-- hokuyo_node -->
   <depend stack="geometry" />       <!-- tf -->
 
 </stack>
