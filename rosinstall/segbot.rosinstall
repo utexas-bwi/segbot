@@ -17,7 +17,13 @@
 {'git': {'local-name': 'serial', 'version': 'v1.0', 'uri':'https://github.com/wjwwood/serial.git'}},
   
 # Segbot base 
-{'git': {'local-name': 'segbot', 'version': 'master', 'uri': 'https://github.com/utexas-bwi/segbot.git'}}
+{'git': {'local-name': 'segbot', 'version': 'master', 'uri': 'https://github.com/utexas-bwi/segbot.git'}},
+
+# Segbot navigation
+{'git': {'local-name': 'segbot_apps', 'version': 'master', 'uri': 'https://github.com/utexas-bwi/segbot_apps.git'}},
+
+# Segbot simulation
+{'git': {'local-name': 'segbot_simulator', 'version': 'master', 'uri': 'https://github.com/utexas-bwi/segbot_simulator.git'}}
 
 ]
 
