@@ -9,10 +9,10 @@
   <xacro:macro name="kinect_camera" params="name parent *origin">
     <joint name="${name}_frame_joint" type="fixed">
       <insert_block name="origin" />
-      <parent link="${parent}"/>
-      <child link="${name}_frame"/>
+      <parent link="${parent}_link"/>
+      <child link="${name}_link"/>
     </joint>
-    <link name="${name}_frame">
+    <link name="${name}_link">
 
       <inertial>
         <mass value="0.1" />
@@ -29,23 +29,16 @@
         </geometry>
       </visual>
 
+<!--
       <collision>
         <origin xyz="0.0 0.012 0" rpy="0 0 0"/>
         <geometry>
           <mesh filename="package://pr2_description/meshes/sensors/kinect_v0/kinect.dae" scale="0.001 0.001 0.001" />
         </geometry>
       </collision>
+-->
 
     </link>
-
-    <joint name="${name}_optical_joint" type="fixed">
-      <origin xyz="0 0 0"
-                rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-      <parent link="${name}_frame"/>
-      <child link="${name}_optical_frame"/>
-    </joint>
-
-    <link name="${name}_optical_frame"/>
 
     <!-- extensions -->
     <xacro:kinect_camera_gazebo name="${name}" />

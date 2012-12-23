@@ -13,7 +13,7 @@
 
   <!-- Add the forward facing kinect sensor for navigation -->
   <include filename="$(find segbot_description)/urdf/sensors/kinect_camera.urdf.xacro" />
-  <kinect_camera name="nav_kinect" parent="base_link">
+  <kinect_camera name="nav_kinect" parent="base">
     <origin xyz="0 0 0.3" rpy="0 0 0" />
   </kinect_camera>
 
