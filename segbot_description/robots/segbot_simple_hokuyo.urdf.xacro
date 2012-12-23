@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<robot name="segbot">
+
+  <!-- Included URDF Files -->
+  <include filename="$(find segbot_description)/urdf/gazebo_simple.xacro" />
+  <include filename="$(find segbot_description)/urdf/segbot_base.xacro" />
+  <property name="M_PI" value="3.14159"/>
+  <property name="SCALE" value="0.0254"/>
+
+  <!-- Add the segbot base -->
+  <segbot />
+
+  <!-- Add the forward facing kinect sensor for navigation -->
+  <include filename="$(find segbot_description)/urdf/sensors/hokuyo_04lx_laser.urdf.xacro" />
+  <hokuyo_04lx_laser name="nav_hokuyo" parent="base" ros_topic="scan" update_rate="10" min_angle="${-M_PI/2}" max_angle="${M_PI/2}">
+    <origin xyz="0.12 0 0.25" rpy="0 0 0" />
+  </hokuyo_04lx_laser>
+
+</robot>

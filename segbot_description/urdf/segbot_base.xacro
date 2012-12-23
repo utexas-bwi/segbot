@@ -3,7 +3,6 @@
 <robot>
   <!-- Included URDF Files -->
   <include filename="$(find segbot_description)/urdf/segbot_wheel.xacro" />
-  <include filename="$(find segbot_description)/urdf/kinect.urdf.xacro" />
 
   <macro name="segbot">
 
