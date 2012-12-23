@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<root xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+      xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+      xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+      xmlns:xacro="http://ros.org/wiki/xacro">
+  
+<xacro:macro name="kinect_camera_gazebo" params="name">
+  <gazebo reference="${name}_frame">
+    <sensor:camera name="${name}_frame_sensor">
+      <imageFormat>R8G8B8</imageFormat>
+      <imageSize>640 480</imageSize>
+      <hfov>57</hfov>
+      <nearClip>0.01</nearClip>
+      <farClip>5</farClip>
+      <updateRate>20.0</updateRate>
+      <baseline>0.2</baseline>
+      <controller:gazebo_ros_openni_kinect name="${name}_frame_controller" plugin="libgazebo_ros_openni_kinect.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>20.0</updateRate>
+        <cameraName>${name}</cameraName>
+        <imageTopicName>${name}/ir/image_raw</imageTopicName>
+        <cameraInfoTopicName>${name}/ir/camera_info</cameraInfoTopicName>
+        <depthImageTopicName>${name}/depth/image_raw</depthImageTopicName>
+        <depthImageInfoTopicName>${name}/depth/camera_info</depthImageInfoTopicName>
+        <pointCloudTopicName>${name}/depth/points</pointCloudTopicName>
+        <frameName>${name}_optical_frame</frameName>
+        <pointCloudCutoff>0.5</pointCloudCutoff>
+        <distortionK1>0.00000001</distortionK1>
+        <distortionK2>0.00000001</distortionK2>
+        <distortionK3>0.00000001</distortionK3>
+        <distortionT1>0.00000001</distortionT1>
+        <distortionT2>0.00000001</distortionT2>
+      </controller:gazebo_ros_openni_kinect>
+    </sensor:camera>
+  </gazebo>
+
+</xacro:macro>
+
+</root>
+
