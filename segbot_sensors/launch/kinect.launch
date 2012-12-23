@@ -1,41 +1,39 @@
 <launch>
 
   <arg name="camera" default="camera" />
-  <arg name="manager" value="$(arg camera)_nodelet_manager" />
   <arg name="ns" default="" />
+  <arg name="use_openni" default="false" />
+  <arg name="laserscan_config" default="false" />
+  <arg name="publish_tf" default="true" />
+  <!-- Remember to construct the tf tree to $(arg ns)/$(arg camera_base_link) -->
 
-  <!-- Kinect -->
-  <include file="$(find segbot_navigation)/launch/openni.launch">
-    <arg name="camera" value="$(arg camera)" />
-    <arg name="ns" value="$(arg ns)" />
-    <arg name="publish_tf" value="false" />
-  </include>
+  <group if="$(arg use_openni)">
+    <include file="$(find segbot_navigation)/launch/openni.launch">
+      <arg name="camera" value="$(arg camera)" />
+      <arg name="ns" value="$(arg ns)" />
+      <arg name="publish_tf" value="$(arg publish_tf)" />
+    </include>
+  </group>
 
-  <!-- throttling -->
-  <node pkg="nodelet" type="nodelet" name="pointcloud_throttle" args="load pointcloud_to_laserscan/CloudThrottle $(arg manager)" respawn="true">
-    <param name="max_rate" value="20.0"/>
-    <remap from="cloud_in" to="$(arg camera)/depth/points"/>
-    <remap from="cloud_out" to="cloud_throttled"/>
-  </node>
-
-  <!-- Fake Laser -->
-  <node pkg="nodelet" type="nodelet" name="kinect_laser" args="load pointcloud_to_laserscan/CloudToScan $(arg manager)" respawn="true">
-    <param name="output_frame_id" value="$(arg ns)/$(arg camera)_depth_frame"/>
-    <!-- heights are in the (optical?) frame of the kinect -->
-    <param name="min_height" value="-0.15"/>
-    <param name="max_height" value="0.15"/>
-    <remap from="cloud" to="cloud_throttled"/>
-  </node>
-
-  <!-- Fake Laser (narrow one, for localization -->
-  <node pkg="nodelet" type="nodelet" name="kinect_laser_narrow" args="load pointcloud_to_laserscan/CloudToScan $(arg manager)" respawn="true">
-    <param name="output_frame_id" value="$(arg ns)/$(arg camera)_depth_frame"/>
-    <!-- heights are in the (optical?) frame of the kinect -->
-    <param name="min_height" value="-0.025"/>
-    <param name="max_height" value="0.025"/>
-    <remap from="cloud" to="cloud_throttled"/>
-    <remap from="scan" to="narrow_scan"/>
-  </node>
+  <group unless="$(arg use_openni)">
+    <group if="$(arg laserscan_config)">
+      <include file="$(find freenect_launch)/launch/examples/freenect-xyz.launch">
+        <arg name="camera" value="$(arg camera)" />
+        <arg name="ns" value="$(arg ns)" />
+        <arg name="publish_tf" value="$(arg publish_tf)" />
+        <arg name="enable_depth_diagnostics" value="true" />
+      </include>
+    </group>
+    <group unless="$(arg laserscan_config)">
+      <include file="$(find freenect_launch)/launch/examples/freenect-xyzrgb.launch">
+        <arg name="camera" value="$(arg camera)" />
+        <arg name="ns" value="$(arg ns)" />
+        <arg name="publish_tf" value="$(arg publish_tf)" />
+        <arg name="enable_depth_diagnostics" value="true" />
+        <arg name="enable_rgb_diagnostics" value="true" />
+      </include>
+    </group>
+  </group>
 
 </launch>
 

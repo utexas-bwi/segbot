@@ -1,0 +1,18 @@
+<launch>
+
+  <arg name="camera" default="camera" />
+  <arg name="ns" default="" />
+
+  <1-- this should fully resolve to $(arg ns)/... automatically -->
+  <arg name="manager" value="$(arg camera)_nodelet_manager" />
+
+  <!-- Fake Laser from kinect pointcloud -->
+  <node pkg="nodelet" type="nodelet" name="kinect_laser_narrow" args="load pointcloud_to_laserscan/CloudToScan $(arg manager)" respawn="true">
+    <param name="output_frame_id" value="$(arg ns)/$(arg camera)_depth_frame"/>
+    <param name="min_height" value="-0.05"/>
+    <param name="max_height" value="0.05"/>
+    <remap from="cloud" to="$(arg camera)/depth/points"/>
+  </node>
+
+</launch>
+
