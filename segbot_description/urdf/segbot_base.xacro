@@ -144,15 +144,6 @@
       <origin xyz="0 -0.2689 0.0239" rpy="0 0 0" />
     </segbot_wheel>
 
-    <!-- floating kinect (for now) -->
-    <kinect turtlebot_camera_parent_name="base_link" 
-      turtlebot_calib_cam_x="0"
-      turtlebot_calib_cam_y="0"
-      turtlebot_calib_cam_z="0.3"
-      turtlebot_calib_cam_rr="0"
-      turtlebot_calib_cam_rp="0"
-      turtlebot_calib_cam_ry="0" />
-
     <!-- ros controllers -->
     <gazebo_segbot_ros_controllers/>
     
