@@ -13,6 +13,8 @@
   <depend package="urdf" />
   <depend package="xacro" />
   <depend package="robot_state_publisher"/>
+  <depend package="pr2_description" /> <!-- adding dependency for kinect -->
+
   <!-- <export> -->
   <!--   <gazebo gazebo_media_path="${prefix}" /> -->
   <!-- </export> -->
