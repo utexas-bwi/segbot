@@ -10,10 +10,14 @@
   <param name="robot_description" command="$(find xacro)/xacro.py '$(find segbot_description)/robots/segbot_full_kinect.urdf.xacro'" />
 
   <!-- launch the tf tree -->
-  <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" output="screen">
+  <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher">
     <param name="publish_frequency" type="double" value="5.0" />
     <param name="tf_prefix" value="$(arg tf_prefix)" />
   </node>
+
+  <!-- launch the joint state publisher to default values -->
+  <!-- gazebo should publish this, but not good way of getting info on real robot for caster wheel -->
+  <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
 
   <!-- launch the kinect sensor (with tf) -->
   <include file="$(find segbot_sensors)/launch/kinect.launch">
