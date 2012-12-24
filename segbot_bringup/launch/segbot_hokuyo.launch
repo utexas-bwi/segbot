@@ -1,0 +1,27 @@
+<launch>
+
+  <arg name="tf_prefix" default="" />
+  <arg name="ns" default="" /> 
+
+  <!-- launch the segway base -->
+  <include file="$(find segbot_bringup)/launch/base.launch" />
+
+  <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
+  <param name="robot_description" command="$(find xacro)/xacro.py '$(find segbot_description)/robots/segbot_simple_hokuyo.urdf.xacro'" />
+
+  <!-- launch the tf tree -->
+  <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" output="screen">
+    <param name="publish_frequency" type="double" value="5.0" />
+    <param name="tf_prefix" value="$(arg tf_prefix)" />
+  </node>
+
+  <!-- launch the joint state publisher to default values -->
+  <!-- gazebo should publish this, but not good way of getting info on real robot for caster wheel -->
+  <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
+
+  <!-- launch the hokuyo sensor -->
+  <include file="$(find segbot_sensors)/launch/hokuyo.launch">
+    <arg name="name" value="nav_hokuyo" />
+  </include>
+
+</launch>
