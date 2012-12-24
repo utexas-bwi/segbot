@@ -1,7 +1,7 @@
 <launch>
 
   <arg name="tf_prefix" default="" />
-  <arg name="ns" default="" /> 
+  <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- launch the segway base -->
   <include file="$(find segbot_bringup)/launch/base.launch" />
@@ -12,7 +12,6 @@
   <!-- launch the tf tree -->
   <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher" output="screen">
     <param name="publish_frequency" type="double" value="5.0" />
-    <param name="tf_prefix" value="$(arg tf_prefix)" />
   </node>
 
   <!-- launch the joint state publisher to default values -->
@@ -22,6 +21,7 @@
   <!-- launch the hokuyo sensor -->
   <include file="$(find segbot_sensors)/launch/hokuyo.launch">
     <arg name="name" value="nav_hokuyo" />
+    <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
 
 </launch>

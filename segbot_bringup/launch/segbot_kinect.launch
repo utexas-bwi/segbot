@@ -1,6 +1,5 @@
 <launch>
 
-  <arg name="tf_prefix" default="" />
   <arg name="ns" default="" /> 
 
   <!-- launch the segway base -->
@@ -12,7 +11,6 @@
   <!-- launch the tf tree -->
   <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher">
     <param name="publish_frequency" type="double" value="5.0" />
-    <param name="tf_prefix" value="$(arg tf_prefix)" />
   </node>
 
   <!-- launch the joint state publisher to default values -->
