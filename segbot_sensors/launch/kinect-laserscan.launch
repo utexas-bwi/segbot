@@ -11,6 +11,9 @@
     <param name="output_frame_id" value="$(arg ns)/$(arg camera)_depth_frame"/>
     <param name="min_height" value="-0.05"/>
     <param name="max_height" value="0.05"/>
+    <param name="angle_min" value="-0.5" /> <!-- 57 degrees / 2 in radians -->
+    <param name="angle_max" value="0.5" /> <!-- 57 degrees / 2 in radians -->
+    <param name="range_max" value="5.0" />
     <remap from="cloud" to="$(arg camera)/depth/points"/>
   </node>
 
