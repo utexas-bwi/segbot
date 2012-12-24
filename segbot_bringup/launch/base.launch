@@ -1,6 +1,6 @@
 <launch>
- 
-  <arg name="tf_prefix" default="" /> 
+
+  <!-- Set use_sim_time to false if the hardware segway driver is being loaded --> 
   <param name="/use_sim_time" value="false"/>
 
   <!-- Launch Segway driver -->
@@ -38,10 +38,5 @@
     <remap from="~odom" to="odom" />
 
   </node>
-
-  <!-- Launch robot description -->
-  <include file="$(find segbot_bringup)/launch/segbot_description_tf.launch">
-    <arg name="tf_prefix" value="$(arg tf_prefix)" />
-  </include>
 
 </launch>

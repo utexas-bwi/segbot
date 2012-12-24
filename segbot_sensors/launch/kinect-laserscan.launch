@@ -3,7 +3,7 @@
   <arg name="camera" default="camera" />
   <arg name="ns" default="" />
 
-  <1-- this should fully resolve to $(arg ns)/... automatically -->
+  <!-- this should fully resolve to $(arg ns)/... automatically -->
   <arg name="manager" value="$(arg camera)_nodelet_manager" />
 
   <!-- Fake Laser from kinect pointcloud -->
