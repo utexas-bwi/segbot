@@ -3,18 +3,21 @@
 <robot name="segbot">
 
   <!-- Included URDF Files -->
+  <include filename="$(find segbot_description)/urdf/common.urdf.xacro" />
   <include filename="$(find segbot_description)/urdf/gazebo.xacro" />
   <include filename="$(find segbot_description)/urdf/segbot_base.xacro" />
-  <property name="M_PI" value="3.14159"/>
-  <property name="SCALE" value="0.0254"/>
+  <include filename="$(find segbot_description)/urdf/segbot_chassis.urdf.xacro" />
 
   <!-- Add the segbot base -->
   <segbot />
+  <segbot_chassis parent="base">
+    <origin xyz="-${2*INCH_TO_M} 0 ${4.25*INCH_TO_M}"/>
+  </segbot_chassis>
 
   <!-- Add the forward facing kinect sensor for navigation -->
-  <include filename="$(find segbot_description)/urdf/sensors/kinect_camera.urdf.xacro" />
-  <kinect_camera name="nav_kinect" parent="base">
-    <origin xyz="0 0 0.3" rpy="0 0 0" />
-  </kinect_camera>
+  <include filename="$(find segbot_description)/urdf/mounts/kinect_mount.urdf.xacro" />
+  <kinect_mount name="nav_kinect" parent="back_right_vertical_beam" length="${10.75*INCH_TO_M}">
+    <origin xyz="0 ${0.5*INCH_TO_M} ${4*INCH_TO_M}" rpy="-${M_PI/2} -${M_PI/2} 0" />
+  </kinect_mount>
 
 </robot>
