@@ -25,7 +25,7 @@
         <geometry>
           <box size="${1*INCH_TO_M} ${1*INCH_TO_M} ${length}" />
         </geometry>
-        <material name="beam_grey" />
+        <material name="light_grey" />
       </visual>
     </link>
 
