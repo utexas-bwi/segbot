@@ -3,7 +3,7 @@
  
   <xacro:macro name="aluminium_sheet" params="name parent thickness length width *origin">
     <joint name="${name}_joint" type="fixed">
-      <insert_block name="origin" />
+      <xacro:insert_block name="origin" />
       <parent link="${parent}_link"/>
       <child link="${name}_link"/>
     </joint>
