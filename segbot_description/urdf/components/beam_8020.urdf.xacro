@@ -4,11 +4,9 @@
       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
       xmlns:xacro="http://ros.org/wiki/xacro">
   
-  <include filename="$(find segbot_description)/urdf/sensors/kinect_camera.gazebo.xacro" />
-
-  <xacro:macro name="kinect_camera" params="name parent *origin">
+  <xacro:macro name="beam_8020" params="name parent length *origin">
     <joint name="${name}_joint" type="fixed">
-      <insert_block name="origin" />
+      <xacro:insert_block name="origin" />
       <parent link="${parent}_link"/>
       <child link="${name}_link"/>
     </joint>
@@ -23,26 +21,19 @@
       </inertial>
 
       <visual>
-        <origin xyz="0.0 0.012 0" rpy="0 0 0"/>
+        <origin xyz="0 0 ${length/2}" rpy="0 0 0"/>
         <geometry>
-          <mesh filename="package://pr2_description/meshes/sensors/kinect_v0/kinect.dae" scale="0.001 0.001 0.001" />
+          <box size="${1*INCH_TO_M} ${1*INCH_TO_M} ${length}" />
         </geometry>
+        <material name="beam_grey">
+          <color rgba="0.8 0.8 0.8 1" />
+        </material>
       </visual>
-
-<!--
-      <collision>
-        <origin xyz="0.0 0.012 0" rpy="0 0 0"/>
-        <geometry>
-          <mesh filename="package://pr2_description/meshes/sensors/kinect_v0/kinect.dae" scale="0.001 0.001 0.001" />
-        </geometry>
-      </collision>
--->
 
     </link>
 
-    <!-- extensions -->
-    <xacro:kinect_camera_gazebo name="${name}" />
   </xacro:macro>
 
 </root>
+
 

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<root xmlns:xacro="http://ros.org/wiki/xacro">
+ 
+  <xacro:macro name="aluminium_sheet" params="name parent thickness length width *origin">
+    <joint name="${name}_joint" type="fixed">
+      <insert_block name="origin" />
+      <parent link="${parent}_link"/>
+      <child link="${name}_link"/>
+    </joint>
+    <link name="${name}_link">
+
+      <inertial>
+        <mass value="0.1" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
+                 iyy="0.01"  iyz="0.0"
+                 izz="0.01" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 ${thickness/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${length} ${width} ${thickness}" />
+        </geometry>
+        <material name="sheet_grey">
+          <color rgba="0.5 0.5 0.5 1" />
+        </material>
+      </visual>
+
+    </link>
+
+  </xacro:macro>
+
+</root>
+
