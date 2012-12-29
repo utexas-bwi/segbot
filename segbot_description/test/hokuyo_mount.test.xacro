@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<robot name="kinect"
+       xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Included URDF Files -->
+  <include filename="$(find segbot_description)/urdf/common.urdf.xacro" />
+  <include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
+
+  <!-- add the root link -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.001 0.001 0.001" />
+      </geometry>
+    </visual>
+  </link>
+
+  <!-- Add the kinect camera -->
+  <xacro:hokuyo_mount name="test_hokuyo" parent="base" length="${10.75*INCH_TO_M}" ros_topic="scan" update_rate="10" min_angle="${-M_PI/2}" max_angle="${M_PI/2}">
+    <origin xyz="0 0 0" rpy="-${M_PI/2} -${M_PI/2} 0" />
+  </xacro:hokuyo_mount>
+
+</robot>

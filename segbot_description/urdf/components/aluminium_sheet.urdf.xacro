@@ -22,9 +22,7 @@
         <geometry>
           <box size="${length} ${width} ${thickness}" />
         </geometry>
-        <material name="sheet_grey">
-          <color rgba="0.5 0.5 0.5 1" />
-        </material>
+        <material name="sheet_grey" />
       </visual>
 
     </link>

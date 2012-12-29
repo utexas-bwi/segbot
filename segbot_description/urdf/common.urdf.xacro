@@ -1,7 +1,18 @@
 <?xml version="1.0"?>
 
 <root xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- constants -->
   <xacro:property name="M_PI" value="3.14159"/>
   <xacro:property name="INCH_TO_M" value="0.0254"/>
+
+  <!-- colors -->
+  <material name="beam_grey">
+    <color rgba="0.7 0.7 0.7 1" />
+  </material>
+  <material name="sheet_grey">
+    <color rgba="0.5 0.5 0.5 1" />
+  </material>
+
 </root>
 
