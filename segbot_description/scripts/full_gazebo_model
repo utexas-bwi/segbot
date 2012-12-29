@@ -1,0 +1,5 @@
+#!/bin/sh
+
+cp $1 /tmp/test.urdf
+sed -i 's/gazebo_simple/gazebo/g' /tmp/test.urdf
+rosrun xacro xacro.py /tmp/test.urdf
