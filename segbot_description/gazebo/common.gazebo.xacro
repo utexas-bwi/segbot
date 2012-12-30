@@ -3,87 +3,88 @@
 <robot
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
   xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
-  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface">
+  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+  xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <macro name="gazebo_segbot_base_link_surface">
+  <xacro:macro name="gazebo_segbot_base_link_surface">
     <gazebo reference="base_link">
       <mu1 value="100.0" />
       <mu2 value="100.0" />
       <kp  value="1000000.0" />
       <kd  value="1.0" />
     </gazebo>
-  </macro>
+  </xacro:macro>
 
-  <macro name="gazebo_segbot_castor_wheel_link_surface">
+  <xacro:macro name="gazebo_segbot_castor_wheel_link_surface">
     <gazebo reference="caster_wheel_link">
       <mu1 value="10.0" />
       <mu2 value="10.0" />
       <kp  value="1000000.0" />
       <kd  value="1.0" />
     </gazebo>
-  </macro>
+  </xacro:macro>
 
-  <macro name="segbot_base_link_mesh">
+  <xacro:macro name="segbot_base_link_mesh">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <geometry>
       <mesh filename="package://segbot_description/meshes/rmp50-base-link.dae" scale="0.0254 0.0254 0.0254"/>
     </geometry>
-  </macro>
+  </xacro:macro>
 
-  <macro name="segbot_base_link_cylinder">
+  <xacro:macro name="segbot_base_link_cylinder">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <geometry>
       <cylinder length="0.4330" radius="0.6" />
     </geometry>
-  </macro>
+  </xacro:macro>
 
-  <macro name="segbot_castor_wheel_link_mesh">
+  <xacro:macro name="segbot_castor_wheel_link_mesh">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <geometry>
       <mesh filename="package://segbot_description/meshes/rmp50-castor-wheel.dae" scale="0.0254 0.0254 0.0254"/>
     </geometry>
-  </macro>
+  </xacro:macro>
 
-  <macro name="segbot_collision_none">
+  <xacro:macro name="segbot_collision_none">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <geometry>
       <box size="0.01 0.01 0.01" />
     </geometry>
-  </macro>
+  </xacro:macro>
 
-  <macro name="segbot_castor_support_link_mesh">
+  <xacro:macro name="segbot_castor_support_link_mesh">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <geometry>
       <mesh filename="package://segbot_description/meshes/rmp50-castor-link.dae" scale="0.0254 0.0254 0.0254"/>
     </geometry>
-  </macro>
+  </xacro:macro>
 
-  <macro name="segbot_wheel_mesh" params="suffix">
+  <xacro:macro name="segbot_wheel_mesh" params="suffix">
     <origin xyz="0 0 0" rpy="0 0 0" />
     <geometry>
       <mesh filename="package://segbot_description/meshes/rmp50-${suffix}-wheel.dae" scale="0.0254 0.0254 0.0254"/>
     </geometry>
-  </macro>
+  </xacro:macro>
 
-  <macro name="gazebo_segbot_wheel_surface">
+  <xacro:macro name="gazebo_segbot_wheel_surface">
     <gazebo reference="${parent}_${suffix}_wheel_link" >
       <mu1 value="10.0" />
       <mu2 value="10.0" />
       <kp  value="1000000.0" />
       <kd  value="1.0" />
     </gazebo>
-  </macro>
+  </xacro:macro>
 
-  <macro name="gazebo_segbot_controllers_common">
+  <xacro:macro name="gazebo_segbot_controllers_common">
     <canonicalBody>base_footprint</canonicalBody>
     <controller:gazebo_ros_controller_manager name="gazebo_ros_controller_manager" plugin="libgazebo_ros_controller_manager.so">
       <alwaysOn>true</alwaysOn>
       <updateRate>5.0</updateRate>
       <interface:audio name="gazebo_ros_controller_manager_dummy_iface" />
     </controller:gazebo_ros_controller_manager>
-  </macro>
+  </xacro:macro>
 
-  <macro name="gazebo_segbot_drive_parameters">
+  <xacro:macro name="gazebo_segbot_drive_parameters">
     <alwaysOn>true</alwaysOn>
     <update>100</update>
     <updateRate>100.0</updateRate>
@@ -94,18 +95,18 @@
     <torque>20</torque>
     <interface:position name="position_iface_0"/>
     <topicName>cmd_vel</topicName>
-  </macro>
+  </xacro:macro>
 
-  <macro name="gazebo_segbot_simple_drive_plugin">
+  <xacro:macro name="gazebo_segbot_simple_drive_plugin">
     <controller:segbotsimpledrive_plugin name="differential_drive_controller" plugin="libsegbotsimpledrive_plugin.so">
       <gazebo_segbot_drive_parameters />
     </controller:segbotsimpledrive_plugin>
-  </macro>
+  </xacro:macro>
 
-  <macro name="gazebo_segbot_drive_plugin">
+  <xacro:macro name="gazebo_segbot_drive_plugin">
     <controller:segbotdrive_plugin name="differential_drive_controller" plugin="libsegbotdrive_plugin.so">
       <gazebo_segbot_drive_parameters />
     </controller:segbotdrive_plugin>
-  </macro>
+  </xacro:macro>
 
 </robot>
