@@ -6,7 +6,7 @@
   <!-- Included URDF Files -->
   <include filename="$(find segbot_description)/urdf/common.urdf.xacro" />
   <include filename="$(find segbot_description)/gazebo/simple_collision.gazebo.xacro" />
-  <include filename="$(find segbot_description)/urdf/segbot_base.xacro" />
+  <include filename="$(find segbot_description)/urdf/segbot_base.urdf.xacro" />
   <include filename="$(find segbot_description)/urdf/segbot_chassis.urdf.xacro" />
   <include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
 
