@@ -1,0 +1,12 @@
+<launch>
+  <group ns="test_robot">
+    <arg name="tf_prefix" value="test_robot" />
+    <param name="tf_prefix" value="$(arg tf_prefix)" />
+
+    <include file="$(find segbot_sensors)/launch/hokuyo.launch">
+      <arg name="name" value="test_hokuyo" />
+      <arg name="tf_prefix" value="$(arg tf_prefix)" />
+    </include>
+  </group>
+</launch>
+
