@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<robot
+<root
   xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
   xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
@@ -109,4 +109,4 @@
     </controller:segbotdrive_plugin>
   </xacro:macro>
 
-</robot>
+</root>
