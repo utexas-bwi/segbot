@@ -45,6 +45,12 @@
         </geometry>
         <material name="almost_black" />
       </visual>
+      <collision>
+        <origin xyz="0 0 ${5.5*INCH_TO_M}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${7*INCH_TO_M} ${14*INCH_TO_M} ${11*INCH_TO_M}" />
+        </geometry>
+      </collision>
     </link>
 
     <!-- 80/20 base beams -->

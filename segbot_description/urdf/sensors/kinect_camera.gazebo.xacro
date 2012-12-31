@@ -5,8 +5,8 @@
       xmlns:xacro="http://ros.org/wiki/xacro">
   
 <xacro:macro name="kinect_camera_gazebo" params="name">
-  <gazebo reference="${name}_frame">
-    <sensor:camera name="${name}_frame_sensor">
+  <gazebo reference="${name}_link">
+    <sensor:camera name="${name}_link_sensor">
       <imageFormat>R8G8B8</imageFormat>
       <imageSize>640 480</imageSize>
       <hfov>57</hfov>
@@ -18,8 +18,8 @@
         <alwaysOn>true</alwaysOn>
         <updateRate>20.0</updateRate>
         <cameraName>${name}</cameraName>
-        <imageTopicName>${name}/ir/image_raw</imageTopicName>
-        <cameraInfoTopicName>${name}/ir/camera_info</cameraInfoTopicName>
+        <imageTopicName>${name}/rgb/image_raw</imageTopicName>
+        <cameraInfoTopicName>${name}/rgb/camera_info</cameraInfoTopicName>
         <depthImageTopicName>${name}/depth/image_raw</depthImageTopicName>
         <depthImageInfoTopicName>${name}/depth/camera_info</depthImageInfoTopicName>
         <pointCloudTopicName>${name}/depth/points</pointCloudTopicName>

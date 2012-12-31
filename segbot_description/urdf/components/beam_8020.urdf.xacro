@@ -27,7 +27,17 @@
         </geometry>
         <material name="light_grey" />
       </visual>
+      <collision>
+        <origin xyz="0 0 ${length/2}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${1*INCH_TO_M} ${1*INCH_TO_M} ${length}" />
+        </geometry>
+      </collision>
     </link>
+
+    <gazebo reference="${name}_link">
+      <material>Gazebo/Grey</material>
+    </gazebo>
 
   </xacro:macro>
 
