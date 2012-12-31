@@ -1,0 +1,25 @@
+<launch>
+
+  <arg name="name" default="nav_kinect" /> 
+  <arg name="tf_prefix" default="" /> 
+  <arg name="use_full_gazebo_model" default="false" />
+  <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_kinect.urdf.xacro" />
+
+  <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
+  <param unless="$(arg use_full_gazebo_model)" name="robot_description" 
+    command="$(find xacro)/xacro.py '$(arg urdf_file)'" />
+  <param if="$(arg use_full_gazebo_model)" name="robot_description" 
+    command="$(find segbot_description)/scripts/get_full_gazebo_model $(arg urdf_file)" />
+
+  <!-- launch the tf tree -->
+  <node pkg="robot_state_publisher" type="state_publisher" name="robot_state_publisher">
+    <param name="publish_frequency" type="double" value="5.0" />
+  </node>
+
+  <!-- launch the kinect laserscan converter -->
+  <include file="$(find segbot_sensors)/launch/kinect/kinect-laserscan.launch">
+    <arg name="tf_prefix" value="$(arg tf_prefix)" />
+    <arg name="camera" value="$(arg name)" />
+  </include>
+
+</launch>

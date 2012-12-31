@@ -7,7 +7,7 @@
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- construct the link from the base of the hokuyo to the laser -->
-  <group if="publish_tf">
+  <group if="$(arg publish_tf)">
     <include file="$(find segbot_sensors)/launch/hokuyo/hokuyo-frames.launch">
       <arg name="name" value="$(arg name)" />
     </include>

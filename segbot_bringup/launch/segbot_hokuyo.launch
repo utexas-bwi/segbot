@@ -1,0 +1,22 @@
+<launch>
+
+  <!-- set the tf prefix as necessary -->
+  <arg name="tf_prefix" default="" />
+  <param name="tf_prefix" value="$(arg tf_prefix)" />
+
+  <!-- launch all the auxillary configuration information -->
+  <include file="$(find segbot_bringup)/launch/includes/segbot_hokuyo.auxillary.launch" />
+
+  <!-- launch the joint state publisher to default values -->
+  <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
+
+  <!-- launch the segway base -->
+  <include file="$(find segbot_bringup)/launch/includes/segway_base.launch" />
+
+  <!-- launch the hokuyo sensor -->
+  <include file="$(find segbot_sensors)/launch/hokuyo/hokuyo.launch">
+    <arg name="name" value="nav_hokuyo" />
+    <arg name="tf_prefix" value="$(arg tf_prefix)" />
+  </include>
+
+</launch>
