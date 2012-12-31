@@ -1,0 +1,6 @@
+<launch>
+  <arg name="name" default="laser" />
+  <!-- Remember to construct the tf tree to $(arg name)_link -->
+  <node name="$(arg name)_link_broadcaster" pkg="tf" type="static_transform_publisher"
+    args="0 0 0.058 0 0 0 $(arg name)_link $(arg name)_laser_link 100" />
+</launch>
