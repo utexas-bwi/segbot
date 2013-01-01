@@ -15,7 +15,6 @@
     <link name="${name}_link">
       <inertial>
         <mass value="0.1" />
-        <origin xyz="0 0 0" rpy="0 0 0"/>
         <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
                  iyy="0.01"  iyz="0.0"
                  izz="0.01" />
@@ -37,6 +36,10 @@
 
     <gazebo reference="${name}_link">
       <material>Gazebo/Grey</material>
+      <mu1 value="100.0" />
+      <mu2 value="100.0" />
+      <kp value="1000000.0" />
+      <kd value="1.0" />
     </gazebo>
 
   </xacro:macro>
