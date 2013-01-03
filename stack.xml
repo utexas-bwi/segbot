@@ -14,6 +14,7 @@
   <depend stack="freenect_stack" /> <!-- freenect_launch -->
   <depend stack="openni_launch" />  <!-- openni_launch -->
   <depend stack="laser_drivers" />  <!-- hokuyo_node -->
-  <depend stack="geometry" />       <!-- tf -->
+  <depend stack="tf" />       <!-- tf -->
+  <depend stack="laser_filters" />
 
 </stack>

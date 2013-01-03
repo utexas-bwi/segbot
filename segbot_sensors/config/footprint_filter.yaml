@@ -1,0 +1,6 @@
+scan_filter_chain:
+- name: footprint_filter
+  type: SegbotFootprintFilter
+  params:
+    footprint_frame: base_footprint
+    footprint: [-1,-1,-1,1,1,1,1,-1]

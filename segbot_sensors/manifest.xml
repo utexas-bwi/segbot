@@ -12,6 +12,15 @@
   <depend package="hokuyo_node" />
   <depend package="freenect_launch" />
   <depend package="openni_launch" />
+  <depend package="filters" />
+  <depend package="laser_filters" />
+  <depend package="tf" />
+  <depend package="pluginlib" />
+
+  <export>
+    <cpp cflags="-I${prefix}/include `rosboost-cfg --cflags`" lflags="-Wl,-rpath,${prefix}/lib -L${prefix}/lib -lsegbot_sensors_filters" />
+    <filters plugin="${prefix}/segbot_sensors_plugins.xml" />
+  </export>
 
 </package>
 
