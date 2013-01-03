@@ -10,7 +10,7 @@
 
     <!-- root link, on the ground just below the robot origin -->
     <link name="base_footprint">
-      <visual>
+     <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <box size="0.001 0.001 0.001" />
@@ -27,11 +27,11 @@
     <!-- This is the robot origin, middle of the wheel axis -->
     <link name="base_link">
       <inertial>
-        <mass value="0.01" />
-        <origin xyz="0 0 0" />
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-          iyy="1.0" iyz="0.0" 
-          izz="1.0" />
+        <mass value="30" />
+        <origin xyz="-0.1 0 -0.075" />
+        <inertia ixx="3.0" ixy="0.0" ixz="0.0"
+          iyy="3.0" iyz="0.0" 
+          izz="2.0" />
       </inertial>
 
       <visual>
@@ -47,21 +47,21 @@
     <xacro:gazebo_segbot_base_link_surface />
 
     <!-- pushing the center of mass of the body to a more appropriate pos -->
-    <joint name="base_center_of_mass_joint" type="fixed">
-      <origin xyz="-0.1 0 -0.075" rpy="0 0 0" />
-      <parent link="base_link"/>
-      <child link="base_center_of_mass_link" />
-    </joint>
+    <!-- <joint name="base_center_of_mass_joint" type="fixed"> -->
+    <!--   <origin xyz="-0.1 0 -0.075" rpy="0 0 0" /> -->
+    <!--   <parent link="base_link"/> -->
+    <!--   <child link="base_center_of_mass_link" /> -->
+    <!-- </joint> -->
 
-    <link name="base_center_of_mass_link">
-      <inertial>
-        <mass value="30" />
-        <origin xyz="0 0 0" />
-        <inertia ixx="1.0" ixy="0.0" ixz="0.0"
-          iyy="1.0" iyz="0.0" 
-          izz="1.0" />
-      </inertial>
-    </link>
+    <!-- <link name="base_center_of_mass_link"> -->
+    <!--   <inertial> -->
+    <!--     <mass value="30" /> -->
+    <!--     <origin xyz="0 0 0" /> -->
+    <!--     <inertia ixx="1.0" ixy="0.0" ixz="0.0" -->
+    <!--       iyy="1.0" iyz="0.0"  -->
+    <!--       izz="1.0" /> -->
+    <!--   </inertial> -->
+    <!-- </link> -->
 
     <!-- castor joint and wheel -->
     <joint name="base_caster_support_joint" type="continuous">
@@ -100,6 +100,13 @@
 
     </link>
 
+    <gazebo reference="base_caster_support_link">
+      <mu1 value="100.0" />
+      <mu2 value="100.0" />
+      <kp  value="1000000.0" />
+      <kd  value="1.0" />
+    </gazebo>
+
     <joint name="caster_wheel_joint" type="continuous">
       <origin xyz="-0.0397 0 -0.0918" rpy="0 0 0" />
       <parent link="base_caster_support_link" />
@@ -111,11 +118,11 @@
       <joint_properties damping="0.0" friction="0.0" />
     </joint>
 
-    <transmission type="pr2_mechanism_model/SimpleTransmission" name="caster_wheel_trans">
-      <actuator name="caster_wheel_motor" />
-      <joint name="caster_wheel_joint" />
-      <mechanicalReduction>1.0</mechanicalReduction>
-    </transmission>
+    <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="caster_wheel_trans"> -->
+    <!--   <actuator name="caster_wheel_motor" /> -->
+    <!--   <joint name="caster_wheel_joint" /> -->
+    <!--   <mechanicalReduction>1.0</mechanicalReduction> -->
+    <!-- </transmission> -->
 
     <link name="caster_wheel_link">
       <inertial>

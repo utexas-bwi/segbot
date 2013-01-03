@@ -52,6 +52,12 @@
         </geometry>
       </collision>
     </link>
+    <gazebo reference="battery_box_link">
+      <mu1 value="100.0" />
+      <mu2 value="100.0" />
+      <kp  value="1000000.0" />
+      <kd  value="1.0" />
+    </gazebo>
 
     <!-- 80/20 base beams -->
     <!-- left beam -->

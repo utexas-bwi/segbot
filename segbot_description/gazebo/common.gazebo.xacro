@@ -66,7 +66,7 @@
     </geometry>
   </xacro:macro>
 
-  <xacro:macro name="gazebo_segbot_wheel_surface">
+  <xacro:macro name="gazebo_segbot_wheel_surface" params="parent suffix">
     <gazebo reference="${parent}_${suffix}_wheel_link" >
       <mu1 value="10.0" />
       <mu2 value="10.0" />
