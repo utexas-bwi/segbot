@@ -10,14 +10,12 @@
   <param if="$(arg use_full_gazebo_model)" name="robot_description" 
     command="$(find segbot_description)/scripts/get_full_gazebo_model $(arg urdf_file)" />
 
-  <!-- launch the tf tree from the urdf (for all fixed joints) -->
+  <!-- launch the tf tree from the urdf (for all fixed joints + the hokuyo internal link) -->
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
     <param name="publish_frequency" type="double" value="5.0" />
   </node>
 
-  <!-- launch the hokuyo tf link - LAUNCHED IN ROBOT DESCRIPTION FOR NOW!!! -->
-  <!-- <include file="$(find segbot_sensors)/launch/hokuyo/hokuyo-frames.launch"> -->
-  <!--   <arg name="name" value="nav_hokuyo" /> -->
-  <!-- </include> -->
+  <!-- launch the laser filter to get rid of readings from the robot itself -->
+  <include file="$(find segbot_sensors)/launch/hokuyo/hokuyo-filters.launch" />
 
 </launch>
