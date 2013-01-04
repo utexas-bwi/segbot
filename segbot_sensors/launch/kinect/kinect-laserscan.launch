@@ -2,19 +2,20 @@
 
   <arg name="camera" default="camera" />
   <arg name="tf_prefix" default="" />
+  <arg name="launch_manager" default="true" />
 
   <!-- this should fully resolve to $(arg ns)/... automatically -->
   <arg name="manager" value="$(arg camera)_nodelet_manager" />
+  <node if="$(arg launch_manager)" pkg="nodelet" type="nodelet"
+        name="$(arg manager)" args="manager" output="screen" />
 
   <!-- Fake Laser from kinect pointcloud -->
-  <node pkg="nodelet" type="nodelet" name="kinect_laser_narrow" args="load pointcloud_to_laserscan/CloudToScan $(arg manager)" respawn="true">
+  <node pkg="nodelet" type="nodelet" name="kinect_laser" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet $(arg manager)" respawn="true">
     <param name="output_frame_id" value="$(arg tf_prefix)/$(arg camera)_depth_frame"/>
-    <param name="min_height" value="-0.05"/>
-    <param name="max_height" value="0.05"/>
-    <param name="angle_min" value="-0.5" /> <!-- 57 degrees / 2 in radians -->
-    <param name="angle_max" value="0.5" /> <!-- 57 degrees / 2 in radians -->
     <param name="range_max" value="5.0" />
-    <remap from="cloud" to="$(arg camera)/depth/points"/>
+    <param name="scan_height" value="5" />
+    <remap from="image" to="$(arg camera)/depth/image_raw"/>
+    <remap from="scan" to="scan_filtered" />
   </node>
 
 </launch>
