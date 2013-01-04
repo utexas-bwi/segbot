@@ -118,11 +118,11 @@
       <joint_properties damping="0.0" friction="0.0" />
     </joint>
 
-    <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="caster_wheel_trans"> -->
-    <!--   <actuator name="caster_wheel_motor" /> -->
-    <!--   <joint name="caster_wheel_joint" /> -->
-    <!--   <mechanicalReduction>1.0</mechanicalReduction> -->
-    <!-- </transmission> -->
+    <transmission type="pr2_mechanism_model/SimpleTransmission" name="caster_wheel_trans">
+      <actuator name="caster_wheel_motor" />
+      <joint name="caster_wheel_joint" />
+      <mechanicalReduction>1.0</mechanicalReduction>
+    </transmission>
 
     <link name="caster_wheel_link">
       <inertial>

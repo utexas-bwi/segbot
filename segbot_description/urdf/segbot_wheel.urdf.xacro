@@ -34,11 +34,11 @@
 
     <xacro:gazebo_segbot_wheel_surface parent="${parent}" suffix="${suffix}" />
 
-    <!-- <transmission type="pr2_mechanism_model/SimpleTransmission" name="${parent}_${suffix}_wheel_trans"> -->
-    <!--   <actuator name="${parent}_${suffix}_wheel_motor" /> -->
-    <!--   <joint name="${parent}_${suffix}_wheel_joint" /> -->
-    <!--   <mechanicalReduction>1.0</mechanicalReduction> -->
-    <!-- </transmission> -->
+    <transmission type="pr2_mechanism_model/SimpleTransmission" name="${parent}_${suffix}_wheel_trans">
+      <actuator name="${parent}_${suffix}_wheel_motor" />
+      <joint name="${parent}_${suffix}_wheel_joint" />
+      <mechanicalReduction>1.0</mechanicalReduction>
+    </transmission>
 
   </xacro:macro>
 </root>
