@@ -33,4 +33,4 @@
 
 #include "pluginlib/class_list_macros.h"
 
-PLUGINLIB_REGISTER_CLASS(SegbotFootprintFilter, segbot_sensors::SegbotFootprintFilter, filters::FilterBase<sensor_msgs::LaserScan>)
+PLUGINLIB_REGISTER_CLASS(segbot_sensors/SegbotFootprintFilter, segbot_sensors::SegbotFootprintFilter, filters::FilterBase<sensor_msgs::LaserScan>)

@@ -30,6 +30,12 @@ namespace segbot_sensors
           ROS_WARN("No footprint frame provided, assuming footprint is in the frame of reference of the sensor.");
           get_transformation_ = false;
           return false;
+        } else {
+          ros::NodeHandle private_nh("~");
+          std::string tf_prefix = tf::getPrefixParam(private_nh);
+          std::string resolved_frame = tf::resolve(tf_prefix, footprint_frame_);
+          ROS_INFO("Resolved footprint frame from %s to %s.", footprint_frame_.c_str(), resolved_frame.c_str());
+          footprint_frame_ = resolved_frame;
         }
 
         XmlRpc::XmlRpcValue footprint_list;
