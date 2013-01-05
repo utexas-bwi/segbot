@@ -86,21 +86,21 @@
 
   <xacro:macro name="gazebo_segbot_drive_parameters">
     <alwaysOn>true</alwaysOn>
-    <update>100</update>
     <updateRate>100.0</updateRate>
     <leftJoint>base_link_right_wheel_joint</leftJoint>
     <rightJoint>base_link_left_wheel_joint</rightJoint>
     <wheelSeparation>0.5380</wheelSeparation>
     <wheelDiameter>0.2410</wheelDiameter>
     <torque>20</torque>
-    <interface:position name="position_iface_0"/>
     <topicName>cmd_vel</topicName>
+    <!-- <interface:position name="position_iface_0"/> -->
   </xacro:macro>
 
   <xacro:macro name="gazebo_segbot_simple_drive_plugin">
-    <controller:segbotsimpledrive_plugin name="differential_drive_controller" plugin="libsegbotsimpledrive_plugin.so">
+    <controller:segbotdrive_plugin name="differential_drive_controller" plugin="libsegbotdrive_plugin.so">
       <gazebo_segbot_drive_parameters />
-    </controller:segbotsimpledrive_plugin>
+      <useSimpleModel>true</useSimpleModel>
+    </controller:segbotdrive_plugin>
   </xacro:macro>
 
   <xacro:macro name="gazebo_segbot_drive_plugin">
