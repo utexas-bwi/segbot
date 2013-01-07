@@ -6,6 +6,8 @@
   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
   xmlns:xacro="http://ros.org/wiki/xacro">
 
+  <xacro:property name="SIMPLE_ROBOT_RADIUS" value="0.4" />
+
   <xacro:macro name="gazebo_segbot_base_link_surface">
     <gazebo reference="base_link">
       <mu1 value="100.0" />
@@ -32,9 +34,9 @@
   </xacro:macro>
 
   <xacro:macro name="segbot_base_link_cylinder">
-    <origin xyz="0 0 0" rpy="0 0 0" />
+    <origin xyz="0 0 0.2" rpy="0 0 0" />
     <geometry>
-      <cylinder length="0.4330" radius="0.6" />
+      <cylinder length="0.8330" radius="${SIMPLE_ROBOT_RADIUS}" />
     </geometry>
   </xacro:macro>
 
@@ -84,28 +86,21 @@
     </controller:gazebo_ros_controller_manager>
   </xacro:macro>
 
-  <xacro:macro name="gazebo_segbot_drive_parameters">
-    <alwaysOn>true</alwaysOn>
-    <updateRate>100.0</updateRate>
-    <leftJoint>base_link_right_wheel_joint</leftJoint>
-    <rightJoint>base_link_left_wheel_joint</rightJoint>
-    <wheelSeparation>0.5380</wheelSeparation>
-    <wheelDiameter>0.2410</wheelDiameter>
-    <torque>20</torque>
-    <topicName>cmd_vel</topicName>
-    <!-- <interface:position name="position_iface_0"/> -->
-  </xacro:macro>
-
-  <xacro:macro name="gazebo_segbot_simple_drive_plugin">
+  <xacro:macro name="gazebo_segbot_drive_plugin" params="use_simple_model update_rate">
     <controller:segbotdrive_plugin name="differential_drive_controller" plugin="libsegbotdrive_plugin.so">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>${update_rate}</updateRate>
+      <leftJoint>base_link_right_wheel_joint</leftJoint>
+      <rightJoint>base_link_left_wheel_joint</rightJoint>
+      <wheelSeparation>0.5380</wheelSeparation>
+      <wheelDiameter>0.2410</wheelDiameter>
+      <torque>20</torque>
+      <topicName>cmd_vel</topicName>
       <gazebo_segbot_drive_parameters />
-      <useSimpleModel>true</useSimpleModel>
-    </controller:segbotdrive_plugin>
-  </xacro:macro>
-
-  <xacro:macro name="gazebo_segbot_drive_plugin">
-    <controller:segbotdrive_plugin name="differential_drive_controller" plugin="libsegbotdrive_plugin.so">
-      <gazebo_segbot_drive_parameters />
+      <useSimpleModel>${use_simple_model}</useSimpleModel>
+      <simpleMapTopic>map</simpleMapTopic>
+      <simpleModelRadius>${SIMPLE_ROBOT_RADIUS}</simpleModelRadius>
+      <simpleRobotPadding>0.025</simpleRobotPadding>
     </controller:segbotdrive_plugin>
   </xacro:macro>
 

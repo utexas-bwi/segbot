@@ -24,7 +24,7 @@
       <child link="base_link" />
     </joint>
 
-    <!-- This is the robot origin, middle of the wheel axis -->
+    <!-- This is the robot origin, center of the 2 wheels (axis of rotation) -->
     <link name="base_link">
       <inertial>
         <mass value="30" />
@@ -33,37 +33,17 @@
           iyy="3.0" iyz="0.0" 
           izz="2.0" />
       </inertial>
-
       <visual>
         <xacro:segbot_base_link_visual />
       </visual>
-
       <collision>
         <xacro:segbot_base_link_collision />
       </collision>
-
     </link>
 
     <xacro:gazebo_segbot_base_link_surface />
 
-    <!-- pushing the center of mass of the body to a more appropriate pos -->
-    <!-- <joint name="base_center_of_mass_joint" type="fixed"> -->
-    <!--   <origin xyz="-0.1 0 -0.075" rpy="0 0 0" /> -->
-    <!--   <parent link="base_link"/> -->
-    <!--   <child link="base_center_of_mass_link" /> -->
-    <!-- </joint> -->
-
-    <!-- <link name="base_center_of_mass_link"> -->
-    <!--   <inertial> -->
-    <!--     <mass value="30" /> -->
-    <!--     <origin xyz="0 0 0" /> -->
-    <!--     <inertia ixx="1.0" ixy="0.0" ixz="0.0" -->
-    <!--       iyy="1.0" iyz="0.0"  -->
-    <!--       izz="1.0" /> -->
-    <!--   </inertial> -->
-    <!-- </link> -->
-
-    <!-- castor joint and wheel -->
+    <!-- castor joint -->
     <joint name="base_caster_support_joint" type="continuous">
       <origin xyz="-0.3292 0 -0.0485" rpy="0 0 0" />
       <parent link="base_link" />
@@ -89,15 +69,12 @@
           iyy="0.00375" iyz="0.0"
           izz="0.00375" />
       </inertial>
-
       <visual>
         <segbot_castor_support_link_visual />
       </visual>
-
       <collision>
         <segbot_castor_support_link_collision />
       </collision>
-
     </link>
 
     <gazebo reference="base_caster_support_link">
@@ -107,6 +84,7 @@
       <kd  value="1.0" />
     </gazebo>
 
+    <!-- castor wheel -->
     <joint name="caster_wheel_joint" type="continuous">
       <origin xyz="-0.0397 0 -0.0918" rpy="0 0 0" />
       <parent link="base_caster_support_link" />
@@ -132,15 +110,12 @@
           iyy="0.00581" iyz="0.0"
           izz="0.003" />
       </inertial>
-
       <visual>
         <xacro:segbot_castor_wheel_link_visual />
       </visual>
-
       <collision>
         <xacro:segbot_castor_wheel_link_collision />
       </collision>
-
     </link>
 
     <xacro:gazebo_segbot_castor_wheel_link_surface />

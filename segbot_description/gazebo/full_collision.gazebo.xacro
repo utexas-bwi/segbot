@@ -40,7 +40,7 @@
 
   <xacro:macro name="gazebo_segbot_ros_controllers">
     <gazebo>
-      <xacro:gazebo_segbot_drive_plugin />
+      <xacro:gazebo_segbot_drive_plugin use_simple_model="false" update_rate="100" />
       <xacro:gazebo_segbot_controllers_common />
     </gazebo>
   </xacro:macro>
