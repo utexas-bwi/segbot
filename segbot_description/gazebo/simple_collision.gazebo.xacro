@@ -6,36 +6,36 @@
   <!-- Included URDF Files -->
   <include filename="$(find segbot_description)/gazebo/common.gazebo.xacro" />
 
-  <xacro:macro name="segbot_base_link_visual" >
-    <xacro:segbot_base_link_mesh />
-  </xacro:macro>
-
   <xacro:macro name="segbot_base_link_collision" >
-    <xacro:segbot_base_link_cylinder />
-  </xacro:macro>
-
-  <xacro:macro name="segbot_castor_support_link_visual" >
-    <xacro:segbot_castor_support_link_mesh />
+    <xacro:segbot_simple_collision />
   </xacro:macro>
 
   <xacro:macro name="segbot_castor_support_link_collision" >
-    <xacro:segbot_collision_none />
-  </xacro:macro>
-
-  <xacro:macro name="segbot_castor_wheel_link_visual" >
-    <xacro:segbot_castor_wheel_link_mesh />
+    <!-- simple model has no collision -->
   </xacro:macro>
 
   <xacro:macro name="segbot_castor_wheel_link_collision" >
-    <xacro:segbot_collision_none />
-  </xacro:macro>
-
-  <xacro:macro name="segbot_wheel_visual" params="suffix">
-    <xacro:segbot_wheel_mesh suffix="${suffix}" />
+    <!-- simple model has no collision -->
   </xacro:macro>
 
   <xacro:macro name="segbot_wheel_collision" params="suffix">
-    <xacro:segbot_collision_none />
+    <!-- simple model has no collision -->
+  </xacro:macro>
+
+  <xacro:macro name="segbot_battery_box_collision">
+    <!-- simple model has no collision -->
+  </xacro:macro>
+
+  <xacro:macro name="aluminium_sheet_collision" params="thickness length width">
+    <!-- simple model has no collision -->
+  </xacro:macro>
+
+  <xacro:macro name="beam_8020_collision" params="length">
+    <!-- simple model has no collision -->
+  </xacro:macro>
+
+  <xacro:macro name="standoff_632_collision" params="length">
+    <!-- simple model has no collision -->
   </xacro:macro>
 
   <xacro:macro name="gazebo_segbot_ros_controllers">

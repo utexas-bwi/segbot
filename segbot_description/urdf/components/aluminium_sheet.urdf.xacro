@@ -22,12 +22,7 @@
         </geometry>
         <material name="dark_grey" />
       </visual>
-      <collision>
-        <origin xyz="0 0 ${thickness/2}" rpy="0 0 0"/>
-        <geometry>
-          <box size="${length} ${width} ${thickness}" />
-        </geometry>
-      </collision>
+      <xacro:aluminium_sheet_collision thickness="${thickness}" length="${length}" width="${width}"/>
     </link>
 
     <gazebo reference="${name}_link">

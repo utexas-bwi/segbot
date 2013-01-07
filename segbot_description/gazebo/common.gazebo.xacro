@@ -26,46 +26,13 @@
     </gazebo>
   </xacro:macro>
 
-  <xacro:macro name="segbot_base_link_mesh">
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="package://segbot_description/meshes/rmp50-base-link.dae" scale="0.0254 0.0254 0.0254"/>
-    </geometry>
-  </xacro:macro>
-
-  <xacro:macro name="segbot_base_link_cylinder">
-    <origin xyz="0 0 0.2" rpy="0 0 0" />
-    <geometry>
-      <cylinder length="0.8330" radius="${SIMPLE_ROBOT_RADIUS}" />
-    </geometry>
-  </xacro:macro>
-
-  <xacro:macro name="segbot_castor_wheel_link_mesh">
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="package://segbot_description/meshes/rmp50-castor-wheel.dae" scale="0.0254 0.0254 0.0254"/>
-    </geometry>
-  </xacro:macro>
-
-  <xacro:macro name="segbot_collision_none">
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <box size="0.01 0.01 0.01" />
-    </geometry>
-  </xacro:macro>
-
-  <xacro:macro name="segbot_castor_support_link_mesh">
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="package://segbot_description/meshes/rmp50-castor-link.dae" scale="0.0254 0.0254 0.0254"/>
-    </geometry>
-  </xacro:macro>
-
-  <xacro:macro name="segbot_wheel_mesh" params="suffix">
-    <origin xyz="0 0 0" rpy="0 0 0" />
-    <geometry>
-      <mesh filename="package://segbot_description/meshes/rmp50-${suffix}-wheel.dae" scale="0.0254 0.0254 0.0254"/>
-    </geometry>
+  <xacro:macro name="segbot_simple_collision">
+    <collision>
+      <origin xyz="0 0 0.2" rpy="0 0 0" />
+      <geometry>
+        <cylinder length="0.8330" radius="${SIMPLE_ROBOT_RADIUS}" />
+      </geometry>
+    </collision>
   </xacro:macro>
 
   <xacro:macro name="gazebo_segbot_wheel_surface" params="parent suffix">

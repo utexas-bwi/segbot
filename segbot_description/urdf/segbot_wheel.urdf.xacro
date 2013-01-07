@@ -22,14 +22,13 @@
           iyy="0.144" iyz="0.0"
           izz="0.076" />
       </inertial>
-
       <visual>
-        <xacro:segbot_wheel_visual suffix="${suffix}" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://segbot_description/meshes/rmp50-${suffix}-wheel.dae" scale="0.0254 0.0254 0.0254"/>
+        </geometry>
       </visual>
-
-      <collision>
-        <xacro:segbot_wheel_collision suffix="${suffix}" />
-      </collision>
+      <xacro:segbot_wheel_collision suffix="${suffix}" />
     </link>
 
     <xacro:gazebo_segbot_wheel_surface parent="${parent}" suffix="${suffix}" />
