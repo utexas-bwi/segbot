@@ -1,16 +1,4 @@
-# Dependencies
-
-# Core ros stacks
-#
-#   sudo apt-get install ros-fuerte-desktop-full
-
 [
-# Official Ros Stacks
-{'setup-file': {'local-name': '/opt/ros/fuerte/setup.sh'}},
-{'other': {'local-name': '/opt/ros/fuerte/share/ros'}},
-{'other': {'local-name': '/opt/ros/fuerte/share'}},
-{'other': {'local-name': '/opt/ros/fuerte/stacks'}},
-
 # Segway RMP ROS Package
 {'git': {'local-name': 'segway_rmp', 'version': 'master', 'uri':'https://github.com/utexas-bwi/segway-rmp-ros-pkg.git'}},
 {'git': {'local-name': 'libsegwayrmp', 'version': 'master', 'uri':'https://github.com/utexas-bwi/libsegwayrmp.git'}},
