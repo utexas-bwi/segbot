@@ -6,10 +6,10 @@
   <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_kinect.urdf.xacro" />
 
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
-  <param unless="$(arg use_full_gazebo_model)" name="robot_description" 
-    command="$(find xacro)/xacro.py '$(arg urdf_file)'" />
   <param if="$(arg use_full_gazebo_model)" name="robot_description" 
-    command="$(find segbot_description)/scripts/get_full_gazebo_model $(arg urdf_file)" />
+    command="$(find xacro)/xacro.py '$(arg urdf_file)'" />
+  <param unless="$(arg use_full_gazebo_model)" name="robot_description" 
+    command="$(find segbot_description)/scripts/get_simple_gazebo_model $(arg urdf_file)" />
 
   <!-- launch the tf tree -->
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
