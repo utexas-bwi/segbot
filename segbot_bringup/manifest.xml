@@ -1,7 +1,7 @@
 <package>
-  <description brief="segbot_bringup">
+  <description brief="Launch files for the BWI Project's segbot robot at UT Austin">
 
-     segbot_bringup
+     This package contains launch files for segway based robots in the Building Wide Intelligence (BWI) Project at the University of Texas at Austin.
 
   </description>
   <author>Piyush Khandelwal</author>
