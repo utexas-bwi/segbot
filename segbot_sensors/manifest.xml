@@ -1,7 +1,7 @@
 <package>
-  <description brief="segbot_sensors">
+  <description brief="Contains all the Segbot Sensor launch files and relevant filters">
 
-     segbot_sensors
+     This package contains all the sensor-specific launch files and all the relevant filters that are applied on sensor data before being used by the rest of the system.
 
   </description>
   <author>Piyush Khandelwal</author>
