@@ -7,8 +7,8 @@
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- launch the auxillary configuration (shared between h/w and simulation) -->
-  <include file="$(find segbot_bringup)/launch/includes/segbot_kinect.auxillary.launch">
-    <arg name="name" value="nav_kinect" />
+  <include file="$(find segbot_bringup)/launch/includes/segbot_iriss.auxillary.launch">
+    <arg name="name" value="kinect" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
 
@@ -24,7 +24,7 @@
     <arg name="ns" value="$(arg ns)" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="device_id" value="$(arg device_id)" />
-    <arg name="depth_only" value="true" />
+    <arg name="depth_only" value="false" />
   </include>
 
 </launch>

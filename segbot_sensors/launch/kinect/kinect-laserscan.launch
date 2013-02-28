@@ -3,6 +3,10 @@
   <arg name="camera" default="camera" />
   <arg name="tf_prefix" default="" />
   <arg name="launch_manager" default="true" />
+  <arg name="use_registered" default="false" />
+
+  <arg if="$(arg use_registered)" name="image_topic" value="$(arg camera)/depth_registered/image_raw" />
+  <arg unless="$(arg use_registered)" name="image_topic" value="$(arg camera)/depth/image_raw" />
 
   <!-- this should fully resolve to $(arg ns)/... automatically -->
   <arg name="manager" value="$(arg camera)_nodelet_manager" />
@@ -14,7 +18,7 @@
     <param name="output_frame_id" value="$(arg tf_prefix)/$(arg camera)_depth_frame"/>
     <param name="range_max" value="5.0" />
     <param name="scan_height" value="5" />
-    <remap from="image" to="$(arg camera)/depth/image_raw"/>
+    <remap from="image" to="$(arg image_topic)"/>
     <remap from="scan" to="scan_filtered" />
   </node>
 
