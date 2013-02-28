@@ -21,6 +21,7 @@
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="camera" value="$(arg name)" />
     <arg name="use_registered" value="true" />
+    <arg name="launch_manager" value="false" />
   </include>
 
 </launch>
