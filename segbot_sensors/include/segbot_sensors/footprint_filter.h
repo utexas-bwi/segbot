@@ -132,6 +132,8 @@ namespace segbot_sensors
             }
             // in accordance with REP 117
             filtered_scan.ranges[count] = (!c) ? input_scan.ranges[count] : std::numeric_limits<float>::quiet_NaN();
+          } else { //if (input_scan.ranges[count] > input_scan.range_max) {
+            filtered_scan.ranges[count] = input_scan.range_max;
           }
         }
 
