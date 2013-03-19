@@ -26,6 +26,14 @@
     <!-- simple model has no collision -->
   </xacro:macro>
 
+  <xacro:macro name="laptop_collision">
+    <!-- simple model has no collision -->
+  </xacro:macro>
+
+  <xacro:macro name="laptop_screen_collision">
+    <!-- simple model has no collision -->
+  </xacro:macro>
+
   <xacro:macro name="aluminium_sheet_collision" params="thickness length width">
     <!-- simple model has no collision -->
   </xacro:macro>

@@ -5,6 +5,8 @@
   <!-- Included URDF Files -->
   <include filename="$(find segbot_description)/urdf/components/beam_8020.urdf.xacro" />
   <include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
+  <include filename="$(find segbot_description)/urdf/components/battery_box.urdf.xacro" />
+  <include filename="$(find segbot_description)/urdf/components/laptop.urdf.xacro" />
 
   <xacro:macro name="segbot_chassis" params="parent *origin">
 
@@ -24,35 +26,10 @@
       <origin xyz="0 -${6.75*INCH_TO_M} -${2*INCH_TO_M}" rpy="+${M_PI/2} 0 0" />
     </xacro:aluminium_sheet>
 
-    <!-- battery box (approximately 7" by 14" by 11) -->
-    <joint name="battery_box_joint" type="fixed">
+    <!-- battery box -->
+    <xacro:battery_box name="battery_box" parent="chassis_base_plate">
       <origin xyz="-${6.5*INCH_TO_M} 0 ${0.25*INCH_TO_M}" rpy="0 0 0" />
-      <parent link="chassis_base_plate_link" />
-      <child link="battery_box_link" />
-    </joint>
-    <link name="battery_box_link">
-      <inertial>
-        <mass value="0.1" />
-        <origin xyz="0 0 0" rpy="0 0 0"/>
-        <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
-                 iyy="0.01"  iyz="0.0"
-                 izz="0.01" />
-      </inertial>
-      <visual>
-        <origin xyz="0 0 ${5.5*INCH_TO_M}" rpy="0 0 0"/>
-        <geometry>
-          <box size="${7*INCH_TO_M} ${14*INCH_TO_M} ${11*INCH_TO_M}" />
-        </geometry>
-        <material name="almost_black" />
-      </visual>
-      <xacro:segbot_battery_box_collision />
-    </link>
-    <gazebo reference="battery_box_link">
-      <mu1 value="100.0" />
-      <mu2 value="100.0" />
-      <kp  value="1000000.0" />
-      <kd  value="1.0" />
-    </gazebo>
+    </xacro:battery_box>
 
     <!-- 80/20 base beams -->
     <!-- left beam -->
@@ -101,6 +78,11 @@
       <origin xyz="${0.5*INCH_TO_M} ${6.875*INCH_TO_M} ${6*INCH_TO_M}"
         rpy="${M_PI} -${M_PI/2} 0" />
     </xacro:aluminium_sheet>
+
+    <!-- laptop -->
+    <xacro:laptop name="laptop" parent="laptop_base_plate"> 
+      <origin xyz="0 0 ${0.125*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:laptop>
 
   </xacro:macro>
 

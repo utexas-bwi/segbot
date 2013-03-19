@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<root xmlns:xacro="http://ros.org/wiki/xacro">
+ 
+  <xacro:macro name="battery_box" params="name parent *origin">
+
+    <!-- battery box (approximately 7" by 14" by 11) -->
+    <joint name="${name}_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}_link" />
+      <child link="${name}_link" />
+    </joint>
+    <link name="${name}_link">
+      <inertial>
+        <mass value="0.1" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
+                 iyy="0.01"  iyz="0.0"
+                 izz="0.01" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 ${5.5*INCH_TO_M}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${7*INCH_TO_M} ${14*INCH_TO_M} ${11*INCH_TO_M}" />
+        </geometry>
+        <material name="almost_black" />
+      </visual>
+      <xacro:segbot_battery_box_collision />
+    </link>
+
+    <gazebo reference="${name}_link">
+      <material>Gazebo/Black</material>
+      <mu1 value="100.0" />
+      <mu2 value="100.0" />
+      <kp  value="1000000.0" />
+      <kd  value="1.0" />
+    </gazebo>
+
+  </xacro:macro>
+
+</root>
+
