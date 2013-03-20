@@ -42,6 +42,7 @@
       <parent link="${name}_link" />
       <child link="${name}_screen_link" />
     </joint>
+
     <link name="${name}_screen_link">
       <inertial>
         <mass value="0.1" />
@@ -61,6 +62,11 @@
     </link>
 
     <gazebo reference="${name}_screen_link">
+      <plugin name="${name}_video_controller" filename="libgazebo_ros_video.so">
+        <height>240</height>
+        <width>320</width>
+        <topicName>image_raw</topicName>
+      </plugin>
       <material>Gazebo/Grey</material>
       <mu1 value="100.0" />
       <mu2 value="100.0" />
