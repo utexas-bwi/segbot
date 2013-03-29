@@ -26,6 +26,14 @@
     <!-- simple model has no collision -->
   </xacro:macro>
 
+  <xacro:macro name="laptop_collision">
+    <!-- simple model has no collision -->
+  </xacro:macro>
+
+  <xacro:macro name="laptop_screen_collision">
+    <!-- simple model has no collision -->
+  </xacro:macro>
+
   <xacro:macro name="aluminium_sheet_collision" params="thickness length width">
     <!-- simple model has no collision -->
   </xacro:macro>
@@ -40,8 +48,8 @@
 
   <xacro:macro name="gazebo_segbot_ros_controllers">
     <gazebo>
-      <xacro:gazebo_segbot_drive_plugin use_simple_model="true" update_rate="1000" />
-      <xacro:gazebo_segbot_controllers_common />
+      <xacro:gazebo_object_controller_plugin update_rate="50" />
+      <!-- <xacro:gazebo_segbot_controllers_common /> -->
     </gazebo>
   </xacro:macro>
 

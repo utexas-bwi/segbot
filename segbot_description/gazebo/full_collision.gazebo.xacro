@@ -51,6 +51,24 @@
     </collision>
   </xacro:macro>
 
+  <xacro:macro name="laptop_collision">
+    <collision>
+      <origin xyz="0 0 ${0.375*INCH_TO_M}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${12*INCH_TO_M} ${14*INCH_TO_M} ${0.75*INCH_TO_M}" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+
+  <xacro:macro name="laptop_screen_collision">
+    <collision>
+      <origin xyz="${6*INCH_TO_M} 0 -${0.375*INCH_TO_M}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${12*INCH_TO_M} ${14*INCH_TO_M} ${0.75*INCH_TO_M}" />
+      </geometry>
+    </collision>
+  </xacro:macro>
+
   <xacro:macro name="aluminium_sheet_collision" params="thickness length width">
     <collision>
       <origin xyz="0 0 ${thickness/2}" rpy="0 0 0"/>
@@ -80,8 +98,8 @@
 
   <xacro:macro name="gazebo_segbot_ros_controllers">
     <gazebo>
-      <xacro:gazebo_segbot_drive_plugin use_simple_model="false" update_rate="100" />
-      <xacro:gazebo_segbot_controllers_common />
+      <xacro:gazebo_segbot_drive_plugin update_rate="100" />
+      <!-- <xacro:gazebo_segbot_controllers_common /> -->
     </gazebo>
   </xacro:macro>
 

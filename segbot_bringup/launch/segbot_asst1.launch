@@ -6,7 +6,7 @@
   <arg name="device_id" default="#1" />
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
-  <!-- launch the auxillary configuration (shared between h/w and simulation) -->
+  <!-- launch the auxilliary configuration (shared between h/w and simulation) -->
   <include file="$(find segbot_bringup)/launch/includes/segbot_asst1.auxilliary.launch">
     <arg name="name" value="nav_kinect" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
