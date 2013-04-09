@@ -6,7 +6,7 @@
   xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
   xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:property name="SIMPLE_ROBOT_RADIUS" value="0.4" />
+  <xacro:property name="SIMPLE_ROBOT_RADIUS" value="0.25" />
 
   <xacro:macro name="gazebo_segbot_base_link_surface">
     <gazebo reference="base_link">
@@ -73,7 +73,7 @@
       <topicName>cmd_vel</topicName>
       <mapTopic>map</mapTopic>
       <modelRadius>${SIMPLE_ROBOT_RADIUS}</modelRadius>
-      <modelPadding>0.025</modelPadding>
+      <modelPadding>0.05</modelPadding>
     </controller:object_controller_plugin>
   </xacro:macro>
 
