@@ -19,12 +19,12 @@
   <include file="$(find segbot_bringup)/launch/includes/segway_base.launch" />
 
   <!-- launch the kinect sensor in laserscan configuration -->
-  <include file="$(find segbot_sensors)/launch/kinect/kinect.launch">
+  <include file="$(find segbot_sensors)/launch/kinect/iriss_kinect.launch">
     <arg name="name" value="nav_kinect" />
     <arg name="ns" value="$(arg ns)" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="device_id" value="$(arg device_id)" />
-    <arg name="depth_only" value="false" />
+    <arg name="use_openni" value="true" />
   </include>
 
 </launch>
