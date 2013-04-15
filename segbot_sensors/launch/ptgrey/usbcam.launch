@@ -1,0 +1,6 @@
+<launch>
+  <node name="camera1394_node" pkg="camera1394" type="camera1394_node">
+    <param name="bayer_method" value="Simple" />
+    <param name="bayer_pattern" value="rggb" />
+  </node>
+</launch>

@@ -17,8 +17,10 @@
   </xacro:segbot_chassis>
 
   <!-- Add the hokuyo -->
-  <xacro:hokuyo_mount name="nav_hokuyo" parent="front_right_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}" ros_topic="scan" update_rate="10" min_angle="${-M_PI/2}" max_angle="${M_PI/2}">
-    <origin xyz="0 ${0.5*INCH_TO_M} ${2*INCH_TO_M}" rpy="-${M_PI/2} -${M_PI/2} 0" />
+  <xacro:hokuyo_mount name="nav_hokuyo" parent="front_left_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}" ros_topic="scan" update_rate="10" min_angle="${-M_PI/2}" max_angle="${M_PI/2}">
+    <origin xyz="0 -${0.5*INCH_TO_M} ${4*INCH_TO_M}" rpy="${M_PI/2} ${M_PI/2} 0" />
   </xacro:hokuyo_mount>
+
+  <xacro:gazebo_segbot_ros_controllers />
 
 </robot>
