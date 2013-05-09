@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 
 <root
-  xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
-  xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
-  xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
   xmlns:xacro="http://ros.org/wiki/xacro">
 
   <xacro:property name="SIMPLE_ROBOT_RADIUS" value="0.25" />
@@ -46,15 +43,14 @@
 
   <xacro:macro name="gazebo_segbot_controllers_common">
     <canonicalBody>base_footprint</canonicalBody>
-    <controller:gazebo_ros_controller_manager name="gazebo_ros_controller_manager" plugin="libgazebo_ros_controller_manager.so">
+    <plugin name="gazebo_ros_controller_manager" filename="libgazebo_ros_controller_manager.so">
       <alwaysOn>true</alwaysOn>
       <updateRate>5.0</updateRate>
-      <interface:audio name="gazebo_ros_controller_manager_dummy_iface" />
-    </controller:gazebo_ros_controller_manager>
+    </plugin>
   </xacro:macro>
 
   <xacro:macro name="gazebo_segbot_drive_plugin" params="update_rate">
-    <controller:segbotdrive_plugin name="differential_drive_controller" plugin="libsegbotdrive_plugin.so">
+    <plugin name="differential_drive_controller" filename="libsegbotdrive_plugin.so">
       <alwaysOn>true</alwaysOn>
       <updateRate>${update_rate}</updateRate>
       <leftJoint>base_link_right_wheel_joint</leftJoint>
@@ -63,18 +59,18 @@
       <wheelDiameter>0.2410</wheelDiameter>
       <torque>20</torque>
       <topicName>cmd_vel</topicName>
-    </controller:segbotdrive_plugin>
+    </plugin>
   </xacro:macro>
 
   <xacro:macro name="gazebo_object_controller_plugin" params="update_rate">
-    <controller:object_controller_plugin name="object_controller" plugin="libobject_controller_plugin.so">
+    <plugin name="object_controller" filename="libobject_controller_plugin.so">
       <alwaysOn>true</alwaysOn>
       <updateRate>${update_rate}</updateRate>
       <topicName>cmd_vel</topicName>
       <mapTopic>map</mapTopic>
       <modelRadius>${SIMPLE_ROBOT_RADIUS}</modelRadius>
       <modelPadding>0.05</modelPadding>
-    </controller:object_controller_plugin>
+    </plugin>
   </xacro:macro>
 
 </root>
