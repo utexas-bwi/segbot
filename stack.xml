@@ -7,7 +7,7 @@
 
   <depend stack="ros" />
   <depend stack="common_msgs" />
-  <depend stack="segway_rmp" />     <!-- segway_rmpX -->
+  <!-- <depend stack="segway_rmp" />     segway_rmpX -->
   <depend stack="turtlebot" />      <!-- pointcloud_to_laserscan -->
   <depend stack="robot_model" />    <!-- urdf -->
   <depend stack="xacro" />

@@ -9,7 +9,7 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/segbot_bringup</url>
 
-  <depend package="segway_rmpX" />
+  <!-- <depend package="segway_rmpX" /> -->
   <depend package="segbot_description" />
   <depend package="segbot_sensors" />
   <depend package="tf" />

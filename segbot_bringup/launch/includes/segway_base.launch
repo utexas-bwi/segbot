@@ -4,7 +4,7 @@
   <param name="/use_sim_time" value="false"/>
 
   <!-- Launch Segway driver -->
-  <node name="segway_rmp_node" pkg="segway_rmpX" type="segway_rmp_node" output="screen" required="true">
+  <node name="segway_rmp_node" pkg="segway_rmp" type="segway_rmp_node" output="screen" required="true">
 
     <param name="interface_type" type="str" value="serial" />
     <param name="serial_port" type="str" value="/dev/ttyUSB0" />
