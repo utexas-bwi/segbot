@@ -65,13 +65,13 @@
     </link>
 
     <gazebo reference="${name}_screen_link">
-      <visual>
-        <plugin name="${name}_video_controller" filename="libgazebo_ros_video.so">
-          <height>120</height>
-          <width>160</width>
-          <topicName>image</topicName>
-        </plugin>
-      </visual>
+      <!-- <visual> -->
+      <!--   <plugin name="${name}_video_controller" filename="libgazebo_ros_video.so"> -->
+      <!--     <height>120</height> -->
+      <!--     <width>160</width> -->
+      <!--     <topicName>image</topicName> -->
+      <!--   </plugin> -->
+      <!-- </visual> -->
       <material>Gazebo/Grey</material>
       <mu1 value="100.0" />
       <mu2 value="100.0" />
