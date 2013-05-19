@@ -3,7 +3,7 @@
 <root
   xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:property name="SIMPLE_ROBOT_RADIUS" value="0.25" />
+  <xacro:property name="SIMPLE_ROBOT_RADIUS" value="0.05" />
 
   <xacro:macro name="gazebo_segbot_base_link_surface">
     <gazebo reference="base_link">
