@@ -24,6 +24,4 @@
     <arg name="launch_manager" value="false" />
   </include>
 
-  
-
 </launch>
