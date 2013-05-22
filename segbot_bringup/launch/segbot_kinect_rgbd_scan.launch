@@ -6,12 +6,12 @@
   <arg name="device_id" default="#1" />
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
-  <!-- launch the auxillary configuration (shared between h/w and simulation) -->
+  <!-- launch the auxiliary configuration (shared between h/w and simulation) -->
   <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_kinect_scan.launch">
     <arg name="name" value="nav_kinect" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="launch_laserscan_manager" value="false" /> <!-- manager launched by kinect script -->
-    <arg name="use_registered" value="true" /> 
+    <arg name="use_registered_topic" value="true" /> 
   </include>
 
   <!-- launch the joint state publisher to default values -->
@@ -26,6 +26,7 @@
     <arg name="ns" value="$(arg ns)" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="device_id" value="$(arg device_id)" />
+    <arg name="publish_tf" value="false" />
   </include>
 
 </launch>
