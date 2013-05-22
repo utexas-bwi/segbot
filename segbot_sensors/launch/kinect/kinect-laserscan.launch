@@ -14,10 +14,11 @@
         name="$(arg manager)" args="manager" output="screen" />
 
   <!-- Fake Laser from kinect pointcloud -->
-  <node pkg="nodelet" type="nodelet" name="kinect_laser" args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet $(arg manager)" respawn="true">
+  <node pkg="nodelet" type="nodelet" name="kinect_laser" 
+        args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet $(arg manager)" respawn="true">
     <param name="output_frame_id" value="$(arg tf_prefix)/$(arg camera)_depth_frame"/>
-    <param name="range_max" value="2.5" />
-    <param name="scan_height" value="220" />
+    <param name="range_max" value="3.0" />
+    <param name="scan_height" value="479" /> <!-- use entire height of kinect -->
     <remap from="image" to="$(arg image_topic)"/>
     <remap from="scan" to="scan_filtered" />
   </node>
