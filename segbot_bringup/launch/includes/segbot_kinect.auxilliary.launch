@@ -4,6 +4,7 @@
   <arg name="tf_prefix" default="" /> 
   <arg name="use_full_gazebo_model" default="false" />
   <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_kinect.urdf.xacro" />
+  <arg name="launch_laserscan_manager" default="true" />
 
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
   <param if="$(arg use_full_gazebo_model)" name="robot_description" 
@@ -20,6 +21,7 @@
   <include file="$(find segbot_sensors)/launch/kinect/kinect-laserscan.launch">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="camera" value="$(arg name)" />
+    <arg name="launch_manager" value="$(arg launch_laserscan_manager)" />
   </include>
 
 </launch>
