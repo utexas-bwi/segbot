@@ -5,7 +5,7 @@
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- launch all the auxilliary configuration information -->
-  <include file="$(find segbot_bringup)/launch/includes/segbot_hokuyo.auxilliary.launch" />
+  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_hokuyo.launch" />
 
   <!-- launch the joint state publisher to default values -->
   <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
