@@ -16,6 +16,4 @@
     <origin xyz="${BASE_PLATE_X_OFFSET*INCH_TO_M} 0 ${BASE_PLATE_Z_OFFSET*INCH_TO_M}"/>
   </xacro:segbot_chassis>
 
-  <xacro:gazebo_segbot_ros_controllers />
-
 </robot>
