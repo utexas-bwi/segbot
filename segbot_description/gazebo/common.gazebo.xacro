@@ -50,7 +50,7 @@
   </xacro:macro>
 
   <xacro:macro name="gazebo_segbot_drive_plugin" params="update_rate">
-    <plugin name="differential_drive_controller" filename="libsegbotdrive_plugin.so">
+    <plugin name="differential_drive_controller" filename="libdiff_drive_plugin.so">
       <alwaysOn>true</alwaysOn>
       <updateRate>${update_rate}</updateRate>
       <leftJoint>base_link_right_wheel_joint</leftJoint>
