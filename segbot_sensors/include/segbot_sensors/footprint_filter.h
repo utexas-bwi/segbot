@@ -116,7 +116,6 @@ namespace segbot_sensors
         double current_angle = input_scan.angle_min;
 
         for(unsigned int count = 0; count < input_scan.ranges.size(); ++count){
-          current_angle += input_scan.angle_increment;
           if (input_scan.range_min <= input_scan.ranges[count] && 
               input_scan.ranges[count] <= input_scan.range_max) {
             // Valid measurement, check if it lies in the footprint
@@ -130,11 +129,13 @@ namespace segbot_sensors
                (testx < (footprint_[j].x()-footprint_[i].x()) * (testy-footprint_[i].y()) / (footprint_[j].y()-footprint_[i].y()) + footprint_[i].x()) )
                  c = !c;
             }
-            // in accordance with REP 117
+            // in accordance with REP 117, invalidate all readings that are within the robot foot print
             filtered_scan.ranges[count] = (!c) ? input_scan.ranges[count] : std::numeric_limits<float>::quiet_NaN();
-          } else { //if (input_scan.ranges[count] > input_scan.range_max) {
-            filtered_scan.ranges[count] = input_scan.range_max;
+          } else {
+            // Let all inifinte values pass through
+            filtered_scan.ranges[count] = input_scan.ranges[count];
           }
+          current_angle += input_scan.angle_increment;
         }
 
         //make sure to set all the needed fields on the filtered scan
