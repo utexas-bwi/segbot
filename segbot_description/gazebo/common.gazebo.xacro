@@ -50,7 +50,7 @@
   </xacro:macro>
 
   <xacro:macro name="gazebo_segbot_drive_plugin" params="update_rate">
-    <plugin name="differential_drive_controller" filename="libdiff_drive_plugin.so">
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
       <alwaysOn>true</alwaysOn>
       <updateRate>${update_rate}</updateRate>
       <leftJoint>base_link_right_wheel_joint</leftJoint>
@@ -58,7 +58,7 @@
       <wheelSeparation>0.5380</wheelSeparation>
       <wheelDiameter>0.2410</wheelDiameter>
       <torque>20</torque>
-      <topicName>cmd_vel</topicName>
+      <commandTopic>cmd_vel</commandTopic>
     </plugin>
   </xacro:macro>
 
