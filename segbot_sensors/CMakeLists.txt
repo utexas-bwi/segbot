@@ -4,14 +4,28 @@ project(segbot_sensors)
 
 find_package(catkin REQUIRED COMPONENTS laser_filters)
 
-#set the default path for built executables to the "bin" directory
-set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
-#set the default path for built libraries to the "lib" directory
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_library(segbot_sensors_filters src/segbot_sensors_filters.cpp)
-target_link_libraries(segbot_sensors_filters ${Boost_LIBRARIES} ${CATKIN_LIBRARIES})
+target_link_libraries(segbot_sensors_filters 
+  ${Boost_LIBRARIES} 
+  ${catkin_LIBRARIES}
+)
 
 catkin_package(
-    CATKIN_DEPENDS hokuyo_node laser_filters tf
+  CATKIN_DEPENDS hokuyo_node laser_filters tf
 )
+
+# Install the plugin and the plugin description
+install (TARGETS segbot_sensors_filters
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+)
+
+install(FILES segbot_sensors_plugin.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
+# Install runtime launch and configuration files
+foreach(dir launch config)
+   install(DIRECTORY ${dir}/ 
+      DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
+endforeach(dir)
