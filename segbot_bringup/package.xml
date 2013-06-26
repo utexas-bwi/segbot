@@ -1,0 +1,25 @@
+<package>
+  <name>segbot_bringup</name>
+  <version>0.1.0</version>
+  <description>This package contains launch files for segway based robots in the Building Wide Intelligence (BWI) Project at the University of Texas at Austin.</description>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/segbot_bringup</url>
+  <url type="repository">https://github.com/utexas-bwi/segbot.git</url>
+  <url type="bugtracker">https://github.com/utexas-bwi/segbot/issues</url>
+
+  <author>Piyush Khandelwal</author>
+  <maintainer email="piyushk@gmail.com">Piyush Khandelwal</maintainer>
+  <maintainer email="jack.oquin@gmail.com">Jack O'Quin</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>segway_rmp</run_depend>
+  <run_depend>segbot_description</run_depend>
+  <run_depend>segbot_sensors</run_depend>
+  <run_depend>robot_state_publisher</run_depend>
+  <run_depend>joint_state_publisher</run_depend>
+  <run_depend>tf</run_depend>
+
+</package>
