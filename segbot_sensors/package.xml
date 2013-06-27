@@ -20,10 +20,12 @@
   <run_depend>hokuyo_node</run_depend>
   <run_depend>freenect_launch</run_depend>
   <!-- <run_depend>openni_launch</run_depend> --> <!-- uncomment when released into hydro -->
+  <run_depend>filters</run_depend> <!-- only required for exporting plugin -->
   <run_depend>laser_filters</run_depend>
   <run_depend>tf</run_depend>
 
   <export>
     <filters plugin="${prefix}/segbot_sensors_plugins.xml"/>
   </export>
+
 </package>
