@@ -25,7 +25,7 @@ install(FILES segbot_sensors_plugin.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 # Install runtime launch and configuration files
-foreach(dir launch config)
+foreach(dir launch config rviz)
    install(DIRECTORY ${dir}/ 
       DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach(dir)
