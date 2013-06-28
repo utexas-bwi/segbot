@@ -21,7 +21,7 @@ install (TARGETS segbot_sensors_filters
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 )
 
-install(FILES segbot_sensors_plugin.xml
+install(FILES segbot_sensors_plugins.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 # Install runtime launch and configuration files
