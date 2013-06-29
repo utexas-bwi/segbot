@@ -5,6 +5,8 @@ Changelog for package segbot_description
 Forthcoming
 -----------
 
+* added changelog file to each individual package
+
 0.1.0 (2013-06-28)
 ------------------
 * now using only 50 pixels for depthimage_to_laserscan

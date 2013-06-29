@@ -4,6 +4,8 @@ Changelog for package segbot_bringup
 
 Forthcoming
 -----------
+
+* added changelog file to each individual package
 * fixed launch directory location
 
 0.1.0 (2013-06-28)

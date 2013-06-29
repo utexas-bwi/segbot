@@ -5,6 +5,8 @@ Changelog for package segbot_sensors
 Forthcoming
 -----------
 
+* added changelog file to each individual package
+
 0.1.0 (2013-06-28)
 ------------------
 * fixed typo in filename
