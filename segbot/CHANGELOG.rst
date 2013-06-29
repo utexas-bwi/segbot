@@ -1,7 +1,10 @@
-Change history
-==============
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Changelog for package segbot
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.1.0 (06/21/2013)
+Forthcoming
+-----------
+
+0.1.0 (2013-06-28)
 ------------------
-
- * Hydro release
+* catkinizing against hydro. progress towards `#6 <https://github.com/utexas-bwi/segbot/issues/6>`_
