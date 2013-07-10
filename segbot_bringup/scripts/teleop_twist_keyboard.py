@@ -4,7 +4,6 @@
 # documentation. This code is from the teleop_twist_keyboard ROS package, 
 # written by Trevor Jay and licensed under the BSD
 
-import roslib; roslib.load_manifest('teleop_twist_keyboard')
 import rospy
 
 from geometry_msgs.msg import Twist
