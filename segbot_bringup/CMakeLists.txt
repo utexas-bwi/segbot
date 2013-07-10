@@ -5,6 +5,7 @@ find_package(catkin REQUIRED)
 catkin_package()
 
 #Install all launch files
-install(DIRECTORY launch 
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+foreach(dir launch scripts)
+   install(DIRECTORY ${dir}/ 
+      DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
+endforeach(dir)
