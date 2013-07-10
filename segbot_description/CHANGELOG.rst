@@ -2,10 +2,10 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
-
-* added changelog file to each individual package
+0.1.3 (2013-07-10)
+------------------
+* URDF now sets all parameters for diff_drive plugin, removing unneeded warnings
+* reverted robot radius
 
 0.1.0 (2013-06-28)
 ------------------

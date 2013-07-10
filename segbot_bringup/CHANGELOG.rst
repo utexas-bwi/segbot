@@ -2,10 +2,11 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
-
-* added changelog file to each individual package
+0.1.3 (2013-07-10)
+------------------
+* fixed teleop name and installation
+* switched python teleop script from rosbuild to catkin
+* added keyboard teleop script from teleop_twist_keyboard
 * fixed launch directory location
 
 0.1.0 (2013-06-28)

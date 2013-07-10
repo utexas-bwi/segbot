@@ -2,10 +2,9 @@
 Changelog for package segbot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
-
-* added changelog to segbot package
+0.1.3 (2013-07-10)
+------------------
+* bumping metapackage version
 
 0.1.0 (2013-06-28)
 ------------------
