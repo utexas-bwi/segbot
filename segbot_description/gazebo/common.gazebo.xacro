@@ -59,6 +59,9 @@
       <wheelDiameter>0.2410</wheelDiameter>
       <torque>20</torque>
       <commandTopic>cmd_vel</commandTopic>
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
     </plugin>
   </xacro:macro>
 
