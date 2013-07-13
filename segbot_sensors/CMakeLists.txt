@@ -17,9 +17,11 @@ catkin_package(
 )
 
 # Install the plugin and the plugin description
+install (DIRECTORY include/segbot_sensors/
+  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+
 install (TARGETS segbot_sensors_filters
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-)
+  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
 
 install(FILES segbot_sensors_plugins.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

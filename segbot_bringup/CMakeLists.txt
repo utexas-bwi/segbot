@@ -5,10 +5,8 @@ find_package(catkin REQUIRED)
 catkin_package()
 
 #Install all launch files
-foreach(dir launch)
-   install(DIRECTORY ${dir}/ 
-      DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
-endforeach(dir)
+install(DIRECTORY launch/ 
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
 
 #install the teleoperation script in the bin folder
 install(PROGRAMS scripts/teleop_twist_keyboard
