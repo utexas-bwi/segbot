@@ -2,6 +2,10 @@
 Changelog for package segbot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.4 (2013-07-13)
+------------------
+* releasing 0.1.4 with properly formatted changelogs. see `#10 <https://github.com/utexas-bwi/segbot/issues/10>`_
+
 0.1.3 (2013-07-10)
 ------------------
 * bumping metapackage version
