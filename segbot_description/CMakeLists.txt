@@ -6,7 +6,7 @@ find_package(catkin REQUIRED)
 catkin_package()
 
 #install all directories
-foreach(dir meshes gazebo robots urdf scripts)
-   install(DIRECTORY ${dir}/ 
-      DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
+foreach(dir gazebo meshes robots scripts urdf)
+  install(DIRECTORY ${dir}/ 
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach(dir)

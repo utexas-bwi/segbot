@@ -4,10 +4,10 @@ project(segbot_bringup)
 find_package(catkin REQUIRED)
 catkin_package()
 
-#Install all launch files
+# Install all launch files
 install(DIRECTORY launch/ 
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
 
-#install the teleoperation script in the bin folder
+# Install the teleoperation script for rosrun 
 install(PROGRAMS scripts/teleop_twist_keyboard
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

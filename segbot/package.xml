@@ -16,8 +16,8 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <run_depend>segbot_bringup</run_depend>
-  <run_depend>segbot_sensors</run_depend>
   <run_depend>segbot_description</run_depend>
+  <run_depend>segbot_sensors</run_depend>
 
   <export>
     <metapackage/>
