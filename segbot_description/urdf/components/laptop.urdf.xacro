@@ -66,26 +66,26 @@
 
     <gazebo reference="${name}_screen_link">
       <!-- TODO fix this once visual plugins are parsed in urdf -->
-      <!-- <visual name="base_footprint_visuallaptop_screen_link_controller"> -->
-      <!--   <pose>0.217799 -0.000000 1.082250 1.047200 0.000000 -1.570800</pose> -->
-      <!--   <geometry> -->
-      <!--     <box> -->
-      <!--       <size>0.304800 0.228600 0.019050</size> -->
-      <!--     </box> -->
-      <!--   </geometry> -->
-      <!--   <plugin name="${name}_video_controller" filename="libgazebo_ros_video.so"> -->
-      <!--     <height>120</height> -->
-      <!--     <width>160</width> -->
-      <!--     <topicName>image</topicName> -->
-      <!--   </plugin> -->
-      <!-- </visual> -->
-      <visual>
+      <visual name="base_footprint_visuallaptop_screen_link_controller">
+        <pose>0.217799 -0.000000 1.082250 1.047200 0.000000 -1.570800</pose>
+        <geometry>
+          <box>
+            <size>0.304800 0.228600 0.019050</size>
+          </box>
+        </geometry>
         <plugin name="${name}_video_controller" filename="libgazebo_ros_video.so">
           <height>120</height>
           <width>160</width>
           <topicName>image</topicName>
         </plugin>
       </visual>
+      <!-- <visual> -->
+      <!--   <plugin name="${name}_video_controller" filename="libgazebo_ros_video.so"> -->
+      <!--     <height>120</height> -->
+      <!--     <width>160</width> -->
+      <!--     <topicName>image</topicName> -->
+      <!--   </plugin> -->
+      <!-- </visual> -->
       <material>Gazebo/Grey</material>
       <mu1 value="100.0" />
       <mu2 value="100.0" />
