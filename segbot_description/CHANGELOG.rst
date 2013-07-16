@@ -2,6 +2,11 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.5 (2013-07-16)
+------------------
+* cleaned up and alphabetized cmake and package description files
+* reverting visual plugin change until pull request makes it to gazebo. See `#21 <https://bitbucket.org/osrf/sdformat/pull-request/21/patch-to-allow-parser_urdf-to-parse-visual/diff>`_
+
 0.1.4 (2013-07-13)
 ------------------
 * releasing 0.1.4 with properly formatted changelogs. see `#10 <https://github.com/utexas-bwi/segbot/issues/10>`_

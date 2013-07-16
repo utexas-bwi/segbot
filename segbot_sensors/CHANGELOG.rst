@@ -2,6 +2,11 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.5 (2013-07-16)
+------------------
+* cleaned up and alphabetized cmake and package description files
+* nan_to_inf temporarily sets 0 values to inf as well. see `#5 <https://github.com/ros-drivers/hokuyo_node/issues/5>`_
+
 0.1.4 (2013-07-13)
 ------------------
 * releasing 0.1.4 with properly formatted changelogs. see `#10 <https://github.com/utexas-bwi/segbot/issues/10>`_

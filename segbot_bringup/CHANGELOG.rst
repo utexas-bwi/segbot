@@ -2,6 +2,10 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.5 (2013-07-16)
+------------------
+* cleaned up and alphabetized cmake and package description files
+
 0.1.4 (2013-07-13)
 ------------------
 * releasing 0.1.4 with properly formatted changelogs. see `#10 <https://github.com/utexas-bwi/segbot/issues/10>`_
