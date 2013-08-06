@@ -4,10 +4,10 @@
       xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
       xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <include filename="$(find segbot_description)/urdf/components/beam_8020.urdf.xacro" />
-  <include filename="$(find segbot_description)/urdf/components/standoff_632.urdf.xacro" />
-  <include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
-  <include filename="$(find segbot_description)/urdf/sensors/kinect_camera.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/beam_8020.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/standoff_632.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/sensors/kinect_camera.urdf.xacro" />
 
   <xacro:macro name="kinect_mount" params="name parent *origin length">
     <xacro:beam_8020 name="${name}_sensor_beam" parent="${parent}" length="${length}">
