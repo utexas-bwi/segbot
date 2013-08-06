@@ -4,8 +4,8 @@
        xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- Included URDF Files -->
-  <include filename="$(find segbot_description)/urdf/common.urdf.xacro" />
-  <include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/common.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
 
   <!-- add the root link -->
   <link name="base_link">

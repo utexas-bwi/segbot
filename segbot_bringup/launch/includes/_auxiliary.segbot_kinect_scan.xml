@@ -8,10 +8,8 @@
   <arg name="use_registered_topic" default="false" />
 
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
-  <param if="$(arg use_full_gazebo_model)" name="robot_description" 
-    command="$(find xacro)/xacro.py '$(arg urdf_file)'" />
-  <param unless="$(arg use_full_gazebo_model)" name="robot_description" 
-    command="$(find segbot_description)/scripts/get_simple_gazebo_model $(arg urdf_file)" />
+  <param name="robot_description" 
+    command="$(find xacro)/xacro.py '$(arg urdf_file)' use_full_gazebo_model:=$(arg use_full_gazebo_model)" />
 
   <!-- launch the tf tree -->
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">

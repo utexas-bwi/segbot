@@ -3,44 +3,6 @@
 <root
   xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:property name="SIMPLE_ROBOT_RADIUS" value="0.30" />
-
-  <xacro:macro name="gazebo_segbot_base_link_surface">
-    <gazebo reference="base_link">
-      <mu1 value="100.0" />
-      <mu2 value="100.0" />
-      <kp  value="1000000.0" />
-      <kd  value="1.0" />
-    </gazebo>
-  </xacro:macro>
-
-  <xacro:macro name="gazebo_segbot_castor_wheel_link_surface">
-    <gazebo reference="caster_wheel_link">
-      <mu1 value="10.0" />
-      <mu2 value="10.0" />
-      <kp  value="1000000.0" />
-      <kd  value="1.0" />
-    </gazebo>
-  </xacro:macro>
-
-  <xacro:macro name="segbot_simple_collision">
-    <collision>
-      <origin xyz="0 0 0.2" rpy="0 0 0" />
-      <geometry>
-        <cylinder length="0.8330" radius="${SIMPLE_ROBOT_RADIUS}" />
-      </geometry>
-    </collision>
-  </xacro:macro>
-
-  <xacro:macro name="gazebo_segbot_wheel_surface" params="parent suffix">
-    <gazebo reference="${parent}_${suffix}_wheel_link" >
-      <mu1 value="10.0" />
-      <mu2 value="10.0" />
-      <kp  value="1000000.0" />
-      <kd  value="1.0" />
-    </gazebo>
-  </xacro:macro>
-
   <xacro:macro name="gazebo_segbot_controllers_common">
     <canonicalBody>base_footprint</canonicalBody>
     <plugin name="gazebo_ros_controller_manager" filename="libgazebo_ros_controller_manager.so">
@@ -50,28 +12,9 @@
   </xacro:macro>
 
   <xacro:macro name="gazebo_segbot_drive_plugin" params="update_rate">
-    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
-      <updateRate>${update_rate}</updateRate>
-      <leftJoint>base_link_right_wheel_joint</leftJoint>
-      <rightJoint>base_link_left_wheel_joint</rightJoint>
-      <wheelSeparation>0.5380</wheelSeparation>
-      <wheelDiameter>0.2410</wheelDiameter>
-      <torque>20</torque>
-      <commandTopic>cmd_vel</commandTopic>
-      <odometryTopic>odom</odometryTopic>
-      <odometryFrame>odom</odometryFrame>
-      <robotBaseFrame>base_footprint</robotBaseFrame>
-    </plugin>
   </xacro:macro>
 
   <xacro:macro name="gazebo_object_controller_plugin" params="update_rate">
-    <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
-      <commandTopic>cmd_vel</commandTopic>
-      <odometryTopic>odom</odometryTopic>
-      <odometryFrame>odom</odometryFrame>
-      <robotBaseFrame>base_footprint</robotBaseFrame>
-      <odometryRate>${update_rate}</odometryRate>
-    </plugin>
   </xacro:macro>
 
 </root>

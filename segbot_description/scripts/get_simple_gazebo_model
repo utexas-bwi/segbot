@@ -1,6 +1,0 @@
-#!/bin/sh
-
-cp $1 /tmp/test.urdf
-sed -i 's/full_collision/simple_collision/g' /tmp/test.urdf
-rosrun xacro xacro.py /tmp/test.urdf
-rm /tmp/test.urdf

@@ -4,11 +4,11 @@
        xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- Included URDF Files -->
-  <include filename="$(find segbot_description)/urdf/common.urdf.xacro" />
-  <include filename="$(find segbot_description)/gazebo/full_collision.gazebo.xacro" />
-  <include filename="$(find segbot_description)/urdf/segbot_base.urdf.xacro" />
-  <include filename="$(find segbot_description)/urdf/segbot_chassis.urdf.xacro" />
-  <include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/common.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/gazebo/segbot.gazebo.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/segbot_base.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/segbot_chassis.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
 
   <!-- Add the segbot base -->
   <xacro:segbot />

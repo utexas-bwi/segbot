@@ -5,10 +5,8 @@
   <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_hokuyo.urdf.xacro" />
 
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
-  <param if="$(arg use_full_gazebo_model)" name="robot_description" 
-    command="$(find xacro)/xacro.py '$(arg urdf_file)'" />
-  <param unless="$(arg use_full_gazebo_model)" name="robot_description" 
-    command="$(find segbot_description)/scripts/get_simple_gazebo_model $(arg urdf_file)" />
+  <param name="robot_description" 
+    command="$(find xacro)/xacro.py '$(arg urdf_file)' use_full_gazebo_model:=$(arg use_full_gazebo_model)" />
 
   <!-- launch the tf tree from the urdf (for all fixed joints + the hokuyo internal link) -->
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
