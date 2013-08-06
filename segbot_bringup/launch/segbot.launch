@@ -7,11 +7,11 @@
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- launch the auxiliary configuration (shared between h/w and simulation) -->
-  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot.launch">
+  <include file="$(find segbot_bringup)/launch/includes/_auxiliary.segbot.xml">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
 
   <!-- launch the segway base -->
-  <include file="$(find segbot_bringup)/launch/includes/segway_base.launch" />
+  <include file="$(find segbot_bringup)/launch/segway_base.launch" />
 
 </launch>

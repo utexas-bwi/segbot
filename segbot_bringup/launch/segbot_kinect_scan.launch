@@ -7,14 +7,14 @@
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- launch the auxiliary configuration (shared between h/w and simulation) -->
-  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_kinect_scan.launch">
+  <include file="$(find segbot_bringup)/launch/includes/_auxiliary.segbot_kinect_scan.xml">
     <arg name="name" value="nav_kinect" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="launch_laserscan_manager" value="false" /> <!-- manager launched by kinect script -->
   </include>
 
   <!-- launch the segway base -->
-  <include file="$(find segbot_bringup)/launch/includes/segway_base.launch" />
+  <include file="$(find segbot_bringup)/launch/segway_base.launch" />
 
   <!-- launch the kinect sensor in laserscan configuration -->
   <include file="$(find segbot_sensors)/launch/kinect/kinect.launch">
