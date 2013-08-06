@@ -11,9 +11,6 @@
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
 
-  <!-- launch the joint state publisher to default values -->
-  <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
-
   <!-- launch the segway base -->
   <include file="$(find segbot_bringup)/launch/includes/segway_base.launch" />
 

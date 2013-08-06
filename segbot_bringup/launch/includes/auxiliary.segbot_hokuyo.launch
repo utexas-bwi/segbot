@@ -15,6 +15,9 @@
     <param name="publish_frequency" type="double" value="5.0" />
   </node>
 
+  <!-- launch the joint state publisher to default values -->
+  <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
+
   <!-- launch the laser filter to get rid of readings from the robot itself -->
   <include file="$(find segbot_sensors)/launch/hokuyo/hokuyo-filters.launch" />
 
