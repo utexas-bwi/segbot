@@ -18,5 +18,4 @@
   <run_depend>pr2_description</run_depend> <!-- kinect mesh -->
   <run_depend>xacro</run_depend>
 
-
 </package>
