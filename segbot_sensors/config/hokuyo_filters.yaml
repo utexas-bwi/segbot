@@ -1,6 +1,4 @@
 scan_filter_chain:
-- name: nan_to_inf_filter
-  type: segbot_sensors/NanToInfFilter
 - name: footprint_filter
   type: segbot_sensors/SegbotFootprintFilter
   params:
