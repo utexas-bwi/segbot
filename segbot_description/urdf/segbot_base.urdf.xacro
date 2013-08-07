@@ -26,13 +26,7 @@
 
     <!-- This is the robot origin, center of the 2 wheels (axis of rotation) -->
     <link name="base_link">
-      <inertial>
-        <mass value="30" />
-        <origin xyz="-0.1 0 -0.075" />
-        <inertia ixx="3.0" ixy="0.0" ixz="0.0"
-          iyy="3.0" iyz="0.0" 
-          izz="2.0" />
-      </inertial>
+      <xacro:segbot_base_link_inertial />
       <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>

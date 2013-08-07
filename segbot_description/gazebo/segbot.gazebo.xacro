@@ -3,8 +3,6 @@
 <root
   xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:property name="SIMPLE_ROBOT_RADIUS" value="0.30" />
-
   <xacro:macro name="gazebo_segbot_base_link_surface">
     <gazebo reference="base_link">
       <mu1 value="100.0" />
@@ -32,6 +30,27 @@
     </gazebo>
   </xacro:macro>
 
+  <xacro:macro name="segbot_base_link_inertial" >
+    <xacro:if value="$(arg use_full_gazebo_model)">
+      <inertial>
+        <mass value="30" />
+        <origin xyz="-0.1 0 -0.075" />
+        <inertia ixx="3.0" ixy="0.0" ixz="0.0"
+          iyy="3.0" iyz="0.0" 
+          izz="2.0" />
+      </inertial>
+    </xacro:if>
+    <xacro:unless value="$(arg use_full_gazebo_model)">
+      <inertial>
+        <mass value="30" />
+        <origin xyz="0 0 -0.2165" />
+        <inertia ixx="300.0" ixy="0.0" ixz="0.0"
+          iyy="300.0" iyz="0.0" 
+          izz="300.0" />
+      </inertial>
+    </xacro:unless>
+  </xacro:macro>
+
   <xacro:macro name="segbot_base_link_collision" >
     <xacro:if value="$(arg use_full_gazebo_model)">
       <collision>
@@ -43,9 +62,9 @@
     </xacro:if>
     <xacro:unless value="$(arg use_full_gazebo_model)">
       <collision>
-        <origin xyz="0 0 0.2" rpy="0 0 0" />
+        <origin xyz="-0.15 0 0" rpy="0 0 0" />
         <geometry>
-          <cylinder length="0.8330" radius="${SIMPLE_ROBOT_RADIUS}" />
+          <box size="0.5 0.4 0.4330" />
         </geometry>
       </collision>
     </xacro:unless>
