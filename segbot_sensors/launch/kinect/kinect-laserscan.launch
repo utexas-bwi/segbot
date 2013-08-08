@@ -20,8 +20,9 @@
     <param name="range_max" value="3.0" />
     <param name="scan_height" value="50" />
     <remap from="image" to="$(arg image_topic)"/>
-    <remap from="scan" to="scan_filtered" />
   </node>
+
+  <include file="$(find segbot_sensors)/launch/kinect/kinect-filters.launch" />
 
 </launch>
 
