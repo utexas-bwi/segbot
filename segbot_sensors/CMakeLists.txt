@@ -4,16 +4,18 @@ project(segbot_sensors)
 
 find_package(catkin REQUIRED COMPONENTS laser_filters)
 
+catkin_package(
+  CATKIN_DEPENDS hokuyo_node laser_filters tf
+  INCLUDE_DIRS include
+  LIBRARIES segbot_sensors_filters
+)
+
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_library(segbot_sensors_filters src/segbot_sensors_filters.cpp)
 target_link_libraries(segbot_sensors_filters 
   ${Boost_LIBRARIES} 
   ${catkin_LIBRARIES}
-)
-
-catkin_package(
-  CATKIN_DEPENDS hokuyo_node laser_filters tf
 )
 
 # Install the plugin and the plugin description
