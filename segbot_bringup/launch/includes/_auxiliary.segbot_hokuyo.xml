@@ -11,6 +11,7 @@
   <!-- launch the tf tree from the urdf (for all fixed joints + the hokuyo internal link) -->
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
     <param name="publish_frequency" type="double" value="5.0" />
+    <param name="tf_prefix" type="string" value="$(arg tf_prefix)" />
   </node>
 
   <!-- launch the joint state publisher to default values -->
