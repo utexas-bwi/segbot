@@ -2,6 +2,14 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.6 (2013-08-13)
+------------------
+* removed nodelet manager reuse for depthimage_to_laserscan for the time being
+* fixed segbot_bringup to work with upcoming changes to freenect/openni launch files
+* assume no reading from kinect means clear. closes `#17 <https://github.com/utexas-bwi/segbot/issues/17>`_
+* fixed cmake function ordering
+* removed nan_to_inf filter from hokuyo config. closes `#11 <https://github.com/utexas-bwi/segbot/issues/11>`_
+
 0.1.5 (2013-07-16)
 ------------------
 * cleaned up and alphabetized cmake and package description files

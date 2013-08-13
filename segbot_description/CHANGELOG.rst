@@ -2,6 +2,13 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.6 (2013-08-13)
+------------------
+* increased model height to make the robots more visible in gazebo
+* added inertial and collision changes that make the robot move properly under the simple model assumption in gazebo. The collision model of the robot no longer receives returns from the laser.
+* significantly cleaned up segbot_description. need new version of xacro to be released before merging with devel. closes `#7 <https://github.com/utexas-bwi/segbot/issues/7>`_, `#12 <https://github.com/utexas-bwi/segbot/issues/12>`_
+* moved plugins to new version in gazebo_plugins. closes `#13 <https://github.com/utexas-bwi/segbot/issues/13>`_
+
 0.1.5 (2013-07-16)
 ------------------
 * cleaned up and alphabetized cmake and package description files

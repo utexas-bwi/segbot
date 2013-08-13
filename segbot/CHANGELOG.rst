@@ -2,6 +2,9 @@
 Changelog for package segbot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.6 (2013-08-13)
+------------------
+
 0.1.5 (2013-07-16)
 ------------------
 * cleaned up and alphabetized cmake and package description files
