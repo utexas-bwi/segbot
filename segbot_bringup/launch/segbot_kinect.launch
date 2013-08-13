@@ -6,7 +6,7 @@
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- launch the auxiliary configuration (shared between h/w and simulation) -->
-  <include file="$(find segbot_bringup)/launch/includes/_auxiliary.segbot_kinect.xml">
+  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_kinect.launch.xml">
     <arg name="name" value="nav_kinect" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
