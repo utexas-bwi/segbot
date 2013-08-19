@@ -33,5 +33,7 @@ install(DIRECTORY launch/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
 
 # Install the teleoperation script for rosrun 
-install(PROGRAMS scripts/teleop_twist_keyboard
+install(PROGRAMS 
+  scripts/teleop_twist_keyboard
+  scripts/get_addr
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

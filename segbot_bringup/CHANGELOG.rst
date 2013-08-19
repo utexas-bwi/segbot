@@ -2,6 +2,18 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.6 (2013-08-13)
+------------------
+* removed nodelet manager reuse for depthimage_to_laserscan for the time being
+* added a script for getting the ip address
+* fixed segbot_bringup to work with upcoming changes to freenect/openni launch files
+* fixed tf prefix setting for gazebo openni_kinect plugin
+* adding prefix enabled copy of robot_state_publisher. closes `#16 <https://github.com/utexas-bwi/segbot/issues/16>`_
+* cleaned up segbot description
+* renamed all internal launch files to xml. They don't show up in roslaunch any more. closes `#15 <https://github.com/utexas-bwi/segbot/issues/15>`_
+* moved joint state publisher to auxiliary files - now runs on both the real robots and in simulation. closes `#14 <https://github.com/utexas-bwi/segbot/issues/14>`_
+* significantly cleaned up segbot_description. need new version of xacro to be released before merging with devel. closes `#7 <https://github.com/utexas-bwi/segbot/issues/7>`_, `#12 <https://github.com/utexas-bwi/segbot/issues/12>`_
+
 0.1.5 (2013-07-16)
 ------------------
 * cleaned up and alphabetized cmake and package description files

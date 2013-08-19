@@ -1,16 +1,14 @@
 <launch>
 
   <!-- set the tf prefix as necessary -->
-  <arg name="ns" default="" />
-  <arg name="tf_prefix" default="$(arg ns)" />
+  <arg name="tf_prefix" default="" />
   <arg name="device_id" default="#1" />
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- launch the auxiliary configuration (shared between h/w and simulation) -->
-  <include file="$(find segbot_bringup)/launch/includes/_auxiliary.segbot_kinect_scan.xml">
+  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_kinect_scan.launch.xml">
     <arg name="name" value="nav_kinect" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
-    <arg name="launch_laserscan_manager" value="false" /> <!-- manager launched by kinect script -->
     <arg name="use_registered_topic" value="true" /> 
   </include>
 
@@ -20,10 +18,8 @@
   <!-- launch the kinect sensor in laserscan configuration -->
   <include file="$(find segbot_sensors)/launch/kinect/kinect.launch">
     <arg name="name" value="nav_kinect" />
-    <arg name="ns" value="$(arg ns)" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="device_id" value="$(arg device_id)" />
-    <arg name="publish_tf" value="false" />
   </include>
 
 </launch>

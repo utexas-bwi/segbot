@@ -1,6 +1,6 @@
 <package>
   <name>segbot_description</name>
-  <version>0.1.5</version>
+  <version>0.1.6</version>
   <description>Contains URDF descriptions of all robot components for Segway RMP 50 based robots at the University of Texas at Austin. Since the sensors on a given robot are configurable, this package also contains all the different robot configurations.</description>
 
   <license>BSD</license>
