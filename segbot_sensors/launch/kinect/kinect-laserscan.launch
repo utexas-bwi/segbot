@@ -2,15 +2,14 @@
 
   <arg name="camera" default="camera" />
   <arg name="tf_prefix" default="" />
-  <arg name="launch_manager" default="true" />
   <arg name="use_registered" default="false" />
 
   <arg if="$(arg use_registered)" name="image_topic" value="$(arg camera)/depth_registered/image_raw" />
   <arg unless="$(arg use_registered)" name="image_topic" value="$(arg camera)/depth/image_raw" />
 
   <!-- this should fully resolve to $(arg ns)/... automatically -->
-  <arg name="manager" value="$(arg camera)_nodelet_manager" />
-  <node if="$(arg launch_manager)" pkg="nodelet" type="nodelet"
+  <arg name="manager" value="$(arg camera)_scan_manager" />
+  <node pkg="nodelet" type="nodelet"
         name="$(arg manager)" args="manager" output="screen" />
 
   <!-- Fake Laser from kinect pointcloud -->

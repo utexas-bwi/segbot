@@ -5,7 +5,7 @@
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- launch all the auxiliary configuration information -->
-  <include file="$(find segbot_bringup)/launch/includes/_auxiliary.segbot_hokuyo.xml" />
+  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_hokuyo.launch.xml" />
 
   <!-- launch the segway base -->
   <include file="$(find segbot_bringup)/launch/segway_base.launch" />

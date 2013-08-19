@@ -1,6 +1,6 @@
 <package>
   <name>segbot_bringup</name>
-  <version>0.1.5</version>
+  <version>0.1.6</version>
   <description>This package contains launch files for segway based robots in the Building Wide Intelligence (BWI) Project at the University of Texas at Austin.</description>
 
   <license>BSD</license>
@@ -18,6 +18,7 @@
   <build_depend>robot_state_publisher</build_depend>
 
   <run_depend>joint_state_publisher</run_depend>
+  <run_depend>python-netifaces</run_depend>
   <run_depend>robot_state_publisher</run_depend>
   <run_depend>segbot_description</run_depend>
   <run_depend>segbot_sensors</run_depend>
