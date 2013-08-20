@@ -44,9 +44,9 @@
       <inertial>
         <mass value="30" />
         <origin xyz="0 0 -0.2165" />
-        <inertia ixx="300.0" ixy="0.0" ixz="0.0"
-          iyy="300.0" iyz="0.0" 
-          izz="300.0" />
+        <inertia ixx="3000.0" ixy="0.0" ixz="0.0"
+          iyy="3000.0" iyz="0.0" 
+          izz="3000.0" />
       </inertial>
     </xacro:unless>
   </xacro:macro>
