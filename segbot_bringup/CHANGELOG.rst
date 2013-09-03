@@ -2,6 +2,9 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.7 (2013-09-03)
+------------------
+
 0.1.6 (2013-08-13)
 ------------------
 * removed nodelet manager reuse for depthimage_to_laserscan for the time being

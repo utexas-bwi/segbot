@@ -2,6 +2,10 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.7 (2013-09-03)
+------------------
+* increased footprint where laser points are ignored. closes `#19 <https://github.com/utexas-bwi/segbot/issues/19>`_
+
 0.1.6 (2013-08-13)
 ------------------
 * removed nodelet manager reuse for depthimage_to_laserscan for the time being

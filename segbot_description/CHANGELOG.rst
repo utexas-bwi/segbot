@@ -2,6 +2,10 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.7 (2013-09-03)
+------------------
+* increasing inertia to keep robot vertical when using gazebo_ros_planar_move
+
 0.1.6 (2013-08-13)
 ------------------
 * increased model height to make the robots more visible in gazebo
