@@ -16,6 +16,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>robot_state_publisher</build_depend>
+  <build_depend>roslaunch</build_depend> <!-- unit test only -->
 
   <run_depend>joint_state_publisher</run_depend>
   <run_depend>python-netifaces</run_depend>
