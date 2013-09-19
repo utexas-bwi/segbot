@@ -16,14 +16,18 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>laser_filters</build_depend>
+  <build_depend>roslaunch</build_depend> <!-- unit test only -->
 
+  <run_depend>camera1394</run_depend>
   <run_depend>depthimage_to_laserscan</run_depend>
   <run_depend>filters</run_depend>
   <run_depend>freenect_launch</run_depend>
   <run_depend>hokuyo_node</run_depend>
   <run_depend>laser_filters</run_depend>
+  <run_depend>nodelet</run_depend>
   <run_depend>openni_launch</run_depend>
   <run_depend>tf</run_depend>
+  <run_depend>rviz</run_depend>
 
   <export>
     <filters plugin="${prefix}/segbot_sensors_plugins.xml"/>

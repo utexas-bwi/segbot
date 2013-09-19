@@ -33,3 +33,12 @@ foreach(dir config launch rviz)
   install(DIRECTORY ${dir}/ 
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach(dir)
+
+# unit tests are enabled selectively
+if (CATKIN_ENABLE_TESTING)
+  find_package(roslaunch REQUIRED)
+  roslaunch_add_file_check(launch)
+  roslaunch_add_file_check(launch/hokuyo)
+  #roslaunch_add_file_check(launch/kinect) # fails due to ros-drivers/openni_launch#10
+  roslaunch_add_file_check(launch/ptgrey)
+endif (CATKIN_ENABLE_TESTING)
