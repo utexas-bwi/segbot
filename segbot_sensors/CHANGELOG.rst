@@ -2,6 +2,12 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.8 (forthcoming)
+-------------------
+
+* add missing segbot_sensors dependency on depthimage_to_laserscan
+  (`#20 <https://github.com/utexas-bwi/segbot/issues/20>`_).
+
 0.1.7 (2013-09-03)
 ------------------
 * increased footprint where laser points are ignored. closes `#19 <https://github.com/utexas-bwi/segbot/issues/19>`_
