@@ -2,6 +2,11 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.8 (forthcoming)
+-------------------
+* use ``roslaunch_add_files_check()`` to test that required launch
+  file dependencies are declared.
+
 0.1.7 (2013-09-03)
 ------------------
 
