@@ -17,7 +17,7 @@
         args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet $(arg manager)" respawn="true">
     <param name="output_frame_id" value="$(arg tf_prefix)/$(arg camera)_depth_frame"/>
     <param name="range_max" value="3.0" />
-    <param name="scan_height" value="50" />
+    <param name="scan_height" value="450" />
     <remap from="image" to="$(arg image_topic)"/>
   </node>
 
