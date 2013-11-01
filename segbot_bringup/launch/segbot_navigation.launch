@@ -5,12 +5,6 @@
   <arg name="device_id" default="#1" />
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
-  <!-- launch the auxiliary configuration (shared between h/w and simulation) -->
-  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_kinect_scan.launch.xml">
-    <arg name="name" value="nav_kinect" />
-    <arg name="tf_prefix" value="$(arg tf_prefix)" />
-  </include>
-
   <!-- launch the segway base -->
   <include file="$(find segbot_bringup)/launch/segway_base.launch" />
 
@@ -32,7 +26,7 @@
   <!-- COMMON aux information -->
   <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_navigation.launch.xml">
     <arg name="tf_prefix" default="$(arg tf_prefix)" /> 
-    <arg name="use_registered_topic" default="true" />
+    <arg name="use_registered_topic" default="false" />
   </include>
 
 </launch>
