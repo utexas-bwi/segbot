@@ -3,6 +3,9 @@
   <arg name="camera" default="camera" />
   <arg name="tf_prefix" default="" />
   <arg name="use_registered" default="false" />
+  <arg name="out_topic" default="scan_filtered" />
+  <arg name="min_height" default="-0.1" />
+  <arg name="max_height" default="0.1" />
 
   <arg if="$(arg use_registered)" name="image_topic" value="$(arg camera)/depth_registered/image_raw" />
   <arg unless="$(arg use_registered)" name="image_topic" value="$(arg camera)/depth/image_raw" />
@@ -17,11 +20,17 @@
         args="load depthimage_to_laserscan/DepthImageToLaserScanNodelet $(arg manager)" respawn="true">
     <param name="output_frame_id" value="$(arg tf_prefix)/$(arg camera)_depth_frame"/>
     <param name="range_max" value="3.0" />
-    <param name="scan_height" value="450" />
+    <param name="scan_height" value="478" />
+    <param name="min_height" value="$(arg min_height)" />
+    <param name="max_height" value="$(arg max_height)" />
+    <remap from="scan" to="$(arg camera)/scan"/>
     <remap from="image" to="$(arg image_topic)"/>
   </node>
 
-  <include file="$(find segbot_sensors)/launch/kinect/kinect-filters.launch" />
+  <include file="$(find segbot_sensors)/launch/kinect/kinect-filters.launch">
+    <arg name="in_topic" value="$(arg camera)/scan" />
+    <arg name="out_topic" value="$(arg out_topic)" />
+  </include>
 
 </launch>
 
