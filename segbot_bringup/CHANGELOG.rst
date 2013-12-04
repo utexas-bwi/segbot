@@ -2,10 +2,16 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.1.8 (forthcoming)
--------------------
+Forthcoming
+-----------
 * use ``roslaunch_add_files_check()`` to test that required launch
   file dependencies are declared.
+* fixed a few minor errors found on the real robot
+* added configuration with both the hokuyo and kinect in it
+* preparing to add kinect as well as the hokuyo for navigation
+* update change history
+* segbot_bringup: use roslaunch_add_file_check() (`#20 <https://github.com/utexas-bwi/segbot/issues/20>`_)
+* Contributors: BWI, Jack O'Quin, Piyush Khandelwal
 
 0.1.7 (2013-09-03)
 ------------------

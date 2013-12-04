@@ -2,8 +2,11 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.1.8 (forthcoming)
--------------------
+Forthcoming
+-----------
+* added configuration with both the hokuyo and kinect in it
+* segbot_description: add empty new change entry
+* Contributors: Jack O'Quin, Piyush Khandelwal
 
 0.1.7 (2013-09-03)
 ------------------

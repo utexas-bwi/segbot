@@ -2,12 +2,21 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.1.8 (forthcoming)
--------------------
+Forthcoming
+-----------
 * add missing segbot_sensors dependency on depthimage_to_laserscan
   (`#20 <https://github.com/utexas-bwi/segbot/issues/20>`_).
 * use ``roslaunch_add_files_check()`` to test that required launch
   file dependencies are declared.
+* fixed a few minor errors found on the real robot
+* added configuration with both the hokuyo and kinect in it
+* preparing to add kinect as well as the hokuyo for navigation
+* change nan to inf filter to handle max_range+ values as well. need to sort this all out in navigation
+* update change history
+* segbot_sensors: test any kinect launch files that do not us openni_launch (`#20 <https://github.com/utexas-bwi/segbot/issues/20>`_)
+* add roslaunch_add_file_check() unit test (`#20 <https://github.com/utexas-bwi/segbot/issues/20>`_, `ros-drivers/openni_launch#10 <https://github.com/ros-drivers/openni_launch/issues/10>`_)
+* add missing segbot_sensors dependency on depthimage_to_laserscan (`#20 <https://github.com/utexas-bwi/segbot/issues/20>`_)
+* fixed issue with hydro costmap not accepting +inf range values
 
 0.1.7 (2013-09-03)
 ------------------
