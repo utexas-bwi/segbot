@@ -11,8 +11,7 @@
     command="$(find xacro)/xacro.py '$(arg urdf_file)' use_full_gazebo_model:=$(arg use_full_gazebo_model)" />
 
   <!-- launch the tf tree -->
-  <node pkg="segbot_bringup" type="segbot_state_publisher" name="robot_state_publisher">
-  <!-- <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher"> -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
     <param name="publish_frequency" type="double" value="5.0" />
   </node>
 

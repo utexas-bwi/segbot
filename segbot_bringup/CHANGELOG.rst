@@ -2,6 +2,14 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.9 (forthcoming)
+-------------------
+* revert update for `#16`_ now that we can use the standard
+  robot_state_publisher (`#21`_).
+
+.. _`#16`: https://github.com/utexas-bwi/segbot/issues/16
+.. _`#21`: https://github.com/utexas-bwi/segbot/issues/21
+
 0.1.8 (2013-12-04)
 ------------------
 * use ``roslaunch_add_files_check()`` to test that required launch
