@@ -2,6 +2,9 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.9 (2013-12-15)
+------------------
+
 0.1.8 (2013-12-04)
 ------------------
 * add missing segbot_sensors dependency on depthimage_to_laserscan

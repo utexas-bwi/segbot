@@ -2,6 +2,9 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.1.9 (2013-12-15)
+------------------
+
 0.1.8 (2013-12-04)
 ------------------
 * added configuration with both the hokuyo and kinect in it

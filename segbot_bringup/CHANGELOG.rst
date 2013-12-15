@@ -2,8 +2,8 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-0.1.9 (forthcoming)
--------------------
+0.1.9 (2013-12-15)
+------------------
 * revert update for `#16`_ now that we can use the standard
   robot_state_publisher (`#21`_).
 
