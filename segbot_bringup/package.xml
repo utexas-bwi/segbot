@@ -19,7 +19,7 @@
 
   <run_depend>joint_state_publisher</run_depend>
   <run_depend>python-netifaces</run_depend>
-  <run_depend>robot_state_publisher</run_depend>
+  <run_depend version_gte="1.9.10">robot_state_publisher</run_depend>
   <run_depend>segbot_description</run_depend>
   <run_depend>segbot_sensors</run_depend>
   <run_depend>segway_rmp</run_depend>
