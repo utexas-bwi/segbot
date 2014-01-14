@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-# See http://code.google.com/p/brown-ros-pkg/wiki/teleop_twist_keyboard for 
-# documentation. This code is from the teleop_twist_keyboard ROS package, 
-# written by Trevor Jay and licensed under the BSD
+# Based on the teleop_twist_keyboard script from brown-ros-pkg
+# Original Authors: Trevor Jay
+# Original License: BSD
+# See https://code.google.com/p/brown-ros-pkg/ for more details
 
 import rospy
 

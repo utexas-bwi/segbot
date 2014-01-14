@@ -2,8 +2,8 @@
 
 # Based on the turtlebot_addr.py script in the turtlebot_bringup package
 # Original Authors: Tully Foote
-# License: BSD
-# Source: https://kforge.ros.org/turtlebot/turtlebot/raw-file/fb8354a98ac5/turtlebot_bringup/scripts/turtlebot_addr.py
+# Original License: BSD
+# See https://github.com/turtlebot/graveyard_turtlebot_common for more details
 
 import sys
 import netifaces
