@@ -2,9 +2,8 @@
   <name>segbot_sensors</name>
   <version>0.1.9</version>
   <description>
-    This package contains all the sensor specific launch files and
-    all the relevant filters that are applied on sensor data before being used
-    by the segbot.
+    Contains sensor specific launch files and all the relevant filters that are
+    applied on sensor data before being used by the segbot.
   </description>
 
   <license>BSD</license>
