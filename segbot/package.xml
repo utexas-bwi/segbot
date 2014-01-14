@@ -1,7 +1,11 @@
 <package>
   <name>segbot</name>
   <version>0.1.9</version>
-  <description>Drivers for Segway RMP 50 based robots at the University of Texas at Austin</description>
+  <description>
+    ROS drivers for controlling Segway RMP 50 based robots at Learning Agents 
+    Research Group (LARG), AI Laboratory, Department of Computer Science, 
+    The University of Texas at Austin. 
+  </description>
 
   <license>BSD</license>
 
@@ -9,7 +13,7 @@
   <url type="repository">https://github.com/utexas-bwi/segbot.git</url>
   <url type="bugtracker">https://github.com/utexas-bwi/segbot/issues</url>
 
-  <author>Piyush Khandelwal</author>
+  <author email="piyushk@gmail.com">Piyush Khandelwal</author>
   <maintainer email="piyushk@gmail.com">Piyush Khandelwal</maintainer>
   <maintainer email="jack.oquin@gmail.com">Jack O'Quin</maintainer>
 

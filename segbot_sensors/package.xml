@@ -1,7 +1,11 @@
 <package>
   <name>segbot_sensors</name>
   <version>0.1.9</version>
-  <description>This package contains all the sensor specific launch files and all the relevant filters that are applied on sensor data before being used by Segbot.</description>
+  <description>
+    This package contains all the sensor specific launch files and
+    all the relevant filters that are applied on sensor data before being used
+    by the segbot.
+  </description>
 
   <license>BSD</license>
 
@@ -9,7 +13,7 @@
   <url type="repository">https://github.com/utexas-bwi/segbot.git</url>
   <url type="bugtracker">https://github.com/utexas-bwi/segbot/issues</url>
 
-  <author>Piyush Khandelwal</author>
+  <author email="piyushk@gmail.com">Piyush Khandelwal</author>
   <maintainer email="piyushk@gmail.com">Piyush Khandelwal</maintainer>
   <maintainer email="jack.oquin@gmail.com">Jack O'Quin</maintainer>
 
@@ -26,8 +30,8 @@
   <run_depend>laser_filters</run_depend>
   <run_depend>nodelet</run_depend>
   <run_depend>openni_launch</run_depend>
-  <run_depend>tf</run_depend>
   <run_depend>rviz</run_depend>
+  <run_depend>tf</run_depend>
 
   <export>
     <filters plugin="${prefix}/segbot_sensors_plugins.xml"/>

@@ -1,3 +1,7 @@
+/*
+ * LICENSE: https://github.com/utexas-bwi/segbot/blob/devel/LICENSE
+ */
+
 #ifndef LASER_SCAN_NAN_TO_INF_FILTER_H
 #define LASER_SCAN_NAN_TO_INF_FILTER_H
 

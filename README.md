@@ -1,5 +1,5 @@
-The segbot ROS package
-======================
+The segbot ROS meta-package
+===========================
 
 ROS drivers for controlling Segway RMP 50 based robots at Learning Agents 
 Research Group (LARG), AI Laboratory, Department of Computer Science, 

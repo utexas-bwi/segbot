@@ -1,7 +1,10 @@
 <package>
   <name>segbot_description</name>
   <version>0.1.9</version>
-  <description>Contains URDF descriptions of all robot components for Segway RMP 50 based robots at the University of Texas at Austin. Since the sensors on a given robot are configurable, this package also contains all the different robot configurations.</description>
+  <description>
+    Contains URDF descriptions of all robot components and sensors for the
+    segbot, as well as all the different sensor configurations for a segbot.
+  </description>
 
   <license>BSD</license>
 
@@ -9,7 +12,7 @@
   <url type="repository">https://github.com/utexas-bwi/segbot.git</url>
   <url type="bugtracker">https://github.com/utexas-bwi/segbot/issues</url>
 
-  <author>Piyush Khandelwal</author>
+  <author email="piyushk@gmail.com">Piyush Khandelwal</author>
   <maintainer email="piyushk@gmail.com">Piyush Khandelwal</maintainer>
   <maintainer email="jack.oquin@gmail.com">Jack O'Quin</maintainer>
 
