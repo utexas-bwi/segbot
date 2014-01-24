@@ -8,6 +8,7 @@ The University of Texas at Austin.
 Detailed documentation for this code-base can be found on the ROS wiki:
 * [segbot_bringup](http://wiki.ros.org/segbot_bringup)
 * [segbot_description](http://wiki.ros.org/segbot_description)
+* [segbot_firmware](http://wiki.ros.org/segbot_firmware)
 * [segbot_sensors](http://wiki.ros.org/segbot_sensors)
 
 All the code in this package has been released using a modified BSD license, 
