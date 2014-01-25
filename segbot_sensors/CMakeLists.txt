@@ -42,6 +42,11 @@ foreach(dir config launch rviz)
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
 endforeach(dir)
 
+# Lint Python modules for PEP8 compatibility
+file(GLOB_RECURSE ${PROJECT_NAME}_PY_SCRIPTS
+     RELATIVE ${PROJECT_SOURCE_DIR} scripts/*)
+roslint_python(${${PROJECT_NAME}_PY_SCRIPTS})
+
 # unit tests are enabled selectively
 if (CATKIN_ENABLE_TESTING)
   find_package(roslaunch REQUIRED)

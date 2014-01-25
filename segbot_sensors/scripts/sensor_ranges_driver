@@ -72,9 +72,9 @@ class SensorDriver(object):
     """ ROS driver node for UTexas BWI segbot Arduino sensor ranges. """
     def __init__(self, port='/dev/ttyACM0', baud=115200):
         rospy.init_node('sensor_ranges_driver')
-        self.line_parser = re.compile(r'(\d+)cm') 
+        self.line_parser = re.compile(r'(\d+)cm')
         """ Extracts distances from the Arduino serial message line. """
-        self.dev = serial.Serial(port,baud)
+        self.dev = serial.Serial(port, baud)
         """ Serial Arduino connection. """
         if self.dev:
             rospy.loginfo('Serial port ' + port + ' opened at '
@@ -103,7 +103,6 @@ class SensorDriver(object):
 
         self.spin()                     # run main driver loop
         self.shutdown()
-    
 
     def shutdown(self):
         """ Called by rospy on shutdown. """
