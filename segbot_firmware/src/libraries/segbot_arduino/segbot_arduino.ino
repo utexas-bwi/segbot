@@ -2,8 +2,8 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (C) 2013 Jose Bigio
-*  Copyright (C) 2014 Jack O'Quin
+*  Copyright (C) 2013, Jose Bigio
+*  Copyright (C) 2014, Jack O'Quin
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -37,18 +37,18 @@
 #include <NewPing.h>
 
 // Arduino digital control pins for triggering sonar pings.
-#define TRIGGER_PIN1  28
-#define TRIGGER_PIN2  26
-#define TRIGGER_PIN3  24 
-#define TRIGGER_PIN4  22 
-#define TRIGGER_PIN5  20 
+#define TRIGGER_PIN1  30
+#define TRIGGER_PIN2  28
+#define TRIGGER_PIN3  26
+#define TRIGGER_PIN4  24
+#define TRIGGER_PIN5  22
 
 // Arduino pin tied to echo pin on the ultrasonic sensor.
 #define ECHO_PIN1     12
 #define ECHO_PIN2     11 
 #define ECHO_PIN3     10 
 #define ECHO_PIN4     9 
-#define ECHO_PIN5     9
+#define ECHO_PIN5     8
 
 // Maximum sonar distance we want to ping (in centimeters).
 // The maximum sensor distance is rated at 4 to 5 meters.
