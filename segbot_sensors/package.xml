@@ -19,7 +19,10 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>laser_filters</build_depend>
+  <build_depend>message_generation</build_depend>
   <build_depend>roslaunch</build_depend> <!-- unit test only -->
+  <build_depend>rospy</build_depend>
+  <build_depend>sensor_msgs</build_depend>
 
   <run_depend>camera1394</run_depend>
   <run_depend>depthimage_to_laserscan</run_depend>
@@ -27,9 +30,13 @@
   <run_depend>freenect_launch</run_depend>
   <run_depend>hokuyo_node</run_depend>
   <run_depend>laser_filters</run_depend>
+  <run_depend>message_runtime</run_depend>
   <run_depend>nodelet</run_depend>
   <run_depend>openni_launch</run_depend>
+  <run_depend>python-serial</run_depend>
+  <run_depend>rospy</run_depend>
   <run_depend>rviz</run_depend>
+  <run_depend>sensor_msgs</run_depend>
   <run_depend>tf</run_depend>
 
   <export>

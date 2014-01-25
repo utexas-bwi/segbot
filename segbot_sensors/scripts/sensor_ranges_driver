@@ -1,0 +1,146 @@
+#!/usr/bin/env python
+# Software License Agreement (BSD License)
+#
+# Copyright (C) 2014, Jack O'Quin
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+#  * Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#  * Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#  * Neither the name of the author nor of other contributors may be
+#    used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+"""
+This is a ROS device driver node that reads and parses serial messages
+from the Arduino Mega 2560 mounted on BWI segbots, publishing them as
+segbot_sensors/RangeArray ROS messages containing an array of
+sensor_msgs/Range components.
+
+.. note::
+
+   TODO: add diagnositics
+
+"""
+
+# enable some python3 compatibility options:
+from __future__ import absolute_import, print_function, unicode_literals
+
+import sys
+import re
+import serial
+
+import rospy
+from segbot_sensors.msg import RangeArray
+from sensor_msgs.msg import Range
+
+
+class SensorAttributes(Range):
+    """ Subclass of sensor_msgs/Range, for filling in sensor attributes."""
+    def __init__(self, frame_id=None, radiation_type=Range.ULTRASOUND,
+                 field_of_view=0.5, min_range=0.01, max_range=2.0):
+        super(SensorAttributes, self).__init__(
+            radiation_type=radiation_type,
+            field_of_view=field_of_view,
+            min_range=min_range,
+            max_range=max_range)
+        if frame_id:
+            self.header.frame_id = frame_id
+
+
+class SensorDriver(object):
+    """ ROS driver node for UTexas BWI segbot Arduino sensor ranges. """
+    def __init__(self, port='/dev/ttyACM0', baud=115200):
+        rospy.init_node('sensor_ranges_driver')
+        self.line_parser = re.compile(r'(\d+)cm') 
+        """ Extracts distances from the Arduino serial message line. """
+        self.dev = serial.Serial(port,baud)
+        """ Serial Arduino connection. """
+        if self.dev:
+            rospy.loginfo('Serial port ' + port + ' opened at '
+                          + str(baud) + ' baud.')
+        else:
+            rospy.logfatal('Serial port ' + port + ' open failed at '
+                           + str(baud) + ' baud.')
+            sys.exit(1)
+        rospy.sleep(2.0)                # wait for Arduino to initialize
+        self.dev.flushInput()           # discard any old data
+
+        # initialize ROS interface
+        rospy.on_shutdown(self.shutdown)
+        self.pub = rospy.Publisher('sensor_ranges', RangeArray)
+
+        # Our segbots currently have five sonars and two IR detectors.
+        # TODO: define this configuration information using ROS parameters
+        self.sensors = [
+            SensorAttributes('sonar0', radiation_type=Range.ULTRASOUND),
+            SensorAttributes('sonar1', radiation_type=Range.ULTRASOUND),
+            SensorAttributes('sonar2', radiation_type=Range.ULTRASOUND),
+            SensorAttributes('sonar3', radiation_type=Range.ULTRASOUND),
+            SensorAttributes('sonar4', radiation_type=Range.ULTRASOUND),
+            SensorAttributes('cliff0', radiation_type=Range.INFRARED),
+            SensorAttributes('cliff1', radiation_type=Range.INFRARED)]
+
+        self.spin()                     # run main driver loop
+        self.shutdown()
+    
+
+    def shutdown(self):
+        """ Called by rospy on shutdown. """
+        if self.dev:
+            self.dev.close()
+        self.dev = None
+
+    def spin(self):
+        """ Main driver loop. """
+        cycle = rospy.Rate(20)
+        while not rospy.is_shutdown():
+
+            serial_msg = self.dev.readline()
+            now = rospy.Time.now()      # time when read completed
+            rospy.logdebug('Arduino message: ' + serial_msg)
+
+            # Parse line into an array of distances gathered from the sensors.
+            distances = self.line_parser.findall(serial_msg)
+
+            msg = RangeArray()
+            for i in range(len(distances)):
+                distance = int(distances[i])
+                msg.ranges.append(self.sensors[i])
+                if distance == 0:       # nothing detected?
+                    msg.ranges[i].range = float('+inf')  # follow REP-0117
+                else:
+                    # Convert sensor distance from centimeters to meters.
+                    msg.ranges[i].range = 0.01 * float(distance)
+
+                # Label all readings as if they happened right now.
+                # That is wrong, but probably OK at segbot speeds.  A
+                # better estimate would include message latency and
+                # the timing of firmware reading the devices.
+                msg.ranges[i].header.stamp = now
+
+            self.pub.publish(msg)
+            cycle.sleep()
+
+if __name__ == '__main__':
+    node = SensorDriver()

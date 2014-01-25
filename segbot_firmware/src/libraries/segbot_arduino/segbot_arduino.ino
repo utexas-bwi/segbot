@@ -68,7 +68,7 @@ void setup() {
   Serial.begin(115200);
 }
 
-// Called periodically in Arduino main loop.
+// Called repeatedly in Arduino main loop.
 void loop() {
 
   // Wait 50ms between pings (about 20 pings/sec). 29ms should be the
