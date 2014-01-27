@@ -55,6 +55,61 @@ from segbot_sensors.msg import RangeArray
 from sensor_msgs.msg import Range
 
 
+class ArduinoDevice(object):
+    """ Class for managing the Arduino serial port connection.
+    """
+    def __init__(self, port='/dev/ttyACM0', baud=115200):
+        self.port = port
+        """ Path name for Arduino serial port. """ 
+        self.baud = baud
+        """ Baud rate for Arduino serial port. """ 
+        self.dev = None
+        """ Arduino serial device connection. """
+        self.line_parser = re.compile(r'(\d+)cm')
+        """ Extract list of distances from the Arduino serial message. """
+
+    def close(self):
+        if self.dev:
+            self.dev.close()
+        self.dev = None
+
+    def ok(self):
+        """ :returns: ``True`` if Arduino contacted. """
+        return self.dev is not None
+
+    def open(self):
+        """ Open the Arduino serial device interface.
+
+        :returns: ``True`` if open succeeds.
+        """
+        try:
+            self.dev = serial.Serial(self.port, self.baud)
+        except serial.SerialException as e:
+            rospy.logerr('Serial port open failed at '
+                           + str(self.baud) + ' baud: ' + str(e))
+            return False
+
+        rospy.loginfo('Serial port ' + self.port + ' opened at '
+                      + str(self.baud) + ' baud.')
+        rospy.sleep(2.0)                # let Arduino initialize
+        self.dev.flushInput()           # discard any old data
+        return True
+
+    def read(self):
+        serial_msg = ''
+        try:
+            serial_msg = self.dev.readline()
+        except serial.SerialException as e:
+            rospy.logerr('Serial port ' + self.port +
+                         ' read failed: ' + str(e))
+            self.dev.close()
+            self.dev = None
+            return []
+        else:
+            rospy.logdebug('Arduino message: ' + serial_msg)
+        return self.line_parser.findall(serial_msg)
+
+
 class SensorAttributes(Range):
     """ Subclass of sensor_msgs/Range, for filling in sensor attributes."""
     def __init__(self, frame_id=None, radiation_type=Range.ULTRASOUND,
@@ -72,23 +127,10 @@ class SensorDriver(object):
     """ ROS driver node for UTexas BWI segbot Arduino sensor ranges. """
     def __init__(self, port='/dev/ttyACM0', baud=115200):
         rospy.init_node('sensor_ranges_driver')
-        self.line_parser = re.compile(r'(\d+)cm')
-        """ Extracts distances from the Arduino serial message line. """
-        self.dev = serial.Serial(port, baud)
-        """ Serial Arduino connection. """
-        if self.dev:
-            rospy.loginfo('Serial port ' + port + ' opened at '
-                          + str(baud) + ' baud.')
-        else:
-            rospy.logfatal('Serial port ' + port + ' open failed at '
-                           + str(baud) + ' baud.')
-            sys.exit(1)
-        rospy.sleep(2.0)                # wait for Arduino to initialize
-        self.dev.flushInput()           # discard any old data
-
-        # initialize ROS interface
-        rospy.on_shutdown(self.shutdown)
         self.pub = rospy.Publisher('sensor_ranges', RangeArray)
+        self.arduino = ArduinoDevice(port, baud)
+        """ Arduino serial device connection. """
+        rospy.on_shutdown(self.shutdown)
 
         # Our segbots currently have five sonars and two IR detectors.
         # TODO: define this configuration information using ROS parameters
@@ -103,25 +145,24 @@ class SensorDriver(object):
 
         self.spin()                     # run main driver loop
         self.shutdown()
-
+        
     def shutdown(self):
         """ Called by rospy on shutdown. """
-        if self.dev:
-            self.dev.close()
-        self.dev = None
+        self.arduino.close()
 
     def spin(self):
         """ Main driver loop. """
-        cycle = rospy.Rate(20)
+        slow_poll = rospy.Rate(0.25)    # slow poll frequency
+        active_cycle = rospy.Rate(20)   # active cycle frequency
         while not rospy.is_shutdown():
 
-            serial_msg = self.dev.readline()
+            if not self.arduino.ok():   # device not connected?
+                if not self.arduino.open():  # open failed?
+                    slow_poll.sleep()
+                    continue                # try again
+
+            distances = self.arduino.read()
             now = rospy.Time.now()      # time when read completed
-            rospy.logdebug('Arduino message: ' + serial_msg)
-
-            # Parse line into an array of distances gathered from the sensors.
-            distances = self.line_parser.findall(serial_msg)
-
             msg = RangeArray()
             for i in range(len(distances)):
                 distance = int(distances[i])
@@ -139,7 +180,7 @@ class SensorDriver(object):
                 msg.ranges[i].header.stamp = now
 
             self.pub.publish(msg)
-            cycle.sleep()
+            active_cycle.sleep()
 
 if __name__ == '__main__':
     node = SensorDriver()
