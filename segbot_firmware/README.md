@@ -1,7 +1,11 @@
 Segbot Arduino firmware
 =======================
 
-Build and install
+This package contains Arduino firmware for the UTexas BWI segbot
+sensor array.
+
+
+Build and Install
 -----------------
 
 The CMakeLists.txt does not yet support make and install from the
@@ -14,7 +18,7 @@ commands:
     $ cd ~/sketchbook
     $ ln -s $(rospack find segbot_firmware)/src/libraries .
 
-Then run Arduino GUI:
+Plug in the USB cable, then run Arduino GUI:
 
     $ arduino
 
@@ -22,7 +26,7 @@ Select ``File > Sketchbook > Libraries`` followed by the desired
 firmware version.  Then, click the ``->`` icon to compile the
 microcode and load it into the controller.
 
-ROS driver
+ROS Driver
 ----------
 
 When the firmware is loaded, start ``roscore`` and run the ROS device
