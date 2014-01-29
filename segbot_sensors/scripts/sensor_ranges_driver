@@ -61,9 +61,9 @@ class ArduinoDevice(object):
     """
     def __init__(self, port='/dev/ttyACM0', baud=115200):
         self.port = port
-        """ Path name for Arduino serial port. """ 
+        """ Path name for Arduino serial port. """
         self.baud = baud
-        """ Baud rate for Arduino serial port. """ 
+        """ Baud rate for Arduino serial port. """
         self.dev = None
         """ Arduino serial device connection. """
         self.line_parser = re.compile(r'(\d+)cm')
@@ -87,7 +87,7 @@ class ArduinoDevice(object):
             self.dev = serial.Serial(self.port, self.baud)
         except serial.SerialException as e:
             rospy.logerr('Serial port open failed at '
-                           + str(self.baud) + ' baud: ' + str(e))
+                         + str(self.baud) + ' baud: ' + str(e))
             return False
 
         rospy.loginfo('Serial port ' + self.port + ' opened at '
@@ -169,7 +169,7 @@ class SensorDriver(object):
                 msg.ranges[i].range = 0.01 * float(distance)
             msg.ranges[i].header.stamp = now
         self.pub.publish(msg)
-        
+
     def shutdown(self):
         """ Called by rospy on shutdown. """
         self.arduino.close()
