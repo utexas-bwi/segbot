@@ -12,7 +12,7 @@ commands:
     $ sudo apt-get install arduino
     $ mkdir ~/sketchbook 
     $ cd ~/sketchbook
-    $ ln -s libraries $(rospack find segbot_firmware)/src/libraries .
+    $ ln -s $(rospack find segbot_firmware)/src/libraries .
 
 Then run Arduino GUI:
 
@@ -21,3 +21,16 @@ Then run Arduino GUI:
 Select ``File > Sketchbook > Libraries`` followed by the desired
 firmware version.  Then, click the ``->`` icon to compile the
 microcode and load it into the controller.
+
+ROS driver
+----------
+
+When the firmware is loaded, start ``roscore`` and run the ROS device
+driver:
+
+    $ rosrun segbot_sensors sensor_ranges_driver
+
+The driver publishes sensor readings on the ``/sensor_ranges`` topic.
+To see the data, run:
+
+    $ rostopic echo /sensor_ranges
