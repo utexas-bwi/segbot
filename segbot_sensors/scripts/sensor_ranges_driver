@@ -108,6 +108,9 @@ class ArduinoDevice(object):
             errno, perror = e.args
             rospy.logwarn('Serial port read error: ' + str(perror))
         else:
+            # Sometimes the Arduino sends out-of-range characters on
+            # start-up. Just ignore them.
+            serial_msg = serial_msg.decode('ascii', 'ignore')
             rospy.logdebug('Arduino message: ' + serial_msg)
         return self.line_parser.findall(serial_msg)
 
