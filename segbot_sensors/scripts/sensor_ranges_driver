@@ -96,6 +96,10 @@ class ArduinoDevice(object):
         return True
 
     def read(self):
+        """ Read a line from the serial port.
+
+        :returns: List of integer distances in cm reported by the sensors.
+        """
         serial_msg = ''
         try:
             serial_msg = self.dev.readline()
@@ -160,6 +164,8 @@ class SensorDriver(object):
         would include serial port latency and the timing of firmware
         reading the devices.
         """
+        if not distances:               # no data available?
+            return
         now = rospy.Time.now()          # time when read completed
         msg = RangeArray()
         for i in range(len(distances)):
@@ -182,9 +188,7 @@ class SensorDriver(object):
         slow_poll = rospy.Rate(0.25)    # slow poll frequency
         while not rospy.is_shutdown():
             if self.arduino.ok():       # device connected?
-                distances = self.arduino.read()
-                if distances:
-                    self.publish(distances)
+                self.publish(self.arduino.read())
             elif self.arduino.open():   # open succeeded?
                 pass
             else:

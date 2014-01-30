@@ -42,6 +42,7 @@
 
   <export>
     <filters plugin="${prefix}/segbot_sensors_plugins.xml"/>
+    <nodelet plugin="${prefix}/nodelets.xml"/>
   </export>
 
 </package>
