@@ -17,6 +17,7 @@ catkin_package(
 include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_library(ranges_to_cloud src/ranges_nodelet.cpp src/ranges_to_cloud.cpp)
+add_dependencies(ranges_to_cloud ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(ranges_to_cloud ${catkin_LIBRARIES})
 
 add_library(segbot_sensors_filters src/segbot_sensors_filters.cpp)
