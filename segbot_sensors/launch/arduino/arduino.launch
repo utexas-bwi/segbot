@@ -28,10 +28,16 @@
           args="0 0 0.016 0 0 0 1 $(arg frame_id) sonar2" />
     <node name="sonar3_broadcaster"
           pkg="tf2_ros" type="static_transform_publisher"
-          args="-0.032 -0.057 0.016 0 0 0.218 0.976 $(arg frame_id) sonar3" />
+          args="-0.032 0.057 0.016 0 0 0.218 0.976 $(arg frame_id) sonar3" />
     <node name="sonar4_broadcaster"
           pkg="tf2_ros" type="static_transform_publisher"
           args="-0.044 0.095 0.016 0 0 0.426 0.905 $(arg frame_id) sonar4" />
+    <node name="cliff0_broadcaster"
+          pkg="tf2_ros" type="static_transform_publisher"
+          args="-0.032 -0.057 -0.025 0 0.383 0 0.924 $(arg frame_id) cliff0" />
+    <node name="cliff1_broadcaster"
+          pkg="tf2_ros" type="static_transform_publisher"
+          args="-0.032 0.057 -0.025 0 0.383 0 0.924 $(arg frame_id) cliff1" />
   </group>
 
   <!-- run the Arduino interface driver -->

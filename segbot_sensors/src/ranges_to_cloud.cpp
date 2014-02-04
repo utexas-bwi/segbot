@@ -100,8 +100,8 @@ namespace segbot_sensors
             tf::StampedTransform transform;
             try
               {
-                listener_.lookupTransform(r->header.frame_id,
-                                          cloud->header.frame_id,
+                listener_.lookupTransform(cloud->header.frame_id,
+                                          r->header.frame_id,
                                           ros::Time(0), transform);
               }
             catch (tf::TransformException ex)
