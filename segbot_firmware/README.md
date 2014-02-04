@@ -4,6 +4,28 @@ Segbot Arduino firmware
 This package contains Arduino firmware for the UTexas BWI segbot
 sensor array.
 
+Access to Serial Ports
+----------------------
+
+To access the Arduino serial port, you must be authorized for the
+"dialout" group.  To verify that you are a member of that group, run
+this command:
+
+    $ id | grep dialout
+
+If you are in the group, "dialout" will appear in the printed output.   
+
+If you are not yet authorized, run this command on a personal Ubuntu
+system:
+
+    $ sudo usermod -a -G dialout your_user_id
+
+**But**, *do not* run that command on any of the BWI robots or lab
+machines.  They maintain a shared user and group database, so ask a
+system administrator to update it for you.
+
+In either case, logout and login after your group membership has been
+updated, and verify that you are now in the "dialout" group.
 
 Build and Install
 -----------------
@@ -18,7 +40,7 @@ commands:
     $ cd ~/sketchbook
     $ ln -s $(rospack find segbot_firmware)/src/libraries .
 
-Plug in the USB cable, then run Arduino GUI:
+Plug in the USB cable, then run the Arduino GUI:
 
     $ arduino
 

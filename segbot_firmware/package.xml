@@ -16,7 +16,7 @@
   <maintainer email="piyushk@gmail.com">Piyush Khandelwal</maintainer>
   <author>Jose Bigio</author>
   <author>Jack O'Quin</author>
-  <author>Tim Eckel</author>            <!-- NewPing library -->
+  <author>Tim Eckel (NewPing library)</author>
 
   <buildtool_depend>catkin</buildtool_depend>
 
