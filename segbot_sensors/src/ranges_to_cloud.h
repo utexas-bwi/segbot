@@ -43,6 +43,7 @@
 */
 
 #include <ros/ros.h>
+#include <tf/transform_listener.h>
 #include <segbot_sensors/RangeArray.h>
 
 namespace segbot_sensors
@@ -58,6 +59,7 @@ namespace segbot_sensors
 
     ros::Subscriber ranges_;
     ros::Publisher points_;
+    tf::TransformListener listener_;
   };
 }; // end namespace segbot_sensors
 
