@@ -1,8 +1,7 @@
-/* -*- mode: C++ -*-
+/* -*- mode: C++ -*- */
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (C) 2013, Jose Bigio
 *  Copyright (C) 2014, Jack O'Quin
 *  All rights reserved.
 *
@@ -34,73 +33,132 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
+// Based on NewPing library timer-driven 15 sensor example.
+//
+// This driver is event-driven. Your complete sketch needs to be
+// written so there's no "delay" commands and the loop() cycles at
+// faster than a 33ms rate. If other processes take longer than 33ms,
+// you'll need to increase PING_INTERVAL so it doesn't get behind.
+ 
 #include <NewPing.h>
 
-// Arduino digital control pins for triggering sonar pings.
-#define TRIGGER_PIN1  30
-#define TRIGGER_PIN2  28
-#define TRIGGER_PIN3  26
-#define TRIGGER_PIN4  24
-#define TRIGGER_PIN5  22
+#define N_CYCLES 5                      // Number of sonar poll cycles
+#define N_IR 2                          // Number of infrared sensors
+#define N_SENSORS (N_CYCLES + N_IR)     // Total number of sensors
+#define MAX_DISTANCE 200                // Maximum distance to ping (in cm)
 
-// Arduino pin tied to echo pin on the ultrasonic sensor.
-#define ECHO_PIN1     12
-#define ECHO_PIN2     11 
-#define ECHO_PIN3     10 
-#define ECHO_PIN4     9 
-#define ECHO_PIN5     8
+// Each sonar is pinged at 33ms intervals (29ms is about the minimum
+// to avoid cross-sonar echo). 
+#define PING_INTERVAL 33
 
-// Maximum sonar distance we want to ping (in centimeters).
-// The maximum sensor distance is rated at 4 to 5 meters.
-#define MAX_DISTANCE 200
+// One cycle of all sensors takes 33 * N_CYCLES ms.
+#define CYCLE_MS (PING_INTERVAL * N_CYCLES)
 
-// Create NewPing object for each sonar.  Sonars are numbered from
-// right to left in the robot's frame of reference.
-NewPing sonar1(TRIGGER_PIN1, ECHO_PIN1, MAX_DISTANCE);
-NewPing sonar2(TRIGGER_PIN2, ECHO_PIN2, MAX_DISTANCE);
-NewPing sonar3(TRIGGER_PIN3, ECHO_PIN3, MAX_DISTANCE);
-NewPing sonar4(TRIGGER_PIN4, ECHO_PIN4, MAX_DISTANCE);
-NewPing sonar5(TRIGGER_PIN5, ECHO_PIN5, MAX_DISTANCE);
+#define LED_PIN 13                      // Pin with LED attached.
 
-// Called once at Arduino initialization.
-void setup() {
-  // Open serial monitor at 115200 baud to see ping results.
-  Serial.begin(115200);
+// The time when the next ping should happen for each sonar.
+unsigned long ping_timer[N_CYCLES];   
+
+uint8_t current_sonar = 0;              // which sonar is active
+unsigned int distance[N_SENSORS];       // current ping distances
+
+// Each sonars's trigger pin, echo pin, and max distance to ping.
+NewPing sonar[N_CYCLES] =
+  {
+    NewPing(30, 12, MAX_DISTANCE),
+    NewPing(28, 11, MAX_DISTANCE),
+    NewPing(26, 10, MAX_DISTANCE),
+    NewPing(24,  9, MAX_DISTANCE),
+    NewPing(22,  8, MAX_DISTANCE)
+  };
+
+int ir_pin[N_IR] = {A0, A1};            // array of IR analog pins to poll
+
+// Called once on start-up.
+void setup() 
+{
+  Serial.begin(115200);                 // serial port baud rate
+  pinMode(LED_PIN, OUTPUT);             // configure LED output
+
+  // The first ping starts after 75ms, giving the Arduino time to
+  // initialize.  Others follow at PING_INTERVAL ms.
+  ping_timer[0] = millis() + 75;
+  for (uint8_t i = 1; i < N_CYCLES; i++)
+    {
+      ping_timer[i] = ping_timer[i-1] + PING_INTERVAL;
+    }
+  for (uint8_t i = 0; i < N_SENSORS; i++)
+    {
+      distance[i] = 0;
+    }
 }
 
 // Called repeatedly in Arduino main loop.
-void loop() {
+void loop()
+{
+  for (uint8_t i = 0; i < N_CYCLES; i++)
+    {
+      if (millis() >= ping_timer[i])    // time to ping this sonar?
+        {
+          ping_timer[i] += PING_INTERVAL * N_CYCLES;
 
-  // Wait 50ms between pings (about 20 pings/sec). 29ms should be the
-  // shortest delay between pings.
-  delay(50);
-  
-  // Send ping, get ping time in microseconds (uS).
-  unsigned int uS1 = sonar1.ping();
-  unsigned int uS2 = sonar2.ping();
-  unsigned int uS3 = sonar3.ping();
-  unsigned int uS4 = sonar4.ping();
-  unsigned int uS5 = sonar5.ping();
+          if (i == 0 && (current_sonar == N_CYCLES - 1))
+            {
+              poll_infrared();
+              send_results();
+            }
 
-  // Convert ping times to distance and send results to serial port.
-  // (0 = outside set distance range, no ping echo)
-  Serial.print("Ping1: ");
-  Serial.print(uS1 / US_ROUNDTRIP_CM);
-  Serial.print("cm  ");
-  
-  Serial.print("Ping2: ");
-  Serial.print(uS2 / US_ROUNDTRIP_CM);
-  Serial.print("cm  ");
-  
-  Serial.print("Ping3: ");
-  Serial.print(uS3 / US_ROUNDTRIP_CM);
-  Serial.print("cm  ");
-  
-  Serial.print("Ping4: ");
-  Serial.print(uS4 / US_ROUNDTRIP_CM);
-  Serial.print("cm  ");
-  
-  Serial.print("Ping5: ");
-  Serial.print(uS5 / US_ROUNDTRIP_CM);
-  Serial.println("cm  ");
+          // Cancel previous timer and start a new ping cycle.
+          sonar[current_sonar].timer_stop();
+          current_sonar = i;
+          distance[current_sonar] = 0; // in case of no echo
+          sonar[current_sonar].ping_timer(timer_event); // start next ping
+          // (processing continues, interrupt handler will call
+          // timer_event to look for echo).
+        }
+    }
+}
+
+// Timer interrupt handler:
+//
+// If ping completed, set the sonar distance in the array.
+void timer_event()
+{ 
+  if (sonar[current_sonar].check_timer())
+    distance[current_sonar] =
+      sonar[current_sonar].ping_result / US_ROUNDTRIP_CM;
+}
+
+/// Poll all infrared sensors
+//
+//  Done at the end of every cycle.  These sensors do not interfere
+//  with one another, and their input is desired as frequently as
+//  possible to avoid falling down stairs.
+//
+//  TODO: These sensors are noisy: see if it helps to sample the
+//  analog inputs on every timer interrupt and compute exponentially
+//  weighted moving averages.
+void poll_infrared()
+{ 
+  for (uint8_t i = 0; i < N_IR; i++)
+    {
+      float volts = analogRead(ir_pin[i]) * (5.0 / 1024);
+      distance[N_CYCLES + i] = 65.0 * pow(volts, -1.10);
+    }
+}
+
+// Sonar ping cycle complete, send the results.
+void send_results()
+{
+  for (uint8_t i = 0; i < N_SENSORS; i++)
+    {
+      Serial.print(i);
+      Serial.print("=");
+      Serial.print(distance[i]);
+      Serial.print("cm ");
+    }
+  Serial.println();
+
+  // turn the LED on or off with each message sent
+  digitalWrite(LED_PIN, !digitalRead(LED_PIN));
 }
