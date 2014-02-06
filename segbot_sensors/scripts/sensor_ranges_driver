@@ -106,11 +106,11 @@ class ArduinoDevice(object):
         except serial.SerialException as e:
             rospy.logerr('Serial port ' + self.port +
                          ' read failed: ' + str(e))
-            self.dev.close()
-            self.dev = None
-        except select.error as e:
+            self.close()
+        except (select.error, OSError) as e:
             errno, perror = e.args
             rospy.logwarn('Serial port read error: ' + str(perror))
+            self.close()
         else:
             # Sometimes the Arduino sends out-of-range characters on
             # start-up. Just ignore them.
@@ -168,7 +168,7 @@ class SensorDriver(object):
             return
         now = rospy.Time.now()          # time when read completed
         msg = RangeArray()
-        for i in range(len(distances)):
+        for i in range(min(len(distances), len(self.sensors))):
             distance = int(distances[i])
             msg.ranges.append(self.sensors[i])
             if distance == 0:           # nothing detected?
