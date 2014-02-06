@@ -131,7 +131,7 @@ class ArduinoDevice(object):
             # Sometimes the Arduino sends out-of-range characters on
             # start-up. Just ignore them.
             serial_msg = serial_msg.decode('ascii', 'ignore')
-            rospy.loginfo('Arduino message: ' + serial_msg)
+            rospy.logdebug('Arduino message: ' + serial_msg)
             if serial_msg != '':        # not end of test data?
                 return self.line_parser.findall(serial_msg)
             self.close()                # test ended
