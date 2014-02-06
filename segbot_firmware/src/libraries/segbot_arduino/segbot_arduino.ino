@@ -72,7 +72,9 @@ NewPing sonar[N_CYCLES] =
     NewPing(22,  8, MAX_DISTANCE)
   };
 
+#if N_IR > 0
 int ir_pin[N_IR] = {A0, A1};            // array of IR analog pins to poll
+#endif
 
 // Called once on start-up.
 void setup() 
@@ -140,11 +142,13 @@ void timer_event()
 //  weighted moving averages.
 void poll_infrared()
 { 
+#if N_IR > 0
   for (uint8_t i = 0; i < N_IR; i++)
     {
       float volts = analogRead(ir_pin[i]) * (5.0 / 1024);
       distance[N_CYCLES + i] = 65.0 * pow(volts, -1.10);
     }
+#endif
 }
 
 // Sonar ping cycle complete, send the results.
