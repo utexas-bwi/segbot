@@ -2,9 +2,11 @@
 
   <!-- Launch nodes for using Arduino-attached sensors. -->
 
-  <arg name="tf_prefix" default="" /> 
+  <arg name="baud" default="115200" />
   <arg name="frame_id" default="sensor_base" />
+  <arg name="port" default="/dev/ttyACM0" />
   <arg name="publish_tf" default="true" />
+  <arg name="tf_prefix" default="" /> 
 
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
@@ -43,8 +45,8 @@
   <!-- run the Arduino interface driver -->
   <node name="sensor_ranges_driver"
         pkg="segbot_sensors" type="sensor_ranges_driver">
-    <param name="port" value="/dev/ttyACM0" />
-    <param name="baud" value="115200" />
+    <param name="port" value="$(arg port)" />
+    <param name="baud" value="$(arg baud)" />
   </node>
 
   <!-- run the ranges to point cloud conversion nodelet -->
