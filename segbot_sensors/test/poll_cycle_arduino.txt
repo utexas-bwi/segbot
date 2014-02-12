@@ -1,0 +1,57 @@
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 
+0=18cm 3=62cm 5=30cm 6=30cm 
+1=14cm 4=8cm 5=30cm 6=30cm 
+2=68cm 5=30cm 6=30cm 

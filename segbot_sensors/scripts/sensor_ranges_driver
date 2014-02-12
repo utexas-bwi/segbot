@@ -67,7 +67,7 @@ class ArduinoDevice(object):
         """ Baud rate for Arduino serial port. """
         self.dev = None
         """ Arduino serial device connection. """
-        self.line_parser = re.compile(r'(\d+)cm')
+        self.line_parser = re.compile(r'(\d+)=(\d+)cm')
         """ Extract list of distances from the Arduino serial message. """
 
     def close(self):
@@ -114,7 +114,9 @@ class ArduinoDevice(object):
     def read(self):
         """ Read a line from the serial port.
 
-        :returns: List of integer distances in cm reported by the sensors.
+        :returns: List of (sensor, distance) pairs of strings reported
+            for the sensors.  The strings contain integers, with
+            distances in centimeters.
         """
         serial_msg = ''
         try:
@@ -175,29 +177,34 @@ class SensorDriver(object):
 
         self.spin()                     # run main driver loop
 
-    def publish(self, distances):
+    def publish(self, readings):
         """ Publish RangeArray ROS message.
 
-        :param distances: list of integer distances in cm.
+        :param readings: List of (sensor, distance) pairs of strings
+            reported for the sensors.  The strings contain integers,
+            with distances in centimeters.
 
         Labels all readings as if they happened right now.  That is
         wrong, but probably OK at segbot speeds.  A better estimate
         would include serial port latency and the timing of firmware
         reading the devices.
         """
-        if not distances:               # no data available?
+        if not readings:                # no data available?
             return
         now = rospy.Time.now()          # time when read completed
         msg = RangeArray()
-        for i in range(min(len(distances), len(self.sensors))):
-            distance = int(distances[i])
-            msg.ranges.append(self.sensors[i])
+        for sensor, distance in readings:
+            sensor = int(sensor)
+            if sensor >= len(self.sensors):  # unknown sensor
+                continue                     # skip this reading
+            distance = int(distance)
+            msg.ranges.append(self.sensors[sensor])
+            msg.ranges[-1].header.stamp = now
             if distance == 0:           # nothing detected?
-                msg.ranges[i].range = float('+inf')  # follow REP-0117
+                msg.ranges[-1].range = float('+inf')  # follow REP-0117
             else:
-                # Convert sensor distance from centimeters to meters.
-                msg.ranges[i].range = 0.01 * float(distance)
-            msg.ranges[i].header.stamp = now
+                # Convert distance from int centimeters to float meters.
+                msg.ranges[-1].range = 0.01 * float(distance)
         self.pub.publish(msg)
 
     def shutdown(self):
