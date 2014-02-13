@@ -115,7 +115,7 @@ class ArduinoDevice(object):
         """ Read a line from the serial port.
 
         :returns: List of (sensor, distance) pairs of strings reported
-            for the sensors.  The strings contain integers, with
+            for the sensors.  The strings represent integers, with
             distances in centimeters.
         """
         serial_msg = ''
@@ -181,13 +181,8 @@ class SensorDriver(object):
         """ Publish RangeArray ROS message.
 
         :param readings: List of (sensor, distance) pairs of strings
-            reported for the sensors.  The strings contain integers,
+            reported for the sensors.  The strings represent integers,
             with distances in centimeters.
-
-        Labels all readings as if they happened right now.  That is
-        wrong, but probably OK at segbot speeds.  A better estimate
-        would include serial port latency and the timing of firmware
-        reading the devices.
         """
         if not readings:                # no data available?
             return
@@ -195,7 +190,7 @@ class SensorDriver(object):
         msg = RangeArray()
         for sensor, distance in readings:
             sensor = int(sensor)
-            if sensor >= len(self.sensors):  # unknown sensor
+            if sensor >= len(self.sensors):  # unknown sensor?
                 continue                     # skip this reading
             distance = int(distance)
             msg.ranges.append(self.sensors[sensor])
