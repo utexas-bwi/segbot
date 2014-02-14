@@ -35,29 +35,24 @@
 
 /** @file Arduino sensor firmware.
  *
- *  This program is driven by timer events.  The sonars are grouped
- *  into sets which point in different directions.  We ping them in
- *  parallel for a 33ms cycle.  The main loop() must complete in less
- *  than 33ms.
+ *  This program is driven by timer events.  To improve cycle
+ *  frequency, the sonars are grouped into sets pointing in divergent
+ *  directions to avoid mutual interference.  We ping them in parallel
+ *  for a 33ms cycle.
  */
  
 #include <NewPing.h>
 
-#define N_IR 2                          // Number of infrared sensors
-#define N_SONARS 5                      // Number of sonars
-#define N_GROUPS 3                      // Number of sonar polling groups
-#define N_SENSORS (N_SONARS + N_IR)     // Total number of sensors
-#define MAX_DISTANCE 200                // Maximum distance to ping (in cm)
-#define PING_INTERVAL 33                // Ping duration (in milliseconds)
-#define LED_PIN 13                      // Pin with LED attached.
+#define N_IR 2                          // number of infrared sensors
+#define N_SONARS 5                      // number of sonars
+#define N_GROUPS 3                      // number of sonar polling groups
+#define MAX_GROUP (N_SONARS + N_GROUPS - 1) / N_GROUPS
+#define N_SENSORS (N_SONARS + N_IR)     // total number of sensors
+#define PING_INTERVAL 33                // ping duration (in milliseconds)
+#define LED_PIN 13                      // pin with LED attached.
+#define MAX_DISTANCE 200                // maximum distance to ping (in cm)
 
-// The time for the next sonar group ping to begin.
-unsigned long ping_timer;   
-
-uint8_t current_group = N_GROUPS;       // which sonar group is active
-unsigned int distance[N_SENSORS];       // current sensor distances
-
-// Each sonars's trigger pin, echo pin, and max distance to ping.
+// declare each sonar with trigger pin, echo pin, and max distance
 NewPing sonar[N_SONARS] =
   {
     NewPing(30, 12, MAX_DISTANCE),
@@ -71,7 +66,20 @@ NewPing sonar[N_SONARS] =
 int ir_pin[N_IR] = {A0, A1};            // array of IR analog pins to poll
 #endif
 
-// Called once on start-up.
+// corresponding sensor distances: first sonars, then infrared sensors
+unsigned int distance[N_SENSORS];
+
+// To improve cycle frequency, the sonars are grouped into sets
+// pointing in divergent directions to avoid mutual interference.
+unsigned long ping_timer;               // time to start next group
+struct {
+  uint8_t n_sonars;                     // number of sonars in the group
+  uint8_t sensor[MAX_GROUP];            // sensor indexes in the group
+} groups[N_GROUPS];
+
+uint8_t current_group = N_GROUPS;       // which sonar group is active
+
+/// Called once on start-up.
 void setup() 
 {
   Serial.begin(115200);                 // serial port baud rate
@@ -80,47 +88,68 @@ void setup()
   // The first ping starts after 75ms, giving the Arduino time to
   // initialize.  Others follow at PING_INTERVAL ms.
   ping_timer = millis() + 75;
-  for (uint8_t i = 0; i < N_SENSORS; i++)
+
+  // initialize the sonar groups
+  for (uint8_t grp = 0; grp < N_GROUPS; ++grp)
+    {
+      groups[grp].n_sonars = 0;
+      for (uint8_t i = grp; i < N_SONARS; i += N_GROUPS)
+        {
+          groups[grp].sensor[groups[grp].n_sonars] = i;
+          ++groups[grp].n_sonars;
+        }
+    }
+  for (uint8_t i = 0; i < N_SENSORS; ++i)
     {
       distance[i] = 0;
     }
 }
 
-// Called repeatedly in Arduino main loop.
+/// Called repeatedly in Arduino main loop, must complete in under 33ms.
 void loop()
 {
   if (millis() >= ping_timer)       // time to start next sonar group?
     {
       ping_timer += PING_INTERVAL;
 
-      if (current_group < N_GROUPS)
+      if (current_group < N_GROUPS)     // previous group was active?
         {
           // finish previous cycle
           poll_infrared();
           send_results();
 
-          // cancel previous timer and start a new ping cycle.
-          sonar[current_group].timer_stop();
-          distance[current_group] = 0; // in case of no echo
-          sonar[current_group].ping_timer(timer_event); // start next ping
+          // cancel previous timers
+          for (uint8_t i = 0; i < groups[current_group].n_sonars; ++i)
+            {
+              sonar[groups[current_group].sensor[i]].timer_stop();
+            }
+        }
 
-          ++current_group;
-          if (current_group >= N_GROUPS)
-            current_group = 0;
+      // start a new ping cycle
+      ++current_group;
+      if (current_group >= N_GROUPS)
+        current_group = 0;
+      for (uint8_t i = 0; i < groups[current_group].n_sonars; ++i)
+        {
+          uint8_t sensor = groups[current_group].sensor[i];
+          distance[sensor] = 0;                  // in case of no echo
+          sonar[sensor].ping_timer(timer_event); // start next ping
         }
     }
 }
 
-// Timer interrupt handler:
+/// Timer interrupt handler.
 //
-// If ping completed, set the sonar distance in the array.
+//  If ping completed, set the sonar distance in the array.
 void timer_event()
 { 
-  for (uint8_t i = 0; i < groups[current_group].n_sonars; i++)
+  for (uint8_t i = 0; i < groups[current_group].n_sonars; ++i)
     {
-      if (sonar[i].check_timer())
-        distance[groups[current_group].sensor] =
-          sonar[i].ping_result / US_ROUNDTRIP_CM;
+      uint8_t sensor = groups[current_group].sensor[i];
+      if (sonar[sensor].check_timer())
+        {
+          distance[sensor] = sonar[sensor].ping_result / US_ROUNDTRIP_CM;
+        }
     }
 }
 
@@ -130,30 +159,45 @@ void timer_event()
 //  with one another, and their input is desired as frequently as
 //  possible to avoid falling down stairs.
 //
-//  TODO: These sensors are noisy: see if it helps to sample the
-//  analog inputs on every timer interrupt and compute exponentially
-//  weighted moving averages.
+//  These sensors are noisy: maybe it would help to sample the analog
+//  inputs on every timer interrupt and compute a median filter or
+//  exponentially weighted moving average.
 void poll_infrared()
 { 
 #if N_IR > 0
-  for (uint8_t i = 0; i < N_IR; i++)
+  for (uint8_t i = 0; i < N_IR; ++i)
     {
       float volts = analogRead(ir_pin[i]) * (5.0 / 1024);
-      distance[N_CYCLES + i] = 65.0 * pow(volts, -1.10);
+      distance[N_SONARS + i] = 65.0 * pow(volts, -1.10);
     }
 #endif
 }
 
-// Sonar ping cycle complete, send the results.
+/// Format reading for one sensor.
+inline void format_reading(uint8_t sensor)
+{
+      Serial.print(sensor);
+      Serial.print("=");
+      Serial.print(distance[sensor]);
+      Serial.print("cm ");
+}
+
+/// Sonar ping cycle complete, send the results.
 void send_results()
 {
-  for (uint8_t i = 0; i < N_SENSORS; i++)
+  // format readings for current sonar group
+  for (uint8_t i = 0; i < groups[current_group].n_sonars; ++i)
     {
-      Serial.print(i);
-      Serial.print("=");
-      Serial.print(distance[i]);
-      Serial.print("cm ");
+      format_reading(groups[current_group].sensor[i]);
     }
+
+  // append readings for any infrared sensors
+  for (uint8_t i = N_SONARS; i < N_SENSORS; ++i)
+    {
+      format_reading(i);
+    }
+
+  // send single-line message
   Serial.println();
 
   // turn the LED on or off with each message sent
