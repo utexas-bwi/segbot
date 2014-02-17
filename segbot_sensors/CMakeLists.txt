@@ -36,6 +36,9 @@ install (TARGETS ranges_to_cloud segbot_sensors_filters
 install(FILES segbot_sensors_plugins.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
+install(FILES nodelets.xml
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+
 # Install executable Python scripts
 install(DIRECTORY scripts/
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
