@@ -45,18 +45,18 @@ Plug in the USB cable, then run the Arduino GUI:
     $ arduino
 
 Select ``File > Sketchbook > Libraries`` followed by the desired
-firmware version.  Then, click the ``->`` icon to compile the
-microcode and load it into the controller.
+firmware version.  The standard one is named ``segbot_arduino``.
+Then, click the ``->`` icon to compile the microcode and load it into
+the controller.
 
 ROS Driver
 ----------
 
-When the firmware is loaded, start ``roscore`` and run the ROS device
-driver:
+When the firmware is loaded, you can run the ROS device driver:
 
-    $ rosrun segbot_sensors sensor_ranges_driver
+    $ roslaunch segbot_sensors arduino.launch --screen
 
-The driver publishes sensor readings on the ``/sensor_ranges`` topic.
-To see the data, run:
-
-    $ rostopic echo /sensor_ranges
+Sensor ranges are published as point clouds on the ``/range_points``
+topic.  To see the points, run [rviz](http://wiki.ros.org/rviz),
+displaying that topic in the "sensor_base" frame of reference with a
+decay time of 0.2 seconds.
