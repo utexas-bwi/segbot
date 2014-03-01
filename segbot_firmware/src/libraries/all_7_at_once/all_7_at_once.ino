@@ -33,8 +33,6 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-// Experimental microcode that reads just one sonar.
-
 // Based on NewPing library timer-driven 15 sensor example.
 //
 // This driver is event-driven. Your complete sketch needs to be
@@ -44,8 +42,8 @@
  
 #include <NewPing.h>
 
-#define N_CYCLES 1                      // Number of sonar poll cycles
-#define N_IR 0                          // Number of infrared sensors
+#define N_CYCLES 5                      // Number of sonar poll cycles
+#define N_IR 2                          // Number of infrared sensors
 #define N_SENSORS (N_CYCLES + N_IR)     // Total number of sensors
 #define MAX_DISTANCE 200                // Maximum distance to ping (in cm)
 
@@ -67,11 +65,11 @@ unsigned int distance[N_SENSORS];       // current ping distances
 // Each sonars's trigger pin, echo pin, and max distance to ping.
 NewPing sonar[N_CYCLES] =
   {
-    NewPing(30, 12, MAX_DISTANCE)
-    //NewPing(28, 11, MAX_DISTANCE),
-    //NewPing(26, 10, MAX_DISTANCE),
-    //NewPing(24,  9, MAX_DISTANCE),
-    //NewPing(22,  8, MAX_DISTANCE)
+    NewPing(30, 12, MAX_DISTANCE),
+    NewPing(28, 11, MAX_DISTANCE),
+    NewPing(26, 10, MAX_DISTANCE),
+    NewPing(24,  9, MAX_DISTANCE),
+    NewPing(22,  8, MAX_DISTANCE)
   };
 
 #if N_IR > 0
