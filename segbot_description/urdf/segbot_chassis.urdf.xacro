@@ -15,6 +15,31 @@
                            thickness="${0.25*INCH_TO_M}" length="${20*INCH_TO_M}" width="${14*INCH_TO_M}">
       <xacro:insert_block name="origin" />
     </xacro:aluminium_sheet>
+
+    <!-- add chassis mount plate -->
+    <xacro:standoff_632 name="chassis_front_left_standoff" parent="chassis_base_plate"
+                        length="${0.5*INCH_TO_M}">
+      <origin xyz="${8.25*INCH_TO_M} ${4.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:standoff_632>
+    <xacro:standoff_632 name="chassis_front_right_standoff" parent="chassis_base_plate"
+                        length="${0.5*INCH_TO_M}">
+      <origin xyz="${8.25*INCH_TO_M} ${-4.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:standoff_632>
+    <xacro:standoff_632 name="chassis_back_left_standoff" parent="chassis_base_plate"
+                        length="${0.5*INCH_TO_M}">
+      <origin xyz="${6.25*INCH_TO_M} ${4.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:standoff_632>
+    <xacro:standoff_632 name="chassis_back_right_standoff" parent="chassis_base_plate"
+                        length="${0.5*INCH_TO_M}">
+      <origin xyz="${6.25*INCH_TO_M} ${-4.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:standoff_632>
+    <xacro:aluminium_sheet name="chassis_mount_plate" parent="chassis_front_left_standoff" 
+                           thickness="${0.0625*INCH_TO_M}" length="${11*INCH_TO_M}"
+                           width="${9.5*INCH_TO_M}">
+      <origin xyz="${-3.75*INCH_TO_M} ${-4.5*INCH_TO_M} ${(17.0/32.0)*INCH_TO_M}"
+              rpy="0 0 0" />
+    </xacro:aluminium_sheet>
+
     <!-- left side aluminium angle (only the vertical portion for convenience -->
     <xacro:aluminium_sheet name="chassis_left_plate" parent="chassis_base_plate"
                            thickness="${0.25*INCH_TO_M}" length="${20*INCH_TO_M}" width="${4*INCH_TO_M}">
