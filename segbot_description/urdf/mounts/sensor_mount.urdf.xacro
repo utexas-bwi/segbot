@@ -11,28 +11,28 @@
 
     <!-- add sensor mount plate and its standoffs -->
     <xacro:standoff_632 name="${name}_front_left_standoff" parent="${parent}"
-                        length="${0.5*INCH_TO_M}">
-      <origin xyz="${4.25*INCH_TO_M} ${4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}"
+                        length="${1.5*INCH_TO_M}">
+      <origin xyz="${3.25*INCH_TO_M} ${4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}"
               rpy="0 0 0" />
     </xacro:standoff_632>
     <xacro:standoff_632 name="${name}_front_right_standoff" parent="${parent}"
-                        length="${0.5*INCH_TO_M}">
-      <origin xyz="${4.25*INCH_TO_M} ${-4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}" rpy="0 0 0" />
+                        length="${1.5*INCH_TO_M}">
+      <origin xyz="${3.25*INCH_TO_M} ${-4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}" rpy="0 0 0" />
     </xacro:standoff_632>
     <xacro:standoff_632 name="${name}_back_left_standoff" parent="${parent}"
-                        length="${0.5*INCH_TO_M}">
-      <origin xyz="${2.25*INCH_TO_M} ${4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}" rpy="0 0 0" />
+                        length="${1.5*INCH_TO_M}">
+      <origin xyz="${1.25*INCH_TO_M} ${4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}" rpy="0 0 0" />
     </xacro:standoff_632>
     <xacro:standoff_632 name="${name}_back_right_standoff" parent="${parent}"
-                        length="${0.5*INCH_TO_M}">
-      <origin xyz="${2.25*INCH_TO_M} ${-4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}" rpy="0 0 0" />
+                        length="${1.5*INCH_TO_M}">
+      <origin xyz="${1.25*INCH_TO_M} ${-4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}" rpy="0 0 0" />
     </xacro:standoff_632>
     <xacro:aluminium_sheet name="${name}_plate"
                            parent="${name}_front_left_standoff" 
                            thickness="${0.0625*INCH_TO_M}"
                            length="${5.875*INCH_TO_M}"
                            width="${9.5*INCH_TO_M}">
-      <origin xyz="${-(11/16)*INCH_TO_M} ${-4.5*INCH_TO_M} ${(17/32)*INCH_TO_M}"
+      <origin xyz="${(11/16)*INCH_TO_M} ${-4.5*INCH_TO_M} ${(1.5+1/32)*INCH_TO_M}"
               rpy="0 0 0" />
     </xacro:aluminium_sheet>
 
@@ -40,29 +40,29 @@
     <xacro:standoff_632 name="${name}_top_front_left_standoff"
                         parent="${name}_front_left_standoff"
                         length="${2*INCH_TO_M}">
-      <origin xyz="0 0 ${(1/16)*INCH_TO_M}" rpy="0 0 0" />
+      <origin xyz="0 0 ${(1.5+1/16)*INCH_TO_M}" rpy="0 0 0" />
     </xacro:standoff_632>
     <xacro:standoff_632 name="${name}_top_front_right_standoff"
                         parent="${name}_front_right_standoff"
                         length="${2*INCH_TO_M}">
-      <origin xyz="0 0 ${(1/16)*INCH_TO_M}" rpy="0 0 0" />
+      <origin xyz="0 0 ${(1.5+1/16)*INCH_TO_M}" rpy="0 0 0" />
     </xacro:standoff_632>
     <xacro:standoff_632 name="${name}_top_back_left_standoff"
                         parent="${name}_back_left_standoff"
                         length="${2*INCH_TO_M}">
-      <origin xyz="0 0 ${(1/16)*INCH_TO_M}" rpy="0 0 0" />
+      <origin xyz="0 0 ${(1.5+1/16)*INCH_TO_M}" rpy="0 0 0" />
     </xacro:standoff_632>
     <xacro:standoff_632 name="${name}_top_back_right_standoff"
                         parent="${name}_back_right_standoff"
                         length="${2*INCH_TO_M}">
-      <origin xyz="0 0 ${(1/16)*INCH_TO_M}" rpy="0 0 0" />
+      <origin xyz="0 0 ${(1.5+1/16)*INCH_TO_M}" rpy="0 0 0" />
     </xacro:standoff_632>
     <xacro:aluminium_sheet name="${name}_top_plate"
                            parent="${name}_top_front_left_standoff" 
                            thickness="${0.0625*INCH_TO_M}"
                            length="${5.875*INCH_TO_M}"
                            width="${9.5*INCH_TO_M}">
-      <origin xyz="${-(11/16)*INCH_TO_M} ${-4.5*INCH_TO_M} ${(2+1/32)*INCH_TO_M}"
+      <origin xyz="${(11/16)*INCH_TO_M} ${-4.5*INCH_TO_M} ${(2+1/32)*INCH_TO_M}"
               rpy="0 0 0" />
     </xacro:aluminium_sheet>
 
