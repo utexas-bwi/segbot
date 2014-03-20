@@ -3,13 +3,13 @@ cmake_minimum_required(VERSION 2.8.3)
 project(segbot_sensors)
 
 find_package(catkin REQUIRED
-  COMPONENTS laser_filters message_generation roslint sensor_msgs)
+  COMPONENTS laser_filters message_generation pcl_ros roslint sensor_msgs tf)
 
 add_message_files(DIRECTORY msg FILES RangeArray.msg)
 generate_messages(DEPENDENCIES sensor_msgs)
 
 catkin_package(
-  CATKIN_DEPENDS hokuyo_node laser_filters message_runtime sensor_msgs tf
+  CATKIN_DEPENDS hokuyo_node laser_filters message_runtime pcl_ros sensor_msgs tf
   INCLUDE_DIRS include
   LIBRARIES segbot_sensors_filters ranges_to_cloud
 )
