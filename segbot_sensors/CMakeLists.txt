@@ -9,9 +9,19 @@ add_message_files(DIRECTORY msg FILES RangeArray.msg)
 generate_messages(DEPENDENCIES sensor_msgs)
 
 catkin_package(
-  CATKIN_DEPENDS hokuyo_node laser_filters message_runtime pcl_ros sensor_msgs tf
-  INCLUDE_DIRS include
-  LIBRARIES segbot_sensors_filters ranges_to_cloud
+  CATKIN_DEPENDS
+    hokuyo_node
+    laser_filters
+    message_runtime
+    nodelet
+    pcl_ros
+    sensor_msgs
+    tf
+  INCLUDE_DIRS
+    include
+  LIBRARIES
+    segbot_sensors_filters
+    ranges_to_cloud
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
