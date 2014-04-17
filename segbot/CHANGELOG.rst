@@ -2,6 +2,13 @@
 Changelog for package segbot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
+* Release to Hydro.
+* Segbot_sensors: add sensor_ranges driver for Arduino data.
+* Updated descriptions and licensing information.
+
 0.1.9 (2013-12-15)
 ------------------
 

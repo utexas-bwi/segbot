@@ -2,6 +2,27 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
+* Release to Hydro.
+* segbot_sensors: add explicit build dependency on nodelet.
+* segbot_sensors: restore missing build dependencies
+  (fixes `#25 <https://github.com/utexas-bwi/segbot/issues/25>`_).
+* Added udev rules for segbot, and updated the kinect laserscan
+  configuration.
+* Removed catkin_lint errors.
+  Modify parser so a single Arduino message can provide any subset of the sensors.
+* sensor_ranges_driver: get port and baud from ROS parameters
+  If port is not a tty, open as a regular file containing test data.
+* segbot_sensors: add explicit message dependency to CMakeLists.txt.
+* segbot_sensors: add no-op ranges to cloud nodelet.
+* sensor_ranges_driver: ignore non-ASCII characters sent from device.
+* sensor_ranges_driver: improve shutdown and error handling.
+* segbot_sensors: use roslint on Python scripts to do PEP8 checking.
+* segbot_sensors: add sensor_ranges_driver for Arduino data.
+* Updated descriptions and licensing information.
+
 0.1.9 (2013-12-15)
 ------------------
 

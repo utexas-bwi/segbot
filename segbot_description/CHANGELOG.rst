@@ -2,6 +2,19 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
+* Release to Hydro.
+* segbot_description: correct height of hokuyo in other robots.
+* segbot_description: coordinate corrections for sensor_mount and
+  hokuyo.
+* Add sensor mount top plate, still approximate.
+* segbot_description: add approximate location of sensor mount.
+* segbot_description: add chassis mount plate.
+* Add launch file for displaying xacro files.
+* Updated descriptions and licensing information
+
 0.1.9 (2013-12-15)
 ------------------
 

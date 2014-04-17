@@ -2,6 +2,16 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
+* Release to Hydro.
+* Added udev rules for segbot, and updated the kinect laserscan
+  configuration.
+* Catkin_lint approved packages.
+* Updated descriptions and licensing information
+* Fixed licensing information from borrowed scripts.
+
 0.1.9 (2013-12-15)
 ------------------
 * revert update for `#16`_ now that we can use the standard
