@@ -2,8 +2,8 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2014-04-17)
+------------------
 
 * Release to Hydro.
 * Added udev rules for segbot, and updated the kinect laserscan

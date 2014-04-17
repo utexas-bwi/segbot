@@ -2,8 +2,8 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2014-04-17)
+------------------
 
 * Release to Hydro.
 * segbot_description: correct height of hokuyo in other robots.

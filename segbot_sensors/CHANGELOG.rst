@@ -2,8 +2,8 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.2.0 (2014-04-17)
+------------------
 
 * Release to Hydro.
 * segbot_sensors: add explicit build dependency on nodelet.
