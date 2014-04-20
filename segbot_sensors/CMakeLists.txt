@@ -3,7 +3,16 @@ cmake_minimum_required(VERSION 2.8.3)
 project(segbot_sensors)
 
 find_package(catkin REQUIRED
-  COMPONENTS laser_filters message_generation pcl_ros roslint sensor_msgs tf)
+  COMPONENTS
+    laser_filters
+    message_generation
+    nodelet
+    pcl_ros
+    pluginlib
+    roscpp
+    roslint
+    sensor_msgs
+    tf)
 
 add_message_files(DIRECTORY msg FILES RangeArray.msg)
 generate_messages(DEPENDENCIES sensor_msgs)
