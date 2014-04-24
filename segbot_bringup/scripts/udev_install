@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo copying $(rospack find segbot_bringup)/udev to /etc/udev/rules.d
+/usr/bin/sudo /bin/cp -r $(rospack find segbot_bringup)/udev/* /etc/udev/rules.d
+echo reboot for changes to take effect
