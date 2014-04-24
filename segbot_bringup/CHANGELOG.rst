@@ -2,6 +2,12 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.1 (2014-04-24)
+------------------
+* segbot_bringup: install udev rules (`#26
+  <https://github.com/utexas-bwi/segbot/issues/26>`_)
+* fix some problems catkin_lint discovered
+
 0.2.0 (2014-04-17)
 ------------------
 

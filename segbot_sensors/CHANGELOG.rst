@@ -2,6 +2,12 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.1 (2014-04-24)
+------------------
+* fix some problems catkin_lint discovered
+* segbot_sensors: make roslaunch checks complete (`#20
+  <https://github.com/utexas-bwi/segbot/issues/20>`_)
+
 0.2.0 (2014-04-17)
 ------------------
 

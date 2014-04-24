@@ -2,6 +2,10 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.2.1 (2014-04-24)
+------------------
+* fix some problems catkin_lint discovered
+
 0.2.0 (2014-04-17)
 ------------------
 
