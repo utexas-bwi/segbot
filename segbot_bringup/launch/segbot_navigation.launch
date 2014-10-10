@@ -13,7 +13,7 @@
     <arg name="name" value="nav_kinect" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="device_id" value="$(arg device_id)" />
-    <arg name="depth_only" value="true" />
+    <arg name="depth_only" value="false" />
   </include>
 
   <!-- launch the hokuyo sensor -->
