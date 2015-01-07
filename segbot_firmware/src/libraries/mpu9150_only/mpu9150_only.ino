@@ -1,3 +1,41 @@
+/* -*- mode: C++ -*- */
+/*********************************************************************
+* Software License Agreement (BSD License)
+*
+*  Utexas BWI modifications Copyright (C) 2015, Jack O'Quin
+*  See original MPU9150Lib copyright below.
+*  All rights reserved.
+*
+*  Redistribution and use in source and binary forms, with or without
+*  modification, are permitted provided that the following conditions
+*  are met:
+*
+*   * Redistributions of source code must retain the above copyright
+*     notice, this list of conditions and the following disclaimer.
+*   * Redistributions in binary form must reproduce the above
+*     copyright notice, this list of conditions and the following
+*     disclaimer in the documentation and/or other materials provided
+*     with the distribution.
+*   * Neither the name of the authors nor other contributors may be
+*     used to endorse or promote products derived from this software
+*     without specific prior written permission.
+*
+*  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+*  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+*  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+*  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+*  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+*  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+*  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+*  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+*  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+*  POSSIBILITY OF SUCH DAMAGE.
+*********************************************************************/
+
+/** @file stand-alone MPU-9150 Arduino firmware for Segbot version 2. */
+
 ////////////////////////////////////////////////////////////////////////////
 //
 //  This file is part of MPU9150Lib
@@ -78,13 +116,15 @@ void loop()
 {  
   MPU.selectDevice(DEVICE_TO_USE);                         // only needed if device has changed since init but good form anyway
   if (MPU.read()) {                                        // get the latest data if ready yet
-//  MPU.printQuaternion(MPU.m_rawQuaternion);              // print the raw quaternion from the dmp
+    MPU.printQuaternion(MPU.m_fusedQuaternion);              // print the raw quaternion from the dmp
 //  MPU.printVector(MPU.m_rawMag);                         // print the raw mag data
 //  MPU.printVector(MPU.m_rawAccel);                       // print the raw accel data
 //  MPU.printAngles(MPU.m_dmpEulerPose);                   // the Euler angles from the dmp quaternion
-//  MPU.printVector(MPU.m_calAccel);                       // print the calibrated accel data
-//  MPU.printVector(MPU.m_calMag);                         // print the calibrated mag data
-    MPU.printAngles(MPU.m_fusedEulerPose);                 // print the output of the data fusion
+    Serial.print(" ");
+    MPU.printVector(MPU.m_calAccel);                       // print the calibrated accel data
+    Serial.print(" ");
+    MPU.printVector(MPU.m_calMag);                         // print the calibrated mag data
+//  MPU.printAngles(MPU.m_fusedEulerPose);                 // print the output of the data fusion
     Serial.println();
   }
 }
