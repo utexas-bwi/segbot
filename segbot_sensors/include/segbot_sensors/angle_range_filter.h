@@ -64,6 +64,10 @@ namespace segbot_sensors
 			angle_out_max = input_scan.angle_min + (end_index*input_scan.angle_increment);
 			
 			computed_indeces = true;
+			
+			/*ROS_INFO("[angle range filter]: total num measurements: %i",num_original_measurements);
+			ROS_INFO("[angle range filter]: original angle range: %f to %f", input_scan.angle_min,  input_scan.angle_max);
+			ROS_INFO("[angle range filter]: start and end indeces %i, %i",start_index,end_index);*/
 		}
         
 		filtered_scan.ranges.resize(end_index-start_index+1);
