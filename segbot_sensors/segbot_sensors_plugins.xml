@@ -12,5 +12,11 @@
 	 This is a filter that converts nan points to +infinity, effectively making the assumption that locations where no readings are returned are free space.
       </description>
     </class>
+    <class name="segbot_sensors/AngleRangeFilter" type="segbot_sensors::AngleRangeFilter" 
+	    base_class_type="filters::FilterBase<sensor_msgs::LaserScan>">
+      <description>
+	 This is a filter that limits the angle range of the sensor.
+      </description>
+    </class>
   </library>
 </class_libraries>
