@@ -14,6 +14,8 @@ find_package(catkin REQUIRED
     sensor_msgs
     tf)
 
+catkin_python_setup()
+
 add_message_files(DIRECTORY msg FILES RangeArray.msg)
 generate_messages(DEPENDENCIES sensor_msgs)
 
@@ -58,8 +60,8 @@ install(FILES segbot_sensors_plugins.xml
 install(FILES nodelets.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
-# Install executable Python scripts
-install(DIRECTORY scripts/
+# Install executable Python nodes
+install(DIRECTORY nodes/
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
         USE_SOURCE_PERMISSIONS)
 
@@ -71,7 +73,7 @@ endforeach()
 
 # Lint Python modules for PEP8 compatibility
 file(GLOB_RECURSE ${PROJECT_NAME}_PY_SCRIPTS
-     RELATIVE ${PROJECT_SOURCE_DIR} scripts/*)
+     RELATIVE ${PROJECT_SOURCE_DIR} nodes/* src/${PROJECT_NAME}/*)
 roslint_python(${${PROJECT_NAME}_PY_SCRIPTS})
 
 # unit tests are enabled selectively
