@@ -4,8 +4,8 @@ scan_filter_chain:
   params:
     angle_min: -1.5
     angle_max: 1.5
-- name: shadows
-  type: ScanShadowsFilter
+- name: shadows_filter
+  type: laser_filters/ScanShadowsFilter
   params:
     min_angle: 10
     max_angle: 170
