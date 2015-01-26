@@ -46,92 +46,9 @@ device.
 # enable some python3 compatibility options:
 from __future__ import absolute_import, print_function, unicode_literals
 
-import io
 import importlib
-import select
-import serial
-
 import rospy
-from sensor_msgs.msg import Range
-
-
-class ArduinoDevice(object):
-    """ Class for managing the Arduino serial port connection.
-    """
-    def __init__(self, port='/dev/ttyACM0', baud=115200):
-        self.port = port
-        """ Path name for Arduino serial port. """
-        self.baud = baud
-        """ Baud rate for Arduino serial port. """
-        self.dev = None
-        """ Arduino serial device connection. """
-
-    def close(self):
-        if self.dev:
-            self.dev.close()
-        self.dev = None
-
-    def ok(self):
-        """ :returns: ``True`` if Arduino contacted. """
-        return self.dev is not None
-
-    def open(self):
-        """ Open the Arduino serial device interface.
-
-        :returns: ``True`` if open succeeds.
-        """
-        try:
-            self.dev = serial.Serial(self.port, self.baud)
-        except IOError as e:
-            # HACK: serial does not return errno.ENOTTY as it should,
-            #       so check the exact string.
-            enotty = ("Could not configure port: "
-                      + "(25, 'Inappropriate ioctl for device')")
-            if str(e) != enotty:        # is it a serial port?
-                rospy.logerr('Serial port open failed at '
-                             + str(self.baud) + ' baud: ' + str(e))
-                return False
-        else:
-            rospy.loginfo('Serial port ' + self.port + ' opened at '
-                          + str(self.baud) + ' baud.')
-            self.dev.flushInput()       # discard any old data
-            return True
-
-        # Not a serial port: see if it's a regular file with test data.
-        try:
-            self.dev = io.open(self.port, 'rb')
-        except IOError as e:
-            rospy.logerr('File open failed: ' + str(e))
-            return False
-        else:
-            rospy.logdebug('Test file opened: ' + self.port)
-            return True
-
-    def read(self):
-        """ Read a line from the serial port.
-
-        :returns: a string containing the next line, maybe empty.
-        """
-        serial_msg = ''
-        try:
-            serial_msg = self.dev.readline()
-        except serial.SerialException as e:
-            rospy.logerr('Serial port ' + self.port +
-                         ' read failed: ' + str(e))
-            self.close()
-        except (select.error, OSError) as e:
-            errno_, perror = e.args
-            rospy.logwarn('Serial port read error: ' + str(perror))
-            self.close()
-        else:
-            # Sometimes the Arduino sends out-of-range characters on
-            # start-up. Just ignore them.
-            serial_msg = serial_msg.decode('ascii', 'ignore')
-            rospy.logdebug('Arduino message: ' + serial_msg)
-            if serial_msg == '':        # end of test data file?
-                self.close()            # test ended
-            return serial_msg
-        return ''                       # no data read
+from .serial import ArduinoDevice
 
 
 class ArduinoDriver(object):
