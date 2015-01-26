@@ -36,9 +36,74 @@ This module handles sonar messages from the Arduino Mega 2560 mounted
 on BWI segbots, publishing them as ROS sensor_msgs/Range.
 """
 
+# enable some python3 compatibility options:
+from __future__ import absolute_import, print_function, unicode_literals
+
+import re
+
 import rospy
 from sensor_msgs.msg import Range
 
-def main(msg):
-    """ Process Arduino sonar message. """
-    rospy.loginfo('Arduino sonar message: ' + msg)
+
+class SonarAttributes(Range):
+    """ Subclass of sensor_msgs/Range, for filling in sonar attributes."""
+    def __init__(self, frame_id,
+                 field_of_view=0.5, min_range=0.01, max_range=2.0):
+        super(SonarAttributes, self).__init__(
+            radiation_type=Range.ULTRASOUND,
+            field_of_view=field_of_view,
+            min_range=min_range,
+            max_range=max_range)
+        if frame_id:
+            self.header.frame_id = frame_id
+
+
+class SonarMessages(object):
+    """ ROS message translation for UTexas BWI segbot Arduino sonar ranges. """
+    def __init__(self):
+        self.pub = rospy.Publisher('sonar', Range)
+        self.parser = re.compile(r'(\d+)=(\d+)cm')
+        """ Extracts list of distances from the Arduino serial message.
+
+        :returns: List of (sonar, distance) pairs of strings reported
+            for the sonars, may be empty.
+        """
+
+        # Our version 2 segbots have three sonars.
+        # TODO: define this configuration information using ROS parameters
+        self.sonars = [
+            SonarAttributes('sonar0'),
+            SonarAttributes('sonar1'),
+            SonarAttributes('sonar2')]
+
+    def publish(self, serial_msg):
+        """ Publish a ROS Range message for each reading.
+
+        :param serial_msg: sonar message from Arduino.
+        :type serial_msg: str
+        """
+        # Parse serial message line into a list of (sonar, distance)
+        # pairs of strings reported for one or more sonars.  The
+        # strings represent integers, with distances in centimeters.
+        readings = self.parser.findall(serial_msg)
+        if not readings:                # no data available?
+            return
+        now = rospy.Time.now()          # time when message received
+        for sonar, distance in readings:
+            sonar = int(sonar)
+            if sonar >= len(self.sonars):  # unknown sonar?
+                continue                   # skip this reading
+            msg = self.sonars[sonar]
+            msg.header.stamp = now
+            distance = int(distance)
+            if distance == 0:           # nothing detected?
+                msg.range = float('+inf')  # follow REP-0117
+            else:
+                # Convert distance from int centimeters to float meters.
+                msg.range = 0.01 * float(distance)
+            self.pub.publish(msg)
+
+
+sonar = SonarMessages()                # make a SonarMessages instance
+handler = sonar.publish                # declare message handler interface
+""" The this interface called once for each sonar message received. """

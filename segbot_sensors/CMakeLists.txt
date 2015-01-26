@@ -73,7 +73,7 @@ endforeach()
 
 # Lint Python modules for PEP8 compatibility
 file(GLOB_RECURSE ${PROJECT_NAME}_PY_SCRIPTS
-     RELATIVE ${PROJECT_SOURCE_DIR} nodes/* src/${PROJECT_NAME}/*)
+     RELATIVE ${PROJECT_SOURCE_DIR} nodes/* src/${PROJECT_NAME}/*.py)
 roslint_python(${${PROJECT_NAME}_PY_SCRIPTS})
 
 # unit tests are enabled selectively

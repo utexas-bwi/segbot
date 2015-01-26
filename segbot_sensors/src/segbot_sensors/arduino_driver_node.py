@@ -104,7 +104,7 @@ class ArduinoDevice(object):
             rospy.logerr('File open failed: ' + str(e))
             return False
         else:
-            rospy.loginfo('Test file opened: ' + self.port)
+            rospy.logdebug('Test file opened: ' + self.port)
             return True
 
     def read(self):
@@ -150,8 +150,6 @@ class ArduinoDriver(object):
         self.add('S', 'segbot_sensors.sonar')
         self.add('I', 'segbot_sensors.imu')
 
-        self.spin()                     # run main driver loop
-
     def add(self, type_char, handler):
         """ Define another Arduino message.
 
@@ -183,7 +181,7 @@ class ArduinoDriver(object):
                     continue
                 handler = self.msgs.get(msg[0:1])
                 if handler is not None:
-                    handler.main(msg)
+                    handler.handler(msg)
                 else:
                     rospy.logwarn('unknown Arduino message: ' + msg)
             elif self.arduino.open():   # open succeeded?
@@ -195,6 +193,7 @@ class ArduinoDriver(object):
 def main():
     """ Arduino driver node main entry point."""
     node = ArduinoDriver()
+    node.spin()                         # run main driver loop
 
 if __name__ == '__main__':
     main()
