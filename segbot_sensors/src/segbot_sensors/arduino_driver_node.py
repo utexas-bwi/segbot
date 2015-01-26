@@ -47,10 +47,9 @@ device.
 from __future__ import absolute_import, print_function, unicode_literals
 
 import io
-import re
+import importlib
 import select
 import serial
-import sys
 
 import rospy
 from sensor_msgs.msg import Range
@@ -66,8 +65,6 @@ class ArduinoDevice(object):
         """ Baud rate for Arduino serial port. """
         self.dev = None
         """ Arduino serial device connection. """
-        self.line_parser = re.compile(r'(\d+)=(\d+)cm')
-        """ Extract list of distances from the Arduino serial message. """
 
     def close(self):
         if self.dev:
@@ -113,9 +110,7 @@ class ArduinoDevice(object):
     def read(self):
         """ Read a line from the serial port.
 
-        :returns: List of (sensor, distance) pairs of strings reported
-            for the sensors.  The strings represent integers, with
-            distances in centimeters.
+        :returns: a string containing the next line, maybe empty.
         """
         serial_msg = ''
         try:
@@ -133,23 +128,10 @@ class ArduinoDevice(object):
             # start-up. Just ignore them.
             serial_msg = serial_msg.decode('ascii', 'ignore')
             rospy.logdebug('Arduino message: ' + serial_msg)
-            if serial_msg != '':        # not end of test data?
-                return self.line_parser.findall(serial_msg)
-            self.close()                # test ended
-        return []                       # no data read
-
-
-class SensorAttributes(Range):
-    """ Subclass of sensor_msgs/Range, for filling in sensor attributes."""
-    def __init__(self, frame_id, radiation_type,
-                 field_of_view=0.5, min_range=0.01, max_range=2.0):
-        super(SensorAttributes, self).__init__(
-            radiation_type=radiation_type,
-            field_of_view=field_of_view,
-            min_range=min_range,
-            max_range=max_range)
-        if frame_id:
-            self.header.frame_id = frame_id
+            if serial_msg == '':        # end of test data file?
+                self.close()            # test ended
+            return serial_msg
+        return ''                       # no data read
 
 
 class ArduinoDriver(object):
@@ -162,7 +144,30 @@ class ArduinoDriver(object):
         """ Arduino serial device connection. """
         rospy.on_shutdown(self.shutdown)
 
+        # define the known message types
+        self.msgs = {}
+        """ Dictionary of message types and handlers. """
+        self.add('S', 'segbot_sensors.sonar')
+        self.add('I', 'segbot_sensors.imu')
+
         self.spin()                     # run main driver loop
+
+    def add(self, type_char, handler):
+        """ Define another Arduino message.
+
+        :param type_char: Identifying first character of this message.
+        :type type_char: str
+        :param handler: Python module for handling those messages.
+        :type handler: str
+
+        Adds messages starting with type_char to arduino_msgs
+
+        :raises: :exc:`.ValueError` if request already exists.
+        :raises: :exc:`.ImportError` if unable to import handler.
+        """
+        if type_char in self.msgs:
+            raise ValueError('Duplicate Arduino message type: ' + type_char)
+        self.msgs[type_char] = importlib.import_module(handler)
 
     def shutdown(self):
         """ Called by rospy on shutdown. """
@@ -173,7 +178,14 @@ class ArduinoDriver(object):
         slow_poll = rospy.Rate(0.25)    # slow poll frequency
         while not rospy.is_shutdown():
             if self.arduino.ok():       # device connected?
-                self.publish(self.arduino.read())
+                msg = self.arduino.read()
+                if len(msg) == 0:       # nothing read?
+                    continue
+                handler = self.msgs.get(msg[0:1])
+                if handler is not None:
+                    handler.main(msg)
+                else:
+                    rospy.logwarn('unknown Arduino message: ' + msg)
             elif self.arduino.open():   # open succeeded?
                 pass
             else:
