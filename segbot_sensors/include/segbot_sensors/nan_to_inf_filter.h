@@ -27,7 +27,8 @@ namespace segbot_sensors
         for(unsigned int count = 0; count < input_scan.ranges.size(); ++count){
           filtered_scan.ranges[count] = 
               (isnan(input_scan.ranges[count]) || 
-                input_scan.ranges[count] < input_scan.range_min) ?
+                input_scan.ranges[count] < input_scan.range_min ||
+                input_scan.ranges[count] >= input_scan.range_max) ?
               std::numeric_limits<float>::infinity() : input_scan.ranges[count];
 
           // TODO: remove once navigation handles inf_is_valid again
