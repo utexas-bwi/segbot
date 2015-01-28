@@ -163,6 +163,7 @@ inline void format_reading(uint8_t sensor)
 void send_results()
 {
   // format readings for current sonar group
+  Serial.print("S");                    // sonar message marker
   for (uint8_t i = 0; i < groups[current_group].n_sonars; ++i)
     {
       format_reading(groups[current_group].sensor[i]);
