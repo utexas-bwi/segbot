@@ -62,11 +62,43 @@
     </xacro:if>
     <xacro:unless value="$(arg use_full_gazebo_model)">
       <collision>
-        <origin xyz="-0.15 0 0.1" rpy="0 0 0" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
-          <box size="0.5 0.4 0.6330" />
+          <cylinder radius="0.305" length="0.4330" />
         </geometry>
       </collision>
+    </xacro:unless>
+  </xacro:macro>
+
+  <xacro:macro name="gazebo_laser_obstacle">
+    <xacro:unless value="$(arg use_full_gazebo_model)">
+      <joint name="laser_obstacle_joint" type="fixed">
+        <origin xyz="0.0 0 0.4165" rpy="0 0 0" />
+        <parent link="base_link"/>
+        <child link="laser_obstacle" />
+      </joint>
+
+      <link name="laser_obstacle">
+        <inertial>
+          <mass value="0.1" />
+          <origin xyz="0 0 0" rpy="0 0 0"/>
+          <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
+                   iyy="0.01"  iyz="0.0"
+                   izz="0.01" />
+        </inertial>
+       <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+            <box size="0.001 0.001 0.001" />
+          </geometry>
+        </visual>
+        <collision>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+            <box size="0.25 0.6 0.4" />
+          </geometry>
+        </collision>
+      </link>
     </xacro:unless>
   </xacro:macro>
 
