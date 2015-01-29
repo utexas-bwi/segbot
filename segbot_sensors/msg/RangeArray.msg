@@ -2,6 +2,6 @@
 #
 #   This is an array of sensor_msgs/Range readings.
 #
-#   It should go in sensor_msgs, but we did not think of it.
+#   It is ONLY used with segbot version 1.
 
 sensor_msgs/Range[] ranges

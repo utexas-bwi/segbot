@@ -16,6 +16,7 @@ find_package(catkin REQUIRED
 
 catkin_python_setup()
 
+# define RangeArray message (ONLY used for segbot version 1)
 add_message_files(DIRECTORY msg FILES RangeArray.msg)
 generate_messages(DEPENDENCIES sensor_msgs)
 
@@ -32,14 +33,13 @@ catkin_package(
     include
   LIBRARIES
     segbot_sensors_filters
+    range_to_cloud
     ranges_to_cloud
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
-add_library(ranges_to_cloud src/ranges_nodelet.cpp src/ranges_to_cloud.cpp)
-add_dependencies(ranges_to_cloud ${${PROJECT_NAME}_EXPORTED_TARGETS})
-target_link_libraries(ranges_to_cloud ${catkin_LIBRARIES})
+add_subdirectory(src/sonar)
 
 add_library(segbot_sensors_filters src/segbot_sensors_filters.cpp)
 target_link_libraries(segbot_sensors_filters 
@@ -51,13 +51,10 @@ target_link_libraries(segbot_sensors_filters
 install (DIRECTORY include/segbot_sensors/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
 
-install (TARGETS ranges_to_cloud segbot_sensors_filters
+install (TARGETS segbot_sensors_filters
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION})
 
-install(FILES segbot_sensors_plugins.xml
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
-
-install(FILES nodelets.xml
+install(FILES nodelets.xml segbot_sensors_plugins.xml
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
 
 # Install executable Python nodes
