@@ -21,13 +21,13 @@
   <group if="$(arg publish_tf)">
     <node name="sonar0_broadcaster"
           pkg="tf2_ros" type="static_transform_publisher"
-          args="-0.044 -0.095 0.016 0 0 -0.426 0.905 $(arg frame_id) sonar0" />
+          args="0.02 -0.095 0.016 0 0 -0.426 0.905 $(arg frame_id) sonar0" />
     <node name="sonar1_broadcaster"
           pkg="tf2_ros" type="static_transform_publisher"
-          args="-0.032 -0.057 0.016 0 0 -0.218 0.976 $(arg frame_id) sonar1" />
+          args="0 0 0.016 0 0 0 1 $(arg frame_id) sonar1" />
     <node name="sonar2_broadcaster"
           pkg="tf2_ros" type="static_transform_publisher"
-          args="0 0 0.016 0 0 0 1 $(arg frame_id) sonar2" />
+          args="0.02 0.095 0.016 0 0 0.426 0.905 $(arg frame_id) sonar2" />
   </group>
 
   <!-- run the Arduino interface driver -->
