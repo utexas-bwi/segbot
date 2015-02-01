@@ -45,6 +45,7 @@ import rospy
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Vector3
 
+
 def convert_accel(int_val):
     """ Convert acceleration component from device value to ROS value.
 
@@ -53,10 +54,10 @@ def convert_accel(int_val):
     :returns: float value in meters per second squared.
 
     TODO: Figure out the actual conversion. The device readings are a
-    10- or 12-bit A/D value based on a full range of 2g, which is 19.6
-    m/s/s.
+    signed A/D converter value based on a full range of 2g, which is
+    about 19.6 m/s/s.
     """
-    return (float(int_val) / 4096.0) * 19.6
+    return (float(int_val) / 32768.0) * 19.6
 
 
 class ImuAttributes(Imu):
@@ -72,11 +73,11 @@ class ImuAttributes(Imu):
     def __init__(self, frame_id):
         super(ImuAttributes, self).__init__(
             orientation_covariance=[-1.0, 0.0, 0.0,
-                                     0.0, 0.0, 0.0,
-                                     0.0, 0.0, 0.0],
+                                    0.0, 0.0, 0.0,
+                                    0.0, 0.0, 0.0],
             angular_velocity_covariance=[-1.0, 0.0, 0.0,
-                                          0.0, 0.0, 0.0,
-                                          0.0, 0.0, 0.0],
+                                         0.0, 0.0, 0.0,
+                                         0.0, 0.0, 0.0],
             linear_acceleration_covariance=[0.0, 0.0, 0.0,
                                             0.0, 0.0, 0.0,
                                             0.0, 0.0, 0.0])
@@ -87,7 +88,8 @@ class ImuAttributes(Imu):
 class ImuMessages(object):
     """ ROS message translation for UTexas BWI segbot Arduino imu ranges. """
     def __init__(self):
-        self.parser = re.compile(r'I(\d+) accel x: (\d+), y: (\d+), z: (\d+)')
+        self.parser = re.compile(
+            r'I(\d+) accel x: ([-+]?\d+) y: ([-+]?\d+) z: ([-+]?\d+)')
         """ Extracts IMU data from the Arduino serial message.
 
         :returns: List of IMU data strings reported, may be empty.

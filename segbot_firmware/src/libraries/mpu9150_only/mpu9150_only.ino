@@ -116,15 +116,10 @@ void loop()
 {  
   MPU.selectDevice(DEVICE_TO_USE);                         // only needed if device has changed since init but good form anyway
   if (MPU.read()) {                                        // get the latest data if ready yet
-    MPU.printQuaternion(MPU.m_fusedQuaternion);              // print the raw quaternion from the dmp
-//  MPU.printVector(MPU.m_rawMag);                         // print the raw mag data
-//  MPU.printVector(MPU.m_rawAccel);                       // print the raw accel data
-//  MPU.printAngles(MPU.m_dmpEulerPose);                   // the Euler angles from the dmp quaternion
-    Serial.print(" ");
+    Serial.print("I");
+    Serial.print(DEVICE_TO_USE);
+    Serial.print(" accel ");
     MPU.printVector(MPU.m_calAccel);                       // print the calibrated accel data
-    Serial.print(" ");
-    MPU.printVector(MPU.m_calMag);                         // print the calibrated mag data
-//  MPU.printAngles(MPU.m_fusedEulerPose);                 // print the output of the data fusion
     Serial.println();
   }
 }
