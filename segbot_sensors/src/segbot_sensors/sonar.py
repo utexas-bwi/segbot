@@ -106,4 +106,4 @@ class SonarMessages(object):
 
 sonar = SonarMessages()                # make a SonarMessages instance
 handler = sonar.publish                # declare message handler interface
-""" The this interface called once for each sonar message received. """
+""" This interface is called once for each sonar message received. """

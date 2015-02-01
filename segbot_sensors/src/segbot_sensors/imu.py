@@ -35,3 +35,98 @@
 This module handles IMU messages from the Arduino Mega 2560 mounted
 on BWI segbots, publishing them as ROS sensor_msgs/Imu.
 """
+
+# enable some python3 compatibility options:
+from __future__ import absolute_import, print_function, unicode_literals
+
+import re
+
+import rospy
+from sensor_msgs.msg import Imu
+from geometry_msgs.msg import Vector3
+
+def convert_accel(int_val):
+    """ Convert acceleration component from device value to ROS value.
+
+    :param int_val: Reading from device.
+    :type int_val: str
+    :returns: float value in meters per second squared.
+
+    TODO: Figure out the actual conversion. The device readings are a
+    10- or 12-bit A/D value based on a full range of 2g, which is 19.6
+    m/s/s.
+    """
+    return (float(int_val) / 4096.0) * 19.6
+
+
+class ImuAttributes(Imu):
+    """ Subclass of sensor_msgs/Imu, for filling in IMU attributes.
+
+    The IMU orientation is ignored.  That information is not very
+    useful, because the fixed frame of reference is not well-defined.
+
+    The covariances of angular velocity and linear acceleration are
+    presently unknown.  It would be helpful to figure out what they
+    should be.
+    """
+    def __init__(self, frame_id):
+        super(ImuAttributes, self).__init__(
+            orientation_covariance=[-1.0, 0.0, 0.0,
+                                     0.0, 0.0, 0.0,
+                                     0.0, 0.0, 0.0],
+            angular_velocity_covariance=[-1.0, 0.0, 0.0,
+                                          0.0, 0.0, 0.0,
+                                          0.0, 0.0, 0.0],
+            linear_acceleration_covariance=[0.0, 0.0, 0.0,
+                                            0.0, 0.0, 0.0,
+                                            0.0, 0.0, 0.0])
+        if frame_id:
+            self.header.frame_id = frame_id
+
+
+class ImuMessages(object):
+    """ ROS message translation for UTexas BWI segbot Arduino imu ranges. """
+    def __init__(self):
+        self.parser = re.compile(r'I(\d+) accel x: (\d+), y: (\d+), z: (\d+)')
+        """ Extracts IMU data from the Arduino serial message.
+
+        :returns: List of IMU data strings reported, may be empty.
+        """
+        self.pubs = [rospy.Publisher('imu0', Imu)]
+        self.imus = [ImuAttributes('imu0')]
+
+    def publish(self, serial_msg):
+        """ Publish a ROS Range message for each reading.
+
+        :param serial_msg: IMU message from Arduino.
+        :type serial_msg: str
+        """
+        # Parse serial message line into a list of IMU data strings
+        # containing integers.
+        readings = self.parser.match(serial_msg)
+        if not readings:                # no data available?
+            rospy.logwarn('Invalid IMU message: ' + serial_msg)
+            return
+        now = rospy.Time.now()          # time when message received
+        imu = int(readings.group(1))
+
+        if imu >= len(self.imus):       # unknown IMU?
+            rospy.logwarn('Invalid IMU number: ' + str(imu))
+            return                      # skip this reading
+
+        # Convert IMU acceleration components to ROS units
+        x = convert_accel(readings.group(2))
+        y = convert_accel(readings.group(3))
+        z = convert_accel(readings.group(4))
+        rospy.logdebug('IMU' + str(imu)
+                       + ' accel: ' + str(x) + ', ' + str(y) + ', ' + str(z))
+        msg = self.imus[imu]
+        msg.linear_acceleration = Vector3(x, y, z)
+        msg.header.stamp = now
+
+        self.pubs[imu].publish(msg)
+
+
+imu = ImuMessages()                # make an ImuMessages instance
+handler = imu.publish              # declare message handler interface
+""" This interface is called once for each IMU message received. """
