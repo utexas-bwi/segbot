@@ -17,9 +17,7 @@
   <node name="$(arg name)_node" pkg="urg_node" type="urg_node">
     <param name="ip_address" value="192.168.0.10" />
     <param name="frame_id" value="$(arg name)_laser_link" />
-    <!-- <param name="frame_id" value="$(arg tf_prefix)/$(arg name)_laser_link" /> -->
-    <!-- <param name="angle_min" value="0.785" /> --> <!-- pi/4-->
-    <!-- <param name="angle_max" value="3.927" /> --> <!-- 5pi/4 -->
+    <param name="frame_id" value="$(arg tf_prefix)/$(arg name)_laser_link" />
   </node>
   
 </launch>

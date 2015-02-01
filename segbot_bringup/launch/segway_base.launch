@@ -16,7 +16,7 @@
     <param name="motor_timeout" type="double" value="1.0" />
     <param name="rmp_type" type="str" value="50/100" />
         
-    <param name="frame_id" type="str" value="$(arg base_footprint)" />
+    <param name="frame_id" type="str" value="$(arg robot_frame_id)" />
     <param name="odom_frame_id" type="str" value="$(arg odom_frame_id)" />
     <param name="broadcast_tf" type="bool" value="true" />
 
