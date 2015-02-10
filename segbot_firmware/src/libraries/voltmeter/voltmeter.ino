@@ -10,14 +10,8 @@
  float r2 = 18000;
  
  void setup() {
-   Serial.begin(9600);
-   
-   // Send ANSI terminal codes
-   Serial.print("\x1B");
-   Serial.print("[2J");
-   Serial.print("\x1B");
-   Serial.println("[H");
-   // End ANSI terminal codes
+
+   Serial.begin(115200);
    
    Serial.println("--------------------");
    Serial.println("DC VOLTMETER");
@@ -34,9 +28,6 @@
    float v = (analogRead(0) * vPow) / 1024.0;
    float v2 = v / (r2 / (r1 + r2));
    
-   // Send ANSI terminal codes
-   Serial.print("\x1");
-   // End ANSI terminal codes
-   
+   Serial.print("V");
    Serial.println(v2/2);
  }
