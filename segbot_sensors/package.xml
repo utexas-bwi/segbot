@@ -36,6 +36,7 @@
   <run_depend>geometry_msgs</run_depend>
   <run_depend>hokuyo_node</run_depend>
   <run_depend>laser_filters</run_depend>
+  <run_depend>linux_hardware</run_depend>
   <run_depend>message_runtime</run_depend>
   <run_depend>nodelet</run_depend>
   <run_depend>openni_launch</run_depend>

@@ -64,8 +64,9 @@ class ArduinoDriver(object):
         # define the known message types
         self.msgs = {}
         """ Dictionary of message types and handlers. """
-        self.add('S', 'segbot_sensors.sonar')
         self.add('I', 'segbot_sensors.imu')
+        self.add('S', 'segbot_sensors.sonar')
+        self.add('V', 'segbot_sensors.voltmeter')
 
     def add(self, type_char, handler):
         """ Define another Arduino message.
