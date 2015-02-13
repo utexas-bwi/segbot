@@ -42,14 +42,15 @@
 
 #ifndef _VOLTMETER_
 #define _VOLTMETER_ 1
- 
+
 #include <arduino_device.h>
 
 class Voltmeter: public ArduinoDevice
 {
  public:
+  /** Constructor: sets poll period to 1000 msecs (one Hz). */
   Voltmeter(): ArduinoDevice(1000) {}
-  void poll(void) {}
+  void poll(void);
 };
 
 #endif // _VOLTMETER_

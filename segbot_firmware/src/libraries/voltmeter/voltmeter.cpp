@@ -2,7 +2,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (C) 2015, Jack O'Quin
+*  Copyright (C) 2015, Max Svetlik, Pato Lankenau, Jack O'Quin
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -33,54 +33,25 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/** @file Arduino sensor firmware for Segbot version 2.
+/** @file Battery volt meter for Segbot version 2. */
+
+#include <Arduino.h>
+#include <voltmeter.h>
+
+static const float vPow = 4.8;
+static const float r1 = 100000.0;
+static const float r2 = 18000.0;
+
+/** Poll interface.
  *
- *  This program is driven by timer events.  On a 30Hz cycle, it polls
- *  an array of devices, which each may send results in a serial
- *  message.
+ *  When this function is called periodically, it reads the battery
+ *  voltage, sending it in a serial message.
  */
-
-#include "arduino_device.h"
-#include "voltmeter.h"
-
-#define LED_PIN 13                      // pin with LED attached.
-#define N_DEVICES 1                     // number of devices to poll
-#define POLL_INTERVAL 33                // poll interval in milliseconds
-
-// declare each device with trigger pin, echo pin, and max distance
-ArduinoDevice *devices[N_DEVICES];
-unsigned long poll_timer;               // time of next poll cycle
-
-/// Called once on start-up.
-void setup() 
+void Voltmeter::poll(void)
 {
-  Serial.begin(115200);                 // serial port baud rate
-  pinMode(LED_PIN, OUTPUT);             // configure LED output
+  float v = (analogRead(0) * vPow) / 1024.0;
+  float v2 = v / (r2 / (r1 + r2));
 
-  // The first poll starts after 75ms, giving the Arduino time to
-  // initialize.  Others follow at POLL_INTERVAL ms.
-  poll_timer = millis() + 75;
-
-  // initialize all attached devices
-  devices[0] = new Voltmeter();
-}
-
-/// Called repeatedly in Arduino main loop, must complete in under 33ms.
-void loop()
-{
-  if (millis() >= poll_timer)      // time for next device poll cycle?
-    {
-      poll_timer += POLL_INTERVAL;
-      for (uint8_t dev = 0; dev < N_DEVICES; ++dev)
-        {
-          devices[dev]->next_poll_ -= POLL_INTERVAL;
-          if (devices[dev]->next_poll_ <= 0)
-            {
-              // turn the LED on or off with each poll
-              digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-              devices[dev]->poll();      // poll the device
-              devices[dev]->next_poll_ = devices[dev]->poll_msec_;
-            }
-        }
-    }
+  Serial.print("V");
+  Serial.println(v2/2);
 }
