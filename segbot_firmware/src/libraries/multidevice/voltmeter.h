@@ -50,6 +50,6 @@ class Voltmeter: public ArduinoDevice
  public:
   Voltmeter(): ArduinoDevice(1000) {}
   void poll(void) {}
-}
+};
 
 #endif // _VOLTMETER_

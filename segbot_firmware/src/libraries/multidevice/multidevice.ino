@@ -39,7 +39,8 @@
  *  an array of devices, which each may send results in a serial
  *  message.
  */
- 
+
+#include <Arduino.h> 
 #include "arduino_device.h"
 #include "voltmeter.h"
 
@@ -74,7 +75,7 @@ void loop()
       for (uint8_t dev = 0; dev < N_DEVICES; ++dev)
         {
           devices[dev]->next_poll_ -= POLL_INTERVAL;
-          if (devices[dev]->next_poll_ > 0)
+          if (devices[dev]->next_poll_ <= 0)
             {
               // turn the LED on or off with each poll
               digitalWrite(LED_PIN, !digitalRead(LED_PIN));
