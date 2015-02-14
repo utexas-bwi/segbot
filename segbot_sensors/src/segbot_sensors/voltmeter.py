@@ -57,8 +57,14 @@ class VoltmeterMessages(object):
         :returns: voltage data string reported, may be empty.
         """
         self.pub = rospy.Publisher('battery0', SmartBatteryStatus)
+        # initialize constant fields in battery message
         self.battery = SmartBatteryStatus(
-            charge_state=SmartBatteryStatus.DISCHARGING)
+            rate=float('nan'),
+            charge=float('nan'),
+            capacity=float('nan'),
+            design_capacity=float('nan'),
+            charge_state=SmartBatteryStatus.DISCHARGING,
+            present=1)
 
     def publish(self, serial_msg):
         """ Publish a ROS Range message for each reading.
