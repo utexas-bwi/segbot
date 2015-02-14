@@ -41,10 +41,16 @@
  */
 
 #include "arduino_device.h"
+
+// include each device from a separate "Arduino library"
+#include "sonar.h"
 #include "voltmeter.h"
 
+// ugly hack needed to circumvent Arduino build silliness:
+#include <NewPing.h>                    // to resolve sonar reference
+
 #define LED_PIN 13                      // pin with LED attached.
-#define N_DEVICES 1                     // number of devices to poll
+#define N_DEVICES 2                     // number of devices to poll
 #define POLL_INTERVAL 33                // poll interval in milliseconds
 
 // declare each device with trigger pin, echo pin, and max distance
@@ -61,8 +67,9 @@ void setup()
   // initialize.  Others follow at POLL_INTERVAL ms.
   poll_timer = millis() + 75;
 
-  // initialize all attached devices
-  devices[0] = new Voltmeter();
+  // allocate and initialize all attached devices
+  devices[0] = new Sonar();
+  devices[1] = new Voltmeter();
 }
 
 /// Called repeatedly in Arduino main loop, must complete in under 33ms.

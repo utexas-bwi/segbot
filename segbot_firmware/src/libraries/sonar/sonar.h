@@ -41,22 +41,14 @@
 #include <Arduino.h>
 #include <arduino_device.h>
 
-#define N_SONARS 3                    // number of sonars
 #define PING_INTERVAL 33              // 33 msec ping duration, 30 Hz
-#define MAX_DISTANCE 200              // maximum distance to ping (cm)
 
 class Sonar: public ArduinoDevice
 {
-private:
-  void timer_event(void);
-  unsigned int distance_;             // distance of current ping
-  uint8_t current_sonar_;             // currently active sonar
-
 public:
   /** Constructor: sets poll period to ping interval. */
   Sonar():
-    ArduinoDevice(PING_INTERVAL),
-    current_sonar_(N_SONARS)
+    ArduinoDevice(PING_INTERVAL)
   {}
   void poll(void);
 };

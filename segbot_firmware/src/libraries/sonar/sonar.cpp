@@ -2,7 +2,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (C) 2015, Max Svetlik, Pato Lankenau, Jack O'Quin
+*  Copyright (C) 2015, Jack O'Quin
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -35,13 +35,16 @@
 
 /** @file Sonar implementation for Segbot version 2.
  *
- *  This program is driven by timer events.  On a 30Hz cycle, it pings
- *  one sonar, and sends the previous results in a serial message.  In
- *  the next cycle, it pings the next sonar in a round-robin fashion.
+ *  This program is driven by timer events.  On a 30Hz cycle, it sends
+ *  any previous results in a serial message, then pings the next
+ *  sonar in a round-robin fashion.
  */
 
 #include <NewPing.h>
 #include <sonar.h>
+
+#define MAX_DISTANCE 200              // maximum distance to ping (cm)
+#define N_SONARS 3                    // number of sonars
 
 // declare each sonar with trigger pin, echo pin, and max distance
 static NewPing sonar[N_SONARS] =
@@ -51,15 +54,25 @@ static NewPing sonar[N_SONARS] =
     NewPing(26, 2, MAX_DISTANCE),
   };
 
+// These should be class variables, but they are static because the
+// NewPing and Arduino timer interfaces can only handle static
+// functions, not a class member functions.
+static uint8_t static_current = N_SONARS; // currently active sonar
+static unsigned int static_distance;      // distance of current ping
+
 /** Timer interrupt handler.
  *
  *  If ping has completed, set the current distance.
+ *
+ * This should be a class member function, but it is static because
+ * the NewPing and Arduino timer interfaces can only handle static
+ * functions.
  */
-void Sonar::timer_event()
+void timer_event()
 { 
-  if (sonar[current_sonar_].check_timer())
+  if (sonar[static_current].check_timer())
     {
-      distance_ = sonar[current_sonar_].ping_result / US_ROUNDTRIP_CM;
+      static_distance = sonar[static_current].ping_result / US_ROUNDTRIP_CM;
     }
 }
 
@@ -70,24 +83,24 @@ void Sonar::timer_event()
  */
 void Sonar::poll(void)
 {
-  if (current_sonar_ < N_SONARS)         // previous sonar was active?
+  if (static_current < N_SONARS)         // previous sonar was active?
     {
       // cancel previous timer
-      sonar[current_sonar_].timer_stop();
+      sonar[static_current].timer_stop();
 
       // publish previous cycle results
       Serial.print("S");                // sonar message marker
-      Serial.print(current_sonar_);
+      Serial.print(static_current);
       Serial.print("=");
-      Serial.print(distance_);
+      Serial.print(static_distance);
       Serial.println("cm ");
     }
 
   // next sonar in the rotation
-  if (++current_sonar_ >= N_SONARS)
-    current_sonar_ = 0;
+  if (++static_current >= N_SONARS)
+    static_current = 0;
 
   // start another ping
-  distance_ = 0;                        // in case of no echo
-  sonar[current_sonar_].ping_timer(timer_event);
+  static_distance = 0;                        // in case of no echo
+  sonar[static_current].ping_timer(timer_event);
 }
