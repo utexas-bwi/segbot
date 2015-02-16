@@ -56,7 +56,5 @@ When the firmware is loaded, you can run the ROS device driver:
 
     $ roslaunch segbot_sensors arduino.launch --screen
 
-Sensor ranges are published as range messages on the ``/sonar`` topic,
-and point clouds on the ``/range_points`` topic.  To see them, run
-[rviz](http://wiki.ros.org/rviz), and display either topic in the
-"sensor_base" frame of reference.
+The ``segbot_sensors`` package documentation describes the topics
+published.
