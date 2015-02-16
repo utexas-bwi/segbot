@@ -65,7 +65,7 @@ static unsigned int static_distance;      // distance of current ping
  *  If ping has completed, set the current distance.
  *
  * This should be a class member function, but it is static because
- * the NewPing and Arduino timer interfaces can only handle static
+ * the NewPing and Arduino timer interfaces only allow static
  * functions.
  */
 void timer_event()

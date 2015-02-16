@@ -80,13 +80,11 @@ void loop()
       poll_timer += POLL_INTERVAL;
       for (uint8_t dev = 0; dev < N_DEVICES; ++dev)
         {
-          devices[dev]->next_poll_ -= POLL_INTERVAL;
-          if (devices[dev]->next_poll_ <= 0)
+          if (devices[dev]->check(POLL_INTERVAL))
             {
               // turn the LED on or off with each poll
               digitalWrite(LED_PIN, !digitalRead(LED_PIN));
               devices[dev]->poll();      // poll the device
-              devices[dev]->next_poll_ = devices[dev]->poll_msec_;
             }
         }
     }

@@ -41,13 +41,24 @@
 class ArduinoDevice
 {
 public:
-  int poll_msec_;          // number of milliseconds between poll calls
-  int next_poll_;          // number of milliseconds until next poll
-
   ArduinoDevice(int poll_msec):
     poll_msec_(poll_msec),
     next_poll_(poll_msec) {}
+
   virtual void poll() = 0;
+
+  bool check(int interval)
+  {
+    next_poll_ -= interval;
+    if (next_poll_ > 0)
+      return false;                     // not time for next poll
+    next_poll_ = poll_msec_;            // reset counter
+    return true;                        // time for next poll
+  }
+
+private:
+  int poll_msec_;         // number of milliseconds between poll calls
+  int next_poll_;         // number of milliseconds until next poll
 };
 
 #endif // _ARDUINO_DEVICE_
