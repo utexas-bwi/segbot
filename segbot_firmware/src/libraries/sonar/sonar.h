@@ -33,7 +33,10 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/** @file Sonar interface for Segbot version 2. */
+/** @file
+ *
+ * Sonar interface for Segbot version 2.
+ */
 
 #ifndef _SONAR_
 #define _SONAR_ 1
@@ -43,6 +46,7 @@
 
 #define PING_INTERVAL 33              // 33 msec ping duration, 30 Hz
 
+/** Interface for Arduino-attached sonars. */
 class Sonar: public ArduinoDevice
 {
 public:

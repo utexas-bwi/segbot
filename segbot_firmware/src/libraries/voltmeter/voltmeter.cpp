@@ -33,7 +33,10 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/** @file Battery volt meter for Segbot version 2. */
+/** @file
+ *
+ *  Battery volt meter for Segbot version 2.
+ */
 
 #include <Arduino.h>
 #include <voltmeter.h>

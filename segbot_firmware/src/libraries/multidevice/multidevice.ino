@@ -33,7 +33,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/** @file Arduino sensor firmware for Segbot version 2.
+/** @file
+ *
+ *  Arduino sensor firmware for Segbot version 2.
  *
  *  This program is driven by timer events.  On a 30Hz cycle, it polls
  *  an array of devices, which each may send results in a serial
@@ -49,13 +51,12 @@
 // ugly hack needed to circumvent Arduino build silliness:
 #include <NewPing.h>                    // to resolve sonar reference
 
-#define LED_PIN 13                      // pin with LED attached.
-#define N_DEVICES 2                     // number of devices to poll
-#define POLL_INTERVAL 33                // poll interval in milliseconds
+#define LED_PIN 13                    ///< pin with LED attached.
+#define N_DEVICES 2                   ///< number of devices to poll
+#define POLL_INTERVAL 33              ///< poll interval in milliseconds
 
-// declare each device with trigger pin, echo pin, and max distance
-ArduinoDevice *devices[N_DEVICES];
-unsigned long poll_timer;               // time of next poll cycle
+ArduinoDevice *devices[N_DEVICES];    ///< All the device handlers
+unsigned long poll_timer;             ///< time of next poll cycle
 
 /// Called once on start-up.
 void setup() 

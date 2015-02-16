@@ -33,7 +33,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/** @file Sonar implementation for Segbot version 2.
+/** @file
+ *
+ *  Sonar implementation for Segbot version 2.
  *
  *  This program is driven by timer events.  On a 30Hz cycle, it sends
  *  any previous results in a serial message, then pings the next
@@ -43,10 +45,10 @@
 #include <NewPing.h>
 #include <sonar.h>
 
-#define MAX_DISTANCE 200              // maximum distance to ping (cm)
-#define N_SONARS 3                    // number of sonars
+#define MAX_DISTANCE 200              ///< maximum distance to ping (cm)
+#define N_SONARS 3                    ///< number of sonars
 
-// declare each sonar with trigger pin, echo pin, and max distance
+/** Each sonar with trigger pin, echo pin, and max distance. */
 static NewPing sonar[N_SONARS] =
   {
     NewPing(30, 4, MAX_DISTANCE),
@@ -57,8 +59,8 @@ static NewPing sonar[N_SONARS] =
 // These should be class variables, but they are static because the
 // NewPing and Arduino timer interfaces can only handle static
 // functions, not a class member functions.
-static uint8_t static_current = N_SONARS; // currently active sonar
-static unsigned int static_distance;      // distance of current ping
+static uint8_t static_current = N_SONARS; ///< currently active sonar
+static unsigned int static_distance;      ///< distance of current ping
 
 /** Timer interrupt handler.
  *

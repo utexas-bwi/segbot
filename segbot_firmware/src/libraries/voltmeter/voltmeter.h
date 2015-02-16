@@ -33,11 +33,9 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/** @file Battery volt meter for Segbot version 2.
+/** @file
  *
- *  This program is driven by timer events.  On a 30Hz cycle, it polls
- *  an array of devices, which each may send results in a serial
- *  message.
+ *  Battery volt meter interface for Segbot version 2.
  */
 
 #ifndef _VOLTMETER_
@@ -45,6 +43,7 @@
 
 #include <arduino_device.h>
 
+/** Interface for Arduino-attached battery voltage meter. */
 class Voltmeter: public ArduinoDevice
 {
  public:

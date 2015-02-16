@@ -33,32 +33,51 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-/** @file Base class for Segbot version 2 Arduino device. */
+/** @file
+ *
+ *  Base class for Segbot version 2 Arduino device.
+ */
 
 #ifndef _ARDUINO_DEVICE_
 #define _ARDUINO_DEVICE_ 1
 
+/** Base class for handling Arduino-attached devices. */
 class ArduinoDevice
 {
 public:
+
+  /** Constructor.
+   *
+   *  @param poll_msec desired interval between poll calls (milliseconds).
+   */
   ArduinoDevice(int poll_msec):
     poll_msec_(poll_msec),
     next_poll_(poll_msec) {}
 
+  /** Periodic device handler.
+   *
+   *  May send a complete serial message line, if data available.
+   */
   virtual void poll() = 0;
 
+  /** Check if time to poll this device.
+   *
+   *  @param interval Milliseconds since last @c check() call.
+   *  @returns @c true, if time to call poll() now; @c false, otherwise.
+   */
   bool check(int interval)
   {
     next_poll_ -= interval;
     if (next_poll_ > 0)
       return false;                     // not time for next poll
+
     next_poll_ = poll_msec_;            // reset counter
     return true;                        // time for next poll
   }
 
 private:
-  int poll_msec_;         // number of milliseconds between poll calls
-  int next_poll_;         // number of milliseconds until next poll
+  int poll_msec_;              ///< number of msecs between poll() calls
+  int next_poll_;              ///< number of msecs until next poll()
 };
 
 #endif // _ARDUINO_DEVICE_
