@@ -26,6 +26,15 @@ Published topics
 ``sonar`` (`sensor_msgs/Range`_)
     Sonar ranges for each attached device in its own tf frame.
 
+Parameters
+''''''''''
+
+``~baud`` (int, default: 115200)
+    Baud rate for the Arduino serial port.
+
+``~port`` (string, default: /dev/ttyACM0)
+    Serial port attached to the Arduino.
+
 Usage
 '''''
 
@@ -47,7 +56,7 @@ Subscribed topics
 Published topics
 ''''''''''''''''
 
-``sensor_ranges`` (`sensor_msgs/sensor_msgs/PointCloud2`_)
+``sensor_ranges`` (`sensor_msgs/PointCloud2`_)
     A centered distance point for each sonar range.
 
 Usage
@@ -58,7 +67,7 @@ To run both the ``arduino_driver`` and this node::
     $ roslaunch segbot_sensors arduino.launch
 
 .. _`segbot_sensors`:
-   http://wiki.ros.org/segbot_sensors.html
+   http://wiki.ros.org/segbot_sensors
 .. _`sensor_msgs/Imu`:
    http://docs.ros.org/api/sensor_msgs/html/msg/Imu.html
 .. _`sensor_msgs/PointCloud2`:
