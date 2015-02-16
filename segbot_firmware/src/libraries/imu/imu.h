@@ -35,26 +35,21 @@
 
 /** @file
  *
- * Sonar interface for Segbot version 2.
+ *  Arduino-attached MPU-9150 inertial measurement unit for Segbot
+ *  version 2.
  */
 
-#ifndef _SONAR_
-#define _SONAR_ 1
+#ifndef _IMU_
+#define _IMU_ 1
 
-#include <Arduino.h>
 #include <arduino_device.h>
 
-#define PING_INTERVAL 30              // 30 msec ping duration, 33 Hz
-
-/** Interface for Arduino-attached sonars. */
-class Sonar: public ArduinoDevice
+/** Interface for Arduino-attached MPU-9150 IMU. */
+class Imu: public ArduinoDevice
 {
-public:
-  /** Constructor: sets poll period to ping interval. */
-  Sonar():
-    ArduinoDevice(PING_INTERVAL)
-  {}
+ public:
+  Imu();
   void poll(void);
 };
 
-#endif // _SONAR_
+#endif // _IMU_

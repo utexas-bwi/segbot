@@ -1,5 +1,6 @@
 /* -*- mode: C++ -*- */
 /*********************************************************************
+*
 * Software License Agreement (BSD License)
 *
 *  Copyright (C) 2015, Jack O'Quin
@@ -35,23 +36,14 @@
 
 /** @file
  *
- *  Arduino sensor firmware for Segbot version 2.
- *
- *  This program is driven by timer events.  On a 30Hz cycle, it polls
- *  an array of devices, which each may send results in a serial
- *  message.
+ *  Arduino-attached MPU-9150 inertial measurement unit for Segbot
+ *  version 2.
  */
 
-#include "arduino_device.h"
+#include <Arduino.h>
+#include <imu.h>
 
-// include each device from a separate "Arduino library"
-#include "imu.h"
-#include "sonar.h"
-#include "voltmeter.h"
-
-// Ugly hacks needed to circumvent Arduino build silliness:
-#include <NewPing.h>                    // to resolve sonar reference
-#include <Wire.h>                       // to resolve IMU references
+#include <Wire.h>
 #include "I2Cdev.h"
 #include "MPU9150Lib.h"
 #include "CalLib.h"
@@ -61,43 +53,57 @@
 #include <inv_mpu_dmp_motion_driver.h>
 #include <EEPROM.h>
 
-#define LED_PIN 13                    ///< pin with LED attached.
-#define N_DEVICES 3                   ///< number of devices to poll
-#define POLL_INTERVAL 10              ///< poll interval in milliseconds
+#define DEVICE_TO_USE 0                 ///< use the device at 0x68
+MPU9150Lib MPU;                         ///< the MPU object
 
-ArduinoDevice *devices[N_DEVICES];    ///< All the device handlers
-unsigned long poll_timer;             ///< time of next poll cycle
+///  MPU_UPDATE_RATE defines the rate (in Hz) at which the MPU updates
+///  the sensor data and DMP output
+#define MPU_UPDATE_RATE  (20)
 
-/// Called once on start-up.
-void setup() 
+///  MAG_UPDATE_RATE defines the rate (in Hz) at which the MPU updates
+///  the magnetometer data MAG_UPDATE_RATE should be less than or
+///  equal to the MPU_UPDATE_RATE
+#define MAG_UPDATE_RATE  (10)
+
+///  MPU_MAG_MIX defines the influence that the magnetometer has on
+///  the yaw output.  The magnetometer itself is quite noisy so some
+///  mixing with the gyro yaw can help significantly.  This option
+///  gives a good mix of those values:
+#define  MPU_MAG_MIX_GYRO_AND_MAG       10 ///< a good mix value 
+
+///  MPU_LPF_RATE is the low pas filter rate and can be between 5 and 188Hz
+#define MPU_LPF_RATE   40
+
+/** Constructor: sets poll period to 50 msecs (40 Hz). */
+Imu::Imu(): ArduinoDevice(1000/MPU_LPF_RATE)
 {
-  Serial.begin(115200);                 // serial port baud rate
-  pinMode(LED_PIN, OUTPUT);             // configure LED output
+  Wire.begin();
+  MPU.selectDevice(DEVICE_TO_USE);
 
-  // The first poll starts after 75ms, giving the Arduino time to
-  // initialize.  Others follow at POLL_INTERVAL ms.
-  poll_timer = millis() + 75;
-
-  // allocate and initialize all attached devices
-  devices[0] = new Imu();
-  devices[1] = new Sonar();
-  devices[2] = new Voltmeter();
+  // start the device
+  MPU.init(MPU_UPDATE_RATE,
+           MPU_MAG_MIX_GYRO_AND_MAG,
+           MAG_UPDATE_RATE,
+           MPU_LPF_RATE);
 }
 
-/// Called repeatedly in Arduino main loop, must complete in under 33ms.
-void loop()
+/** Poll interface.
+ *
+ *  When this function is called periodically, it reads the battery
+ *  voltage, sending it in a serial message.
+ */
+void Imu::poll(void)
 {
-  if (millis() >= poll_timer)      // time for next device poll cycle?
+  // only needed if device has changed since init but good form anyway:
+  MPU.selectDevice(DEVICE_TO_USE);
+  if (MPU.read())                  // get the latest data if ready yet
     {
-      poll_timer += POLL_INTERVAL;
-      for (uint8_t dev = 0; dev < N_DEVICES; ++dev)
-        {
-          if (devices[dev]->check(POLL_INTERVAL))
-            {
-              // turn the LED on or off with each poll
-              digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-              devices[dev]->poll();      // poll the device
-            }
-        }
-    }
+      Serial.print("I");
+      Serial.print(DEVICE_TO_USE);
+      Serial.print(" accel ");
+
+      // print the calibrated acceleration data
+      MPU.printVector(MPU.m_calAccel);
+      Serial.println();
+  }
 }
