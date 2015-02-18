@@ -48,15 +48,28 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import importlib
 import rospy
+
+from diagnostic_msgs.msg import DiagnosticStatus
+from .diagnostics import Diagnostics
 from .serial import ArduinoDevice
 
 
 class ArduinoDriver(object):
     """ ROS driver node for UTexas BWI segbot Arduino messages. """
-    def __init__(self, port='/dev/ttyACM0', baud=115200):
-        rospy.init_node('arduino_driver')
+    def __init__(self, port='/dev/ttyACM0', baud=115200,
+                 node_name='arduino_driver'):
+        rospy.init_node(node_name)
         port = rospy.get_param('~port', port)
         baud = rospy.get_param('~baud', baud)
+
+        self.diag = Diagnostics()
+        """ Diagnostics collector and publisher. """
+        self.status = DiagnosticStatus(name=node_name)
+        """ Current diagnostic status for this driver. """
+        self.set_status(
+            level=DiagnosticStatus.OK,
+            message='Arduino driver starting.')
+
         self.arduino = ArduinoDevice(port, baud)
         """ Arduino serial device connection. """
         rospy.on_shutdown(self.shutdown)
@@ -85,27 +98,41 @@ class ArduinoDriver(object):
             raise ValueError('Duplicate Arduino message type: ' + type_char)
         self.msgs[type_char] = importlib.import_module(handler)
 
+    def set_status(self, level, message):
+        """ Update diagnostic status. """
+        self.status.level = level
+        self.status.message = message
+        self.diag.update(self.status)
+
     def shutdown(self):
         """ Called by rospy on shutdown. """
         self.arduino.close()
 
     def spin(self):
         """ Main driver loop. """
-        slow_poll = rospy.Rate(0.25)    # slow poll frequency
+        slow_poll = rospy.Rate(1.0)     # slow poll frequency
         while not rospy.is_shutdown():
+
             if self.arduino.ok():       # device connected?
                 msg = self.arduino.read()
-                if len(msg) == 0:       # nothing read?
-                    continue
-                handler = self.msgs.get(msg[0:1])
-                if handler is not None:
-                    handler.handler(msg)
-                else:
-                    rospy.logwarn('unknown Arduino message: ' + msg)
+                if len(msg) > 0:        # something read?
+                    handler = self.msgs.get(msg[0:1])
+                    if handler is not None:
+                        handler.handler(msg)
+                    else:
+                        rospy.logwarn('unknown Arduino message: ' + msg)
+                self.set_status(
+                    level=DiagnosticStatus.OK,
+                    message='Arduino driver running.')
+
             elif self.arduino.open():   # open succeeded?
                 pass
+
             else:
                 slow_poll.sleep()
+                self.set_status(
+                    level=DiagnosticStatus.ERROR,
+                    message='Arduino not connected.')
 
 
 def main():

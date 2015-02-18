@@ -31,6 +31,7 @@
 
   <run_depend>camera1394</run_depend>
   <run_depend>depthimage_to_laserscan</run_depend>
+  <run_depend>diagnostic_msgs</run_depend>
   <run_depend>filters</run_depend>
   <run_depend>freenect_launch</run_depend>
   <run_depend>geometry_msgs</run_depend>
