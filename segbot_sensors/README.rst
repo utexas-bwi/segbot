@@ -26,6 +26,9 @@ Published topics
 ``sonar`` (`sensor_msgs/Range`_)
     Sonar ranges for each attached device in its own tf frame.
 
+``/diagnostics`` (`diagnostic_msgs/DiagnosticStatus`_)
+    Various device diagnostics.
+
 Parameters
 ''''''''''
 
@@ -66,6 +69,8 @@ To run both the ``arduino_driver`` and this node::
 
     $ roslaunch segbot_sensors arduino.launch
 
+.. _`diagnostic_msgs/DiagnosticStatus`:
+   http://docs.ros.org/api/diagnostic_msgs/html/msg/DiagnosticStatus.html
 .. _`segbot_sensors`:
    http://wiki.ros.org/segbot_sensors
 .. _`sensor_msgs/Imu`:
