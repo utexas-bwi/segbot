@@ -1,0 +1,8 @@
+<launch>
+  <node pkg="segbot_sensors" type="aggregator_node"
+        name="diagnostic_aggregator" >
+
+    <rosparam command="load" 
+              file="$(find my_robot_package)/analyzers.yaml" />
+  </node>
+</launch>
