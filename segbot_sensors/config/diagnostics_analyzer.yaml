@@ -3,10 +3,11 @@
 pub_rate: 1.0 # Optional
 base_path: '' # Optional, prepended to all diagnostic output
 analyzers:
-  sensors: #sets the namespace
+  Sensors: #sets the namespace
     type: GenericAnalyzer
-    path: Sensors
-    startswith: 'Voltage'
+    path: battery_estimator
+    startswith: 'battery_estimator'
+    contains: ['Life Remaining']
 #computers:
 #    type: GenericAnalyzer
 #    path: Computers

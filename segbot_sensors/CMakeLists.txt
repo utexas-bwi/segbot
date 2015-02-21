@@ -12,7 +12,10 @@ find_package(catkin REQUIRED
     roscpp
     roslint
     sensor_msgs
-    tf)
+    tf
+    std_msgs
+    diagnostic_msgs
+    roscpp)
 
 catkin_python_setup()
 
@@ -82,3 +85,6 @@ if (CATKIN_ENABLE_TESTING)
   roslaunch_add_file_check(launch/kinect)
   roslaunch_add_file_check(launch/ptgrey)
 endif()
+
+add_executable(batteryLife src/segbot_sensors/battery_monitor.cpp)
+target_link_libraries(batteryLife ${catkin_LIBRARIES})
