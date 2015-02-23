@@ -6,14 +6,23 @@
 #include "diagnostic_msgs/DiagnosticStatus.h"
 #include "diagnostic_msgs/DiagnosticArray.h"
 #include "diagnostic_msgs/KeyValue.h"
+#include "smart_battery_msgs/SmartBatteryStatus.h" //file found
+
+void voltageCallback(const smart_battery_msgs::SmartBatteryStatus::ConstPtr& msg)
+{
+  ROS_INFO("I heard: [%s]", msg->data.c_str());
+  //todo: add voltage profiler logic - write profile rates in /config
+}
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "battery_estimator");
   ros::NodeHandle n;
 
   ros::Publisher battery_life_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 10);
+  ros::Subscriber voltage_sub = n.subscribe("smart_battery_msgs/SmartBatteryStatus", 10, voltageCallback);
 
-  ros::Rate loop_rate(1);
+  ros::Rate loop_rate(1); //1hz
   diagnostic_msgs::DiagnosticStatus status;
   diagnostic_msgs::DiagnosticArray diagAr;
   diagnostic_msgs::KeyValue val;
@@ -26,16 +35,18 @@ int main(int argc, char **argv)
     diagAr.header.stamp = ros::Time::now();
     diagAr.header.frame_id = 1;
     float voltage = 12.3;
-    float estimated_life = 183.0;
+//    float estimated_life = 183.0;
     if(voltage > 11.0){
-	status.message = "Battery in good health";
-	status.level = 0; // 0 = OK
-    }else if(voltage > 10 && voltage < 11){
-	status.message = "Battery low, return to lab.";
-	status.level = 1; // WARN
-    }else{
-	status.message = "Battery CRITICALLY low, or voltmeter data is inaccurate (or missing). Ensure the volt sensor is connected properly and its publisher relaying data.";
-	status.level = 0; // CRITICAL
+		status.message = "Battery in good health";
+		status.level = 0; // 0 = OK
+    }
+    else if(voltage > 10 && voltage < 11){
+		status.message = "Battery low, return to lab.";
+		status.level = 1; // WARN
+    }
+    else{
+		status.message = "Battery CRITICALLY low, or voltmeter data is inaccurate (or missing). Ensure the volt sensor is connected properly and its publisher relaying data.";
+		status.level = 0; // CRITICAL
     }
     status.values.push_back(val);
     diagAr.status.push_back(status);
