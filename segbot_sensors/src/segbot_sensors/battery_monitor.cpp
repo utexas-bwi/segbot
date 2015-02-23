@@ -10,7 +10,7 @@
 
 void voltageCallback(const smart_battery_msgs::SmartBatteryStatus::ConstPtr& msg)
 {
-  ROS_INFO("I heard: [%s]", msg->data.c_str());
+  ROS_INFO("I heard: [%f]", msg->voltage);
   //todo: add voltage profiler logic - write profile rates in /config
 }
 
@@ -27,6 +27,7 @@ int main(int argc, char **argv)
   diagnostic_msgs::DiagnosticArray diagAr;
   diagnostic_msgs::KeyValue val;
   status.hardware_id = "005";
+  status.name = "battery_estimator"; //must match what the aggregator config file expects
   val.key = "battery_value";
   val.value = "183.0";
 

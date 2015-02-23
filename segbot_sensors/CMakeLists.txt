@@ -15,6 +15,7 @@ find_package(catkin REQUIRED
     tf
     std_msgs
     diagnostic_msgs
+    smart_battery_msgs
     roscpp)
 
 catkin_python_setup()
