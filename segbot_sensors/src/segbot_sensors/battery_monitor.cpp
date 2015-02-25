@@ -7,6 +7,9 @@
 #include "diagnostic_msgs/DiagnosticArray.h"
 #include "diagnostic_msgs/KeyValue.h"
 #include "smart_battery_msgs/SmartBatteryStatus.h" //file found
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 void voltageCallback(const smart_battery_msgs::SmartBatteryStatus::ConstPtr& msg)
 {
@@ -14,10 +17,33 @@ void voltageCallback(const smart_battery_msgs::SmartBatteryStatus::ConstPtr& msg
   //todo: add voltage profiler logic - write profile rates in /config
 }
 
+int sendmail()
+{
+    char msg[] = "Robot battery low. Please seek robot and bring to lab for charging.";
+    int retval = -1;
+    FILE *mailpipe = popen("/usr/lib/sendmail -t", "w");
+    if (mailpipe != NULL) {
+        fprintf(mailpipe, "To: maxsvetlik@gmail.com\n");
+        fprintf(mailpipe, "From: bwipowerdameon@bwi.edu\n");
+        fprintf(mailpipe, "Subject: There's an issue with the robot\n");
+        fwrite(msg, 1, strlen(msg), mailpipe);
+        fwrite(".\n", 1, 2, mailpipe);
+        pclose(mailpipe);
+        retval = 0;
+     }
+     else {
+         perror("Failed to invoke sendmail");
+     }
+     return retval;
+}
+
+
 int main(int argc, char **argv)
 {
   ros::init(argc, argv, "battery_estimator");
   ros::NodeHandle n;
+  int mail = system("/usr/lib/sendmail -t < ~/mailmessage.txt &");
+  std::cout << "Mail status: " << mail << std::endl;
 
   ros::Publisher battery_life_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 10);
   ros::Subscriber voltage_sub = n.subscribe("smart_battery_msgs/SmartBatteryStatus", 10, voltageCallback);
