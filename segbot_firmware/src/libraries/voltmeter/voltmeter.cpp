@@ -41,9 +41,12 @@
 #include <Arduino.h>
 #include <voltmeter.h>
 
-static const float vPow = 4.8;
-static const float r1 = 100000.0;
-static const float r2 = 18000.0;
+/** Conversion for DFRobot Analog Voltage Divider DFR0051 V2.
+ *
+ *  The device divides the raw battery current by five, so a full
+ *  range 5v input on analog pin 0 corresponds to 25v input.
+ */
+static const float V_CONVERSION = 40.92;
 
 /** Poll interface.
  *
@@ -52,9 +55,8 @@ static const float r2 = 18000.0;
  */
 void Voltmeter::poll(void)
 {
-  float v = (analogRead(0) * vPow) / 1024.0;
-  float v2 = v / (r2 / (r1 + r2));
+  float v = analogRead(0) / V_CONVERSION;
 
   Serial.print("V");
-  Serial.println(v2/2);
+  Serial.println(v);
 }
