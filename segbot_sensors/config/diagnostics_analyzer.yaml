@@ -5,8 +5,11 @@ base_path: '' # Optional, prepended to all diagnostic output
 analyzers:
   sensors: #sets the namespace
     type: GenericAnalyzer
-    path: battery_estimator
-    startswith: 'battery'
+    path: Battery
+    startswith: [
+        'battery_estimator',
+        'voltage'
+    ]
 #computers:
 #    type: GenericAnalyzer
 #    path: Computers
