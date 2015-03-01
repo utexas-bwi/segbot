@@ -16,7 +16,7 @@ bool sentMail = false;
 void voltageCallback(const smart_battery_msgs::SmartBatteryStatus::ConstPtr& msg)
 {
   voltage = (msg->voltage);
-  ROS_INFO("I heard: [%f]", msg->voltage);
+ // ROS_INFO("I heard: [%f]", msg->voltage);
   //todo: add voltage profiler logic - write profile rates in /config
 }
 
@@ -47,32 +47,43 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
   //int mail = system("/usr/lib/sendmail -t < ~/mailmessage.txt &");
   //std::cout << "Mail status: " << mail << std::endl;
-  //sendmail();
   ros::Publisher battery_life_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 10);
   ros::Subscriber voltage_sub = n.subscribe("smart_battery_msgs/SmartBatteryStatus", 10, voltageCallback);
-
   ros::Rate loop_rate(1); //1hz
+  diagnostic_msgs::DiagnosticStatus voltages;
   diagnostic_msgs::DiagnosticStatus status;
   diagnostic_msgs::DiagnosticArray diagAr;
-  diagnostic_msgs::KeyValue val;
+  diagnostic_msgs::KeyValue status_val;
+  diagnostic_msgs::KeyValue voltages_val;
+  voltages.hardware_id = "005";
+  voltages.name = "voltage";
+  voltages_val.value = voltage;
+  voltages_val.key = "Current voltage: ";
   status.hardware_id = "005";
   status.name = "battery_estimator"; //must match what the aggregator config file expects
-  val.key = "battery_value";
-  val.value = "183.0";
+  status_val.key = "battery_value";
+  status_val.value = "183.0";
+  std::ostringstream ss;
 
   while (ros::ok())
   {
+    //conver from float to string - ugly
+    ss.str("");
+    ss.clear();
+    ss << voltage;
+    voltages_val.value  = ss.str();
     diagAr.header.stamp = ros::Time::now();
     diagAr.header.frame_id = 1;
-    //float voltage = 12.3;
     //float estimated_life = 183.0;
     if(voltage > 11.0){
 		status.message = "Battery in good health";
 		status.level = 0; // 0 = OK
+		voltages.level = 0;
     }
     else if(voltage > 10 && voltage < 11){
 		status.message = "Battery low, return to lab.";
 		status.level = 1; // WARN
+		voltages.level = 1;
 		if(!sentMail){
 			pid_t id = fork();
 			//To maintain steady diag readings, run sendmail in parallel
@@ -90,13 +101,16 @@ int main(int argc, char **argv)
     else{
 		status.message = "Battery CRITICALLY low, or voltmeter data is inaccurate (or missing). Ensure the volt sensor is connected properly and its publisher relaying data.";
 		status.level = 2; // CRITICAL
+		voltages.level = 2;
     }
-
     //TODO: checkout the effect of clearing these.
     status.values.clear();
-    status.values.push_back(val);
+    status.values.push_back(status_val);
+    voltages.values.clear();
+    voltages.values.push_back(voltages_val);
     diagAr.status.clear();
     diagAr.status.push_back(status);
+    diagAr.status.push_back(voltages);
     battery_life_pub.publish(diagAr);
     ros::spinOnce();
     loop_rate.sleep();
