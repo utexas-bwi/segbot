@@ -5,7 +5,8 @@
     <rosparam command="load" 
               file="$(find segbot_sensors)/config/diagnostics_analyzer.yaml" />
   </node>
-  
+  <!-- Launch voltage-diagnostic publisher -->
+  <node name="batteryDiagnostics" pkg="segbot_sensors" type="batteryDiagnostics" />
   <!-- run robot monitor -->
     <node name="rqt_robot_monitor" pkg="rqt_robot_monitor" type="rqt_robot_monitor" />
 </launch>

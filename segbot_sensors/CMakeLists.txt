@@ -87,8 +87,8 @@ if (CATKIN_ENABLE_TESTING)
   roslaunch_add_file_check(launch/ptgrey)
 endif()
 
-add_executable(batteryLife src/segbot_sensors/battery_monitor.cpp)
-target_link_libraries(batteryLife ${catkin_LIBRARIES})
+add_executable(batteryDiagnostics src/segbot_sensors/battery_monitor.cpp)
+target_link_libraries(batteryDiagnostics ${catkin_LIBRARIES})
 
 add_executable(voltagePub src/segbot_sensors/fakeVoltPub.cpp)
 target_link_libraries(voltagePub ${catkin_LIBRARIES})
