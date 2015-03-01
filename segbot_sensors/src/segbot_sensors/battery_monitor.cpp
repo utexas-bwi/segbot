@@ -45,8 +45,6 @@ int main(int argc, char **argv)
 {
   ros::init(argc, argv, "battery_estimator");
   ros::NodeHandle n;
-  //int mail = system("/usr/lib/sendmail -t < ~/mailmessage.txt &");
-  //std::cout << "Mail status: " << mail << std::endl;
   ros::Publisher battery_life_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 10);
   ros::Subscriber voltage_sub = n.subscribe("smart_battery_msgs/SmartBatteryStatus", 10, voltageCallback);
   ros::Rate loop_rate(1); //1hz
@@ -75,15 +73,18 @@ int main(int argc, char **argv)
     diagAr.header.stamp = ros::Time::now();
     diagAr.header.frame_id = 1;
     //float estimated_life = 183.0;
+    
     if(voltage > 11.0){
 		status.message = "Battery in good health";
 		status.level = 0; // 0 = OK
 		voltages.level = 0;
+		voltages.message = "Voltage level OK";
     }
     else if(voltage > 10 && voltage < 11){
 		status.message = "Battery low, return to lab.";
 		status.level = 1; // WARN
 		voltages.level = 1;
+		voltages.message = "Voltage dropping";
 		if(!sentMail){
 			pid_t id = fork();
 			//To maintain steady diag readings, run sendmail in parallel
@@ -98,10 +99,17 @@ int main(int argc, char **argv)
 			sentMail = true;
 		}
     }
+    else if(voltage == NULL || voltage == 0){
+		voltages.message = "No voltage data";
+		voltages.level = 2;
+		status.message = "Cannot extrapolate battery charge. No voltage data.";
+		status.level = 2;
+    }
     else{
 		status.message = "Battery CRITICALLY low, or voltmeter data is inaccurate (or missing). Ensure the volt sensor is connected properly and its publisher relaying data.";
 		status.level = 2; // CRITICAL
 		voltages.level = 2;
+		voltages.message = "ERROR: Ensure accurate volt readings!";
     }
     //TODO: checkout the effect of clearing these.
     status.values.clear();
