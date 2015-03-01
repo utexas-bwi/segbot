@@ -16,7 +16,7 @@ bool sentMail = false;
 void voltageCallback(const smart_battery_msgs::SmartBatteryStatus::ConstPtr& msg)
 {
   voltage = (msg->voltage);
-  //ROS_INFO("I heard: [%f]", msg->voltage);
+  ROS_INFO("I heard: [%f]", msg->voltage);
   //todo: add voltage profiler logic - write profile rates in /config
 }
 
@@ -74,7 +74,16 @@ int main(int argc, char **argv)
 		status.message = "Battery low, return to lab.";
 		status.level = 1; // WARN
 		if(!sentMail){
-			sendMail();
+			pid_t id = fork();
+			//To maintain steady diag readings, run sendmail in parallel
+			if(id == 0){
+				sendMail();
+				exit(EXIT_SUCCESS);
+			}
+			else if (id == -1){
+				printf("Fork failure. Messages not sent");
+				_exit(EXIT_FAILURE);
+			}
 			sentMail = true;
 		}
     }
@@ -82,7 +91,11 @@ int main(int argc, char **argv)
 		status.message = "Battery CRITICALLY low, or voltmeter data is inaccurate (or missing). Ensure the volt sensor is connected properly and its publisher relaying data.";
 		status.level = 2; // CRITICAL
     }
+
+    //TODO: checkout the effect of clearing these.
+    status.values.clear();
     status.values.push_back(val);
+    diagAr.status.clear();
     diagAr.status.push_back(status);
     battery_life_pub.publish(diagAr);
     ros::spinOnce();

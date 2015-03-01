@@ -17,7 +17,7 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
     smart_battery_msgs::SmartBatteryStatus stat;
-    stat.voltage = 12.0;
+    stat.voltage = 10.9;
     chatter_pub.publish(stat);
     ros::spinOnce();
 
