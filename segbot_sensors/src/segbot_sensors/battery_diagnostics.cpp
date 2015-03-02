@@ -34,8 +34,7 @@ int sendMail(std::string outboundList, std::string sender){
     fwrite(".\n", 1, 2, mailpipe);
     pclose(mailpipe);
     retval = 0;
-  }
-  else {
+  }else {
     perror("Failed to invoke sendmail");
   }
   return retval;
@@ -72,8 +71,7 @@ int main(int argc, char **argv){
       status.level = 0; // 0 = OK
       voltages.level = 0;
       voltages.message = "Voltage level OK";
-    }
-    else if(voltage > 10 && voltage < 11){
+    }else if(voltage > 10 && voltage < 11){
       status.message = "Battery low, return to lab.";
       status.level = 1; // WARN
       voltages.level = 1;
