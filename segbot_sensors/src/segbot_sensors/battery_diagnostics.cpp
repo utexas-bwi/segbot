@@ -10,12 +10,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <boost/thread.hpp>
+#include <boost/lexical_cast.hpp>
 
 float voltage;
 bool sentMail = false;
 void voltageCallback(const smart_battery_msgs::SmartBatteryStatus::ConstPtr& msg){
   voltage = (msg->voltage);
- // ROS_INFO("I heard: [%f]", msg->voltage);
+ //ROS_INFO("I heard: [%f]", msg->voltage);
   //todo: add voltage profiler logic - write profile rates in /config
 }
 
@@ -67,15 +69,11 @@ int main(int argc, char **argv){
   std::ostringstream ss;
 
   while (ros::ok()){
-    //convert from float to string - ugly
-    ss.str("");
-    ss.clear();
-    ss << voltage;
-    voltages_val.value  = ss.str();
+    voltages_val.value = boost::lexical_cast<std::string>(voltage);
     diagAr.header.stamp = ros::Time::now();
     diagAr.header.frame_id = 1;
-    //float estimated_life = 183.0;
-    
+    std::cout << voltages_val.value << std::endl;
+
     if(voltage > 11.0){
   		status.message = "Battery in good health";
   		status.level = 0; // 0 = OK
@@ -87,41 +85,35 @@ int main(int argc, char **argv){
   		status.level = 1; // WARN
   		voltages.level = 1;
   		voltages.message = "Voltage dropping";
-		if(!sentMail){
-			pid_t id = fork();
-			//To maintain steady diag readings, run sendmail in parallel
-			if(id == 0){
-        bool paramSuccess;
-        std::string outbound;
-        paramSuccess = n.getParam("email_alert_outbound", outbound);
-        std::string send;
-        paramSuccess &= n.getParam("email_alert_sender", send);
-				if(!paramSuccess){
-          std::cout << "Error reading send mail parameters. Check launchfile. Emails not sent." << std::endl;
-        }
-        else
-          sendMail(outbound, send);
-				exit(EXIT_SUCCESS);
-			}
-			else if (id == -1){
-				printf("Fork failure. Messages not sent");
-				_exit(EXIT_FAILURE);
-			}
-			sentMail = true;
-		}
-    }
-    else if(!voltage || voltage == 0){
-  		voltages.message = "No voltage data";
-  		voltages.level = 2;
-  		status.message = "Cannot extrapolate battery charge. No voltage data.";
-  		status.level = 2;
+  		if(!sentMail){
+  			//To maintain steady diag readings, run sendmail on thread
+          bool paramSuccess;
+          std::string outbound;
+          paramSuccess = n.getParam("email_alert_outbound", outbound);
+          std::string send;
+          paramSuccess &= n.getParam("email_alert_sender", send);
+  				if(!paramSuccess){
+            std::cout << "Error reading send mail parameters. Check launchfile. Emails not sent." << std::endl;
+          }
+          else{
+            boost::thread mailThread(sendMail, outbound, send);
+          }
+  		  }
+  			sentMail = true;
+	  }
+    else if(!voltage){
+    	voltages.message = "No voltage data";
+    	voltages.level = 2;
+    	status.message = "Cannot extrapolate battery charge. No voltage data.";
+    	status.level = 2;
     }
     else{
-  		status.message = "Battery CRITICALLY low, or voltmeter data is inaccurate (or missing). Ensure the volt sensor is connected properly and its publisher relaying data.";
-  		status.level = 2; // CRITICAL
-  		voltages.level = 2;
-  		voltages.message = "ERROR: Ensure accurate volt readings!";
+      status.message = "Battery CRITICALLY low, or voltmeter data is inaccurate (or missing). Ensure the volt sensor is connected properly and its publisher relaying data.";
+    	status.level = 2; // CRITICAL
+    	voltages.level = 2;
+    	voltages.message = "ERROR: Ensure accurate volt readings!";
     }
+  
     //Clearing messages reduces memory overhead, but limits the perception of changes in state in the diagnostics viewer.
     status.values.clear();
     status.values.push_back(status_val);
