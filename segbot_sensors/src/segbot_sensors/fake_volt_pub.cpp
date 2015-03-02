@@ -3,8 +3,7 @@
 #include "smart_battery_msgs/SmartBatteryStatus.h"
 #include <sstream>
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv){
   ros::init(argc, argv, "talker");
 
   ros::NodeHandle n;
@@ -14,8 +13,7 @@ int main(int argc, char **argv)
   ros::Rate loop_rate(10);
 
   int count = 0;
-  while (ros::ok())
-  {
+  while (ros::ok()){
     smart_battery_msgs::SmartBatteryStatus stat;
     stat.voltage = 10.9;
     chatter_pub.publish(stat);
