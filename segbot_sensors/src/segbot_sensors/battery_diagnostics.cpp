@@ -17,7 +17,6 @@ float voltage;
 bool sentMail = false;
 void voltageCallback(const smart_battery_msgs::SmartBatteryStatus::ConstPtr& msg){
   voltage = (msg->voltage);
- //ROS_INFO("I heard: [%f]", msg->voltage);
   //todo: add voltage profiler logic - write profile rates in /config
 }
 
@@ -67,7 +66,6 @@ int main(int argc, char **argv){
     voltages_val.value = boost::lexical_cast<std::string>(voltage);
     diagAr.header.stamp = ros::Time::now();
     diagAr.header.frame_id = 1;
-    std::cout << voltages_val.value << std::endl;
 
     if(voltage > 11.0){
   		status.message = "Battery in good health";
