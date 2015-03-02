@@ -28,13 +28,9 @@ int sendMail(std::string outboundList, std::string sender){
   if (mailpipe != NULL) {
     //arrange to/from lists in appropriate format for sendMail. Convert strings to char[]
     std::string to = "To: " + outboundList + "\n";
-    char to_array[1024];
-    strncpy(to_array, to.c_str(), sizeof(to_array));
     std::string from = "From: " + sender + "\n";
-    char from_array[256];
-    strncpy(from_array, from.c_str(), sizeof(from_array));
-    fprintf(mailpipe, to_array);
-    fprintf(mailpipe, from_array);
+    fprintf(mailpipe, to.c_str());
+    fprintf(mailpipe, from.c_str());
     fprintf(mailpipe, "Subject: Segbot Low Battery Alert\n");
     fwrite(msg, 1, strlen(msg), mailpipe);
     fwrite(".\n", 1, 2, mailpipe);
