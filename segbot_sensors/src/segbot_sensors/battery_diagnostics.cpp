@@ -26,12 +26,11 @@ int sendMail(std::string outboundList, std::string sender){
   int retval = -1;
   FILE *mailpipe = popen("/usr/lib/sendmail -t", "w");
   if (mailpipe != NULL) {
-    //arrange to/from lists in appropriate format for sendMail. Convert strings to char[]
     std::string to = "To: " + outboundList + "\n";
     std::string from = "From: " + sender + "\n";
-    fprintf(mailpipe, to.c_str());
-    fprintf(mailpipe, from.c_str());
-    fprintf(mailpipe, "Subject: Segbot Low Battery Alert\n");
+    fputs(to.c_str(), mailpipe);
+    fputs(from.c_str(), mailpipe);
+    fputs("Subject: Segbot Low Battery Alert\n", mailpipe);
     fwrite(msg, 1, strlen(msg), mailpipe);
     fwrite(".\n", 1, 2, mailpipe);
     pclose(mailpipe);
