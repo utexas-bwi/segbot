@@ -21,7 +21,7 @@
   <!-- KINECT specific stuff -->
 
   <!-- launch the kinect laserscan converter -->
-  <!--
+  
   <include file="$(find segbot_sensors)/launch/kinect/kinect-laserscan.launch">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="camera" value="$(arg kinect_name)" />
@@ -30,7 +30,7 @@
     <arg name="min_height" value ="-0.5" />
     <arg name="max_height" value ="10.0" />
   </include>
-  -->
+  
 
   <!-- set additional tf prefix parameter - required for gazebo -->
   <!--
