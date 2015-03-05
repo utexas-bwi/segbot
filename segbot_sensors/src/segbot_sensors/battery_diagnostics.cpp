@@ -21,7 +21,7 @@ void voltageCallback(const smart_battery_msgs::SmartBatteryStatus::ConstPtr& msg
 }
 
 int sendMail(std::string outboundList, std::string sender){
-  char msg[] = "Hello,\nJust so you know, there is a robot whose battery is low. Please seek this robot and bring it to the lab for charging.\nBest,\nBWI Alterts\n\nPS: Please don't email me!";
+  char msg[] = "Hello,\nJust so you know, there is a robot whose battery is low. Please seek this robot and bring it to the lab for charging.\nBest,\nBuilding Wide Intelligence\n\nPS: Please don't email me!";
   int retval = -1;
   FILE *mailpipe = popen("/usr/lib/sendmail -t", "w");
   if(mailpipe != NULL){
