@@ -39,6 +39,7 @@ import rospy
 import threading
 from diagnostic_msgs.msg import DiagnosticArray, DiagnosticStatus, KeyValue
 
+
 class Diagnostics(object):
     """ ROS diagnostics interface for the Arduino device driver node. """
 
