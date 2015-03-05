@@ -4,6 +4,7 @@ project(segbot_sensors)
 
 find_package(catkin REQUIRED
   COMPONENTS
+    diagnostic_msgs
     laser_filters
     message_generation
     nodelet
@@ -12,17 +13,11 @@ find_package(catkin REQUIRED
     roscpp
     roslint
     sensor_msgs
-    tf
-    std_msgs
-    diagnostic_msgs
     smart_battery_msgs
-    roscpp)
+    std_msgs
+    tf)
 
 catkin_python_setup()
-
-# define RangeArray message (ONLY used for segbot version 1)
-add_message_files(DIRECTORY msg FILES RangeArray.msg)
-generate_messages(DEPENDENCIES sensor_msgs)
 
 catkin_package(
   CATKIN_DEPENDS
@@ -38,7 +33,6 @@ catkin_package(
   LIBRARIES
     segbot_sensors_filters
     range_to_cloud
-    ranges_to_cloud
 )
 
 include_directories(include ${catkin_INCLUDE_DIRS})
