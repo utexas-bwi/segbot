@@ -1,7 +1,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (C) 2014, Jack O'Quin
+*  Copyright (C) 2014, 2015, Jack O'Quin
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -35,12 +35,11 @@
 
 /** @file
 
-@brief ROS node for converting RangeArray messages to PointCloud2.
+@brief ROS node for converting Range messages to PointCloud2.
 
 @par Subscribes
 
- - @b sensor_ranges topic (segbot_sensors/RangeArray) a collection of
-   sensor_msgs/Range information for each ultrasound and IR sensor.
+ - @b sonar topic (sensor_msgs/Range) each ultrasound sensor reading.
 
 @par Advertises
 
@@ -53,12 +52,12 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <sensor_msgs/Range.h>
 #include <pcl_ros/point_cloud.h>
-#include "ranges_to_cloud.h"
+#include "range_to_cloud.h"
 
 namespace segbot_sensors
 {
   /** @brief Constructor. */
-  RangesToCloud::RangesToCloud(ros::NodeHandle node,
+  RangeToCloud::RangeToCloud(ros::NodeHandle node,
                                ros::NodeHandle private_nh)
   {
     // advertise output point cloud (before subscribing to input data)
@@ -67,63 +66,53 @@ namespace segbot_sensors
 
     // subscribe to input ranges
     ranges_ =
-      node.subscribe("sensor_ranges", 10,
-                     &RangesToCloud::processRanges, (RangesToCloud *) this,
+      node.subscribe("sonar", 10,
+                     &RangeToCloud::processRange, (RangeToCloud *) this,
                      ros::TransportHints().tcpNoDelay(true));
   }
 
-  void RangesToCloud::processRanges(const segbot_sensors::RangeArray::ConstPtr
-                                    &ranges_msg)
+  void RangeToCloud::processRange(const sensor_msgs::Range::ConstPtr
+                                  &range_msg)
   {
-    unsigned int nsensors = ranges_msg->ranges.size(); // number of sensors
-    ROS_DEBUG_STREAM("Received " << nsensors << " ranges");
-    if (nsensors == 0)                  // empty message?
-      return;
-
     // allocate a point cloud message
     pcl::PointCloud<pcl::PointXYZ>::Ptr
         cloud(new pcl::PointCloud<pcl::PointXYZ>());
     // cloud's header is a pcl::PCLHeader, convert it before stamp assignment
     cloud->header.stamp =
-      pcl_conversions::toPCL(ranges_msg->ranges[0].header).stamp;
+      pcl_conversions::toPCL(range_msg->header).stamp;
     cloud->header.frame_id = "sensor_base"; // TODO: make this a parameter
     cloud->height = 1;
 
-    // Provide points for sensor ranges provided.
-    for (int sensor = 0; sensor < nsensors; ++sensor)
+    // Skip readings with no object within range (see: REP-0117).
+    if (range_msg->range < std::numeric_limits<float>::infinity())
       {
-        // Skip readings with no object within range (see: REP-0117).
-        const sensor_msgs::Range *r = &ranges_msg->ranges[sensor];
-        if (r->range < std::numeric_limits<float>::infinity())
+        // Transform this range point into the "sensor_base" frame.
+        tf::StampedTransform transform;
+        try
           {
-            // Transform this range point into the "sensor_base" frame.
-            tf::StampedTransform transform;
-            try
-              {
-                listener_.lookupTransform(cloud->header.frame_id,
-                                          r->header.frame_id,
-                                          ros::Time(0), transform);
-              }
-            catch (tf::TransformException ex)
-              {
-                ROS_WARN_STREAM(ex.what());
-                continue;               // skip this sensor
-              }
-
-            tf::Point pt(r->range, 0.0, 0.0);
-            pt = transform * pt;
-
-            pcl::PointXYZ pcl_point;
-            pcl_point.x = pt.m_floats[0];
-            pcl_point.y = pt.m_floats[1];
-            pcl_point.z = pt.m_floats[2];
-            cloud->points.push_back(pcl_point);
-            ++cloud->width;
+            listener_.lookupTransform(cloud->header.frame_id,
+                                      range_msg->header.frame_id,
+                                      ros::Time(0), transform);
           }
-      }
+        catch (tf::TransformException ex)
+          {
+            ROS_WARN_STREAM(ex.what());
+            return;                     // skip this reading
+          }
 
-    // publish the accumulated cloud message
-    points_.publish(cloud);
+        tf::Point pt(range_msg->range, 0.0, 0.0);
+        pt = transform * pt;
+
+        pcl::PointXYZ pcl_point;
+        pcl_point.x = pt.m_floats[0];
+        pcl_point.y = pt.m_floats[1];
+        pcl_point.z = pt.m_floats[2];
+        cloud->points.push_back(pcl_point);
+        ++cloud->width;
+
+        // publish the accumulated cloud message
+        points_.publish(cloud);
+      }
   }
 
 

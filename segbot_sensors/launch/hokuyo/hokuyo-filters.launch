@@ -1,5 +1,6 @@
 <launch>
+  <arg name="filters" default="$(find segbot_sensors)/config/hokuyo_filters.yaml" />
   <node name="hokuyo_laser_filters" pkg="laser_filters" type="scan_to_scan_filter_chain">
-    <rosparam command="load" file="$(find segbot_sensors)/config/hokuyo_filters.yaml" />
+    <rosparam command="load" file="$(arg filters)" />
   </node>
 </launch>

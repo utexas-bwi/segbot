@@ -1,9 +1,9 @@
-<library path="lib/libranges_to_cloud">
-  <class name="segbot_sensors/RangesNodelet"
-         type="segbot_sensors::RangesNodelet"
+<library path="lib/librange_to_cloud">
+  <class name="segbot_sensors/RangeNodelet"
+         type="segbot_sensors::RangeNodelet"
          base_class_type="nodelet::Nodelet">
     <description>
-      Creates PointCloud2 from an Array of Range messages.
+      Creates PointCloud2 from a sensor_msgs/Range topic.
     </description>
   </class>
 </library>

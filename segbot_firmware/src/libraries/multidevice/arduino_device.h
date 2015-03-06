@@ -2,7 +2,7 @@
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (c) 2014 Jack O'Quin
+*  Copyright (C) 2015, Jack O'Quin
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -15,7 +15,7 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the author nor other contributors may be
+*   * Neither the name of the authors nor other contributors may be
 *     used to endorse or promote products derived from this software
 *     without specific prior written permission.
 *
@@ -33,34 +33,51 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-#ifndef _RANGES_TO_CLOUD_
-#define _RANGES_TO_CLOUD_ 1
-
 /** @file
+ *
+ *  Base class for Segbot version 2 Arduino device.
+ */
 
-    @brief ROS interface for converting RangeArray messages to PointCloud2.
+#ifndef _ARDUINO_DEVICE_
+#define _ARDUINO_DEVICE_ 1
 
-*/
-
-#include <ros/ros.h>
-#include <tf/transform_listener.h>
-#include <segbot_sensors/RangeArray.h>
-
-namespace segbot_sensors
+/** Base class for handling Arduino-attached devices. */
+class ArduinoDevice
 {
-  class RangesToCloud
+public:
+
+  /** Constructor.
+   *
+   *  @param poll_msec desired interval between poll calls (milliseconds).
+   */
+  ArduinoDevice(int poll_msec):
+    poll_msec_(poll_msec),
+    next_poll_(poll_msec) {}
+
+  /** Periodic device handler.
+   *
+   *  May send a complete serial message line, if data available.
+   */
+  virtual void poll() = 0;
+
+  /** Check if time to poll this device.
+   *
+   *  @param interval Milliseconds since last @c check() call.
+   *  @returns @c true, if time to call poll() now; @c false, otherwise.
+   */
+  bool check(int interval)
   {
-  public:
-    RangesToCloud(ros::NodeHandle node, ros::NodeHandle priv_nh);
-    ~RangesToCloud(){}
+    next_poll_ -= interval;
+    if (next_poll_ > 0)
+      return false;                     // not time for next poll
 
-  private:
-    void processRanges(const segbot_sensors::RangeArray::ConstPtr &rangesMsg);
+    next_poll_ = poll_msec_;            // reset counter
+    return true;                        // time for next poll
+  }
 
-    ros::Subscriber ranges_;
-    ros::Publisher points_;
-    tf::TransformListener listener_;
-  };
-}; // end namespace segbot_sensors
+private:
+  int poll_msec_;              ///< number of msecs between poll() calls
+  int next_poll_;              ///< number of msecs until next poll()
+};
 
-#endif // _RANGES_TO_CLOUD_
+#endif // _ARDUINO_DEVICE_
