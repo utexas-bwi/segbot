@@ -1,0 +1,17 @@
+<launch>
+
+  <!-- Set necessary parameters -->
+  <param name="email_alert_outbound" type="string" value="maxsvetlik@utexas.edu matteo@cs.utexas.edu shiqi.zhang6@gmail.com 
+jsinapov@cs.utexas.edu pstone@cs.utexas.edu piyushk@gmail.com" />
+  <param name="email_alert_sender" type="string" value="utexas.bwi@gmail.com" />
+
+  <!-- Launch the aggregator --> 
+  <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator" >
+    <rosparam command="load" 
+              file="$(find segbot_sensors)/config/diagnostics_analyzer.yaml" />
+  </node>
+  <!-- Launch voltage-diagnostic publisher -->
+  <node name="battery_diagnostics" pkg="segbot_sensors" type="battery_diagnostics" />
+  <!-- run robot monitor -->
+    <node name="rqt_robot_monitor" pkg="rqt_robot_monitor" type="rqt_robot_monitor" />
+</launch>

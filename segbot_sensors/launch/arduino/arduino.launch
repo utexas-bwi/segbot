@@ -15,43 +15,30 @@
        Uses tf2_ros static transform broadcaster, because that version
        publishes once to a latched "/tf2_static" topic.
 
-       Eventually, these transforms will probably be published by the
-       sensor_ranges_driver, but this works for testing.
+       Eventually, these transforms should be included in the URDF,
+       but this works for testing.
   -->
   <group if="$(arg publish_tf)">
     <node name="sonar0_broadcaster"
           pkg="tf2_ros" type="static_transform_publisher"
-          args="-0.044 -0.095 0.016 0 0 -0.426 0.905 $(arg frame_id) sonar0" />
+          args="0.02 -0.095 0.016 0 0 -0.426 0.905 $(arg frame_id) sonar0" />
     <node name="sonar1_broadcaster"
           pkg="tf2_ros" type="static_transform_publisher"
-          args="-0.032 -0.057 0.016 0 0 -0.218 0.976 $(arg frame_id) sonar1" />
+          args="0 0 0.016 0 0 0 1 $(arg frame_id) sonar1" />
     <node name="sonar2_broadcaster"
           pkg="tf2_ros" type="static_transform_publisher"
-          args="0 0 0.016 0 0 0 1 $(arg frame_id) sonar2" />
-    <node name="sonar3_broadcaster"
-          pkg="tf2_ros" type="static_transform_publisher"
-          args="-0.032 0.057 0.016 0 0 0.218 0.976 $(arg frame_id) sonar3" />
-    <node name="sonar4_broadcaster"
-          pkg="tf2_ros" type="static_transform_publisher"
-          args="-0.044 0.095 0.016 0 0 0.426 0.905 $(arg frame_id) sonar4" />
-    <node name="cliff0_broadcaster"
-          pkg="tf2_ros" type="static_transform_publisher"
-          args="-0.032 -0.057 -0.025 0 0.383 0 0.924 $(arg frame_id) cliff0" />
-    <node name="cliff1_broadcaster"
-          pkg="tf2_ros" type="static_transform_publisher"
-          args="-0.032 0.057 -0.025 0 0.383 0 0.924 $(arg frame_id) cliff1" />
+          args="0.02 0.095 0.016 0 0 0.426 0.905 $(arg frame_id) sonar2" />
   </group>
 
   <!-- run the Arduino interface driver -->
-  <node name="sensor_ranges_driver"
-        pkg="segbot_sensors" type="sensor_ranges_driver">
+  <node name="arduino_driver" pkg="segbot_sensors" type="arduino_driver">
     <param name="port" value="$(arg port)" />
     <param name="baud" value="$(arg baud)" />
   </node>
 
   <!-- run the ranges to point cloud conversion nodelet -->
-  <node name="ranges_to_cloud" pkg="nodelet" type="nodelet"
-        args="standalone segbot_sensors/RangesNodelet">
+  <node name="range_to_cloud" pkg="nodelet" type="nodelet"
+        args="standalone segbot_sensors/RangeNodelet">
     <param name="frame_id" value="$(arg frame_id)" />
   </node>
   
