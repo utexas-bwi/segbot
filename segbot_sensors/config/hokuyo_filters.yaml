@@ -6,3 +6,4 @@ scan_filter_chain:
   params:
     footprint_frame: base_footprint
     footprint: [0.2,0.3,0.2,-0.3,-0.35,-0.25,-0.35,0.25]
+

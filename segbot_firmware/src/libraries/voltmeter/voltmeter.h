@@ -1,7 +1,8 @@
+/* -*- mode: C++ -*- */
 /*********************************************************************
 * Software License Agreement (BSD License)
 *
-*  Copyright (C) 2014, Jack O'Quin
+*  Copyright (C) 2015, Jack O'Quin
 *  All rights reserved.
 *
 *  Redistribution and use in source and binary forms, with or without
@@ -14,7 +15,7 @@
 *     copyright notice, this list of conditions and the following
 *     disclaimer in the documentation and/or other materials provided
 *     with the distribution.
-*   * Neither the name of the author nor other contributors may be
+*   * Neither the name of the authors nor other contributors may be
 *     used to endorse or promote products derived from this software
 *     without specific prior written permission.
 *
@@ -32,43 +33,23 @@
 *  POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************/
 
-
 /** @file
+ *
+ *  Battery volt meter interface for Segbot version 2.
+ */
 
-@brief ROS nodelet for converting RangeArray messages to PointCloud2.
+#ifndef _VOLTMETER_
+#define _VOLTMETER_ 1
 
-*/
+#include <arduino_device.h>
 
-#include <ros/ros.h>
-#include <pluginlib/class_list_macros.h>
-#include <nodelet/nodelet.h>
-
-#include "ranges_to_cloud.h"
-
-namespace segbot_sensors
+/** Interface for Arduino-attached battery voltage meter. */
+class Voltmeter: public ArduinoDevice
 {
-  class RangesNodelet: public nodelet::Nodelet
-  {
-  public:
-    RangesNodelet() {}
-    ~RangesNodelet() {}
+ public:
+  /** Constructor: sets poll period to 1000 msecs (one Hz). */
+  Voltmeter(): ArduinoDevice(1000) {}
+  void poll(void);
+};
 
-  private:
-    boost::shared_ptr<segbot_sensors::RangesToCloud> cnv_;
-
-    virtual void onInit()
-    {
-      ros::NodeHandle priv_nh(getPrivateNodeHandle());
-      ros::NodeHandle node(getNodeHandle());
-      cnv_.reset(new segbot_sensors::RangesToCloud(node, priv_nh));
-    }
-
-  };
-}; // end namespace segbot_sensors
-
-// Register this plugin with pluginlib.  Names must match
-// segbot_sensors_plugins.xml.
-//
-// parameters are: package, class name, class type, base class type
-PLUGINLIB_DECLARE_CLASS(segbot_sensors, RangesNodelet,
-                        segbot_sensors::RangesNodelet, nodelet::Nodelet);
+#endif // _VOLTMETER_

@@ -18,6 +18,7 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>geometry_msgs</build_depend>
   <build_depend>laser_filters</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>nodelet</build_depend>
@@ -30,8 +31,10 @@
 
   <run_depend>camera1394</run_depend>
   <run_depend>depthimage_to_laserscan</run_depend>
+  <run_depend>diagnostic_msgs</run_depend>
   <run_depend>filters</run_depend>
   <run_depend>freenect_launch</run_depend>
+  <run_depend>geometry_msgs</run_depend>
   <run_depend>hokuyo_node</run_depend>
   <run_depend>laser_filters</run_depend>
   <run_depend>message_runtime</run_depend>
@@ -44,6 +47,7 @@
   <run_depend>rospy</run_depend>
   <run_depend>rviz</run_depend>
   <run_depend>sensor_msgs</run_depend>
+  <run_depend>smart_battery_msgs</run_depend>
   <run_depend>tf</run_depend>
   <run_depend>tf2_ros</run_depend>
 
