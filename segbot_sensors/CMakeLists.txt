@@ -5,6 +5,7 @@ project(segbot_sensors)
 find_package(catkin REQUIRED
   COMPONENTS
     diagnostic_msgs
+    geometry_msgs
     laser_filters
     message_generation
     nodelet
@@ -21,12 +22,16 @@ catkin_python_setup()
 
 catkin_package(
   CATKIN_DEPENDS
+    diagnostic_msgs
+    geometry_msgs
     hokuyo_node
     laser_filters
     message_runtime
     nodelet
     pcl_ros
     sensor_msgs
+    smart_battery_msgs
+    std_msgs
     tf
   INCLUDE_DIRS
     include
