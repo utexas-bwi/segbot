@@ -2,8 +2,8 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.0 (2015-03-14)
+------------------
 * fixed default depth_registered flag to allow kinect to work properly.
 * use different filters for segbot v1 and segbot v2 due to differences between different laser models.
 * added launch file for segbot v2.

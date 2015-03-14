@@ -2,8 +2,8 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.0 (2015-03-14)
+------------------
 * use different list of filters for segbot v1 and segbot v2 due to differences between different laser models.
 * added a launch file for ethernet hokuyo for segbot v2.
 * added some code to process low battery messages. The robots will now attempt to send an email if they're reaching 
