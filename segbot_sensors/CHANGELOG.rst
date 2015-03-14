@@ -2,6 +2,17 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* use different list of filters for segbot v1 and segbot v2 due to differences between different laser models.
+* added a launch file for ethernet hokuyo for segbot v2.
+* added some code to process low battery messages. The robots will now attempt to send an email if they're reaching 
+  low battery levels.
+* big rework of all the arduino code to support the sensors on the new mounting plate.
+* added some diagnostic publications.
+* removed hack in nan_to_inf filter that was setting values to max_range - epsilon.
+* Contributors: Jack O'Quin, Jivko Sinapov, Maxwell Svetlik, Piyush Khandelwal
+
 0.2.1 (2014-04-24)
 ------------------
 * fix some problems catkin_lint discovered

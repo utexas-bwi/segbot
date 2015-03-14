@@ -2,6 +2,13 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* modified simple robot model in gazebo to be more accurate while still being able to detect other robots.
+* temp update to change range of hokuyo in simulation.
+* added the kinect.dae mesh that was missing in the meshes folder of segbot_description package
+* Contributors: Jivko Sinapov, Piyush Khandelwal
+
 0.2.1 (2014-04-24)
 ------------------
 * fix some problems catkin_lint discovered

@@ -2,6 +2,15 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fixed default depth_registered flag to allow kinect to work properly.
+* use different filters for segbot v1 and segbot v2 due to differences between different laser models.
+* added launch file for segbot v2.
+* fixed some issues with frame ids for multi robot setup.
+* Changed the value of "depth_only" to "true" so that the published point cloud contains color information as well.
+* Contributors: Jivko Sinapov, Piyush Khandelwal
+
 0.2.1 (2014-04-24)
 ------------------
 * segbot_bringup: install udev rules (`#26
