@@ -1,9 +1,9 @@
 <launch>
 
-  <arg name="name" default="nav_kinect" /> 
+  <arg name="kinect_name" default="nav_kinect" /> 
   <arg name="tf_prefix" default="" /> 
   <arg name="use_full_gazebo_model" default="false" />
-  <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_kinect.urdf.xacro" />
+  <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_v1.urdf.xacro" />
   <arg name="use_registered_topic" default="false" />
 
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
@@ -17,16 +17,25 @@
 
   <!-- launch the joint state publisher to default values -->
   <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
-dd
+
+  <!-- KINECT specific stuff -->
 
   <!-- launch the kinect laserscan converter -->
   <include file="$(find segbot_sensors)/launch/kinect/kinect-laserscan.launch">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
-    <arg name="camera" value="$(arg name)" />
+    <arg name="camera" value="$(arg kinect_name)" />
     <arg name="use_registered" value="$(arg use_registered_topic)" />
+    <arg name="out_topic" value="$(arg kinect_name)/scan_filtered" />
+    <arg name="min_height" value ="-0.5" />
+    <arg name="max_height" value ="10.0" />
   </include>
 
   <!-- set additional tf prefix parameter - required for gazebo -->
-  <param name="$(arg name)/tf_prefix" value="$(arg tf_prefix)" />
+  <param name="$(arg kinect_name)/tf_prefix" value="$(arg tf_prefix)" />
+
+  <!-- HOKUYO specific stuff -->
+  <!-- launch the laser filter to get rid of readings from the robot itself -->
+  <include file="$(find segbot_sensors)/launch/hokuyo/hokuyo-filters.launch" />
 
 </launch>
+

@@ -3,7 +3,7 @@
   <arg name="kinect_name" default="nav_kinect" /> 
   <arg name="tf_prefix" default="" /> 
   <arg name="use_full_gazebo_model" default="false" />
-  <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_navigation.urdf.xacro" />
+  <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_v2.urdf.xacro" />
   <arg name="use_registered_topic" default="false" />
 
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->

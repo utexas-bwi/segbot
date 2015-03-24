@@ -41,7 +41,7 @@
 
     <!-- laptop screen -->
     <joint name="${name}_screen_joint" type="fixed">
-      <origin xyz="${4.5*INCH_TO_M} 0 ${0.75*INCH_TO_M}" rpy="0 -${M_PI/3} 0"/>
+      <origin xyz="${4.5*INCH_TO_M} 0 ${0.75*INCH_TO_M}" rpy="0 -${21/48*M_PI} 0"/>
       <parent link="${name}_link" />
       <child link="${name}_screen_link" />
     </joint>

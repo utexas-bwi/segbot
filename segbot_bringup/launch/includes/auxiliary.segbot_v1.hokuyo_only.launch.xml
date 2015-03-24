@@ -2,7 +2,7 @@
 
   <arg name="tf_prefix" default="" /> 
   <arg name="use_full_gazebo_model" default="false" />
-  <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_hokuyo.urdf.xacro" />
+  <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_v1.hokuyo_only.urdf.xacro" />
 
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
   <param name="robot_description" 

@@ -30,7 +30,9 @@ if (CATKIN_ENABLE_TESTING)
   ## Test the individual files that do work, restore testing of the
   ## rest when openni_launch has been fixed.
   #roslaunch_add_file_check(launch) 
-  roslaunch_add_file_check(launch/segbot_hokuyo.launch)
-  roslaunch_add_file_check(launch/segbot.launch)
+  roslaunch_add_file_check(launch/segbot_v1.launch)
+  roslaunch_add_file_check(launch/segbot_v2.launch)
+  roslaunch_add_file_check(launch/includes/segbot_v1.hokuyo_only.launch)
+  roslaunch_add_file_check(launch/includes/segbot_v1.no_sensors.launch)
   roslaunch_add_file_check(launch/segway_base.launch)
 endif()

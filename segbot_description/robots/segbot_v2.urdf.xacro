@@ -4,10 +4,10 @@
        xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- Included URDF Files -->
-  <xacro:include filename="$(find segbot_description)/urdf/common.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/v2/common.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/gazebo/segbot.gazebo.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/segbot_base.urdf.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/segbot_chassis.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/v2/segbot_chassis.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/kinect_mount.urdf.xacro" />
 
@@ -19,14 +19,19 @@
 
   <!-- Add the forward facing kinect sensor for navigation -->
   <xacro:kinect_mount name="nav_kinect" parent="back_right_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}">
-    <origin xyz="0 ${0.5*INCH_TO_M} ${10.5*INCH_TO_M}" rpy="-${M_PI/2} -${M_PI/2} 0" />
+    <origin xyz="-${1*INCH_TO_M} -${0.5*INCH_TO_M} ${12*INCH_TO_M}" rpy="-${M_PI/2} -${M_PI/2} 0" />
   </xacro:kinect_mount>
   
   <!-- Add the hokuyo -->
   <xacro:hokuyo_mount name="nav_hokuyo" parent="front_left_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}" ros_topic="scan" update_rate="10" min_angle="${-(5 * M_PI)/12}" max_angle="${(5 * M_PI)/12}">
-    <origin xyz="0 -${0.5*INCH_TO_M} ${7*INCH_TO_M}" rpy="${M_PI/2} ${M_PI/2} 0" />
+    <origin xyz="${1*INCH_TO_M} ${0.5*INCH_TO_M} ${5*INCH_TO_M}" rpy="${M_PI/2} ${M_PI/2} 0" />
   </xacro:hokuyo_mount>
 
+  <!-- Add a beam at top so that the robot looks complete. -->
+  <xacro:beam_8020 name="front_cap_beam" parent="front_right_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}">
+    <origin xyz="0 -${0.5*INCH_TO_M} ${36.5*INCH_TO_M}"
+      rpy="-${M_PI/2} 0 0" />
+  </xacro:beam_8020>
   <xacro:gazebo_segbot_ros_controllers />
 
 </robot>
