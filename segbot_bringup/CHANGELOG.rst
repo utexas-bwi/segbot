@@ -2,8 +2,8 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.1 (2015-03-24)
+------------------
 * removed redundant segbot v1 models.
 * updated segbot v2 model to use correct URDF.
 * Contributors: Piyush Khandelwal
