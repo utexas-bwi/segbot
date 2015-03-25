@@ -2,6 +2,9 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.3.0 (2015-03-14)
 ------------------
 * use different list of filters for segbot v1 and segbot v2 due to differences between different laser models.

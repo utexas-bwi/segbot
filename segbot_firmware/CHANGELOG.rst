@@ -2,6 +2,9 @@
 Changelog for package segbot_firmware
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.3.0 (2015-03-14)
 ------------------
 * new arduino firmware for segbot v2.

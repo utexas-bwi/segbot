@@ -2,6 +2,12 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* removed redundant segbot v1 models.
+* updated segbot v2 model to use correct URDF.
+* Contributors: Piyush Khandelwal
+
 0.3.0 (2015-03-14)
 ------------------
 * fixed default depth_registered flag to allow kinect to work properly.

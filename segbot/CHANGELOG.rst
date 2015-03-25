@@ -2,6 +2,9 @@
 Changelog for package segbot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.3.0 (2015-03-14)
 ------------------
 * added platform independent tag to metapackage.

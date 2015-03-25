@@ -2,6 +2,12 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* removed redundant segbot v1 models.
+* added new segbot v2 model URDF.
+* Contributors: Piyush Khandelwal
+
 0.3.0 (2015-03-14)
 ------------------
 * modified simple robot model in gazebo to be more accurate while still being able to detect other robots.
