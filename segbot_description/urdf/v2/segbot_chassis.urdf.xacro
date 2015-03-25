@@ -7,7 +7,7 @@
   <xacro:include filename="$(find segbot_description)/urdf/components/battery_box.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/beam_8020.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/laptop.urdf.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/components/standoff_632.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
 
   <xacro:macro name="segbot_chassis" params="parent *origin">
 

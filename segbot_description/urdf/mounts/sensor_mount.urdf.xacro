@@ -4,29 +4,29 @@
 
 <root xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:include filename="$(find segbot_description)/urdf/components/standoff_632.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
 
   <xacro:macro name="sensor_mount" params="name parent">
 
     <!-- add sensor mount plate and its standoffs -->
-    <xacro:standoff_632 name="${name}_front_left_standoff" parent="${parent}"
+    <xacro:standoff radius="0.003175" name="${name}_front_left_standoff" parent="${parent}"
                         length="${1.5*INCH_TO_M}">
       <origin xyz="${3.25*INCH_TO_M} ${4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}"
               rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="${name}_front_right_standoff" parent="${parent}"
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_front_right_standoff" parent="${parent}"
                         length="${1.5*INCH_TO_M}">
       <origin xyz="${3.25*INCH_TO_M} ${-4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="${name}_back_left_standoff" parent="${parent}"
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_back_left_standoff" parent="${parent}"
                         length="${1.5*INCH_TO_M}">
       <origin xyz="${1.25*INCH_TO_M} ${4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="${name}_back_right_standoff" parent="${parent}"
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_back_right_standoff" parent="${parent}"
                         length="${1.5*INCH_TO_M}">
       <origin xyz="${1.25*INCH_TO_M} ${-4.5*INCH_TO_M} ${(1/32)*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:standoff_632>
+    </xacro:standoff>
     <xacro:aluminium_sheet name="${name}_plate"
                            parent="${name}_front_left_standoff" 
                            thickness="${0.0625*INCH_TO_M}"
@@ -37,26 +37,26 @@
     </xacro:aluminium_sheet>
 
     <!-- add sensor mount top plate and its standoffs -->
-    <xacro:standoff_632 name="${name}_top_front_left_standoff"
+    <xacro:standoff radius="0.003175" name="${name}_top_front_left_standoff"
                         parent="${name}_front_left_standoff"
                         length="${2*INCH_TO_M}">
       <origin xyz="0 0 ${(1.5+1/16)*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="${name}_top_front_right_standoff"
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_top_front_right_standoff"
                         parent="${name}_front_right_standoff"
                         length="${2*INCH_TO_M}">
       <origin xyz="0 0 ${(1.5+1/16)*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="${name}_top_back_left_standoff"
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_top_back_left_standoff"
                         parent="${name}_back_left_standoff"
                         length="${2*INCH_TO_M}">
       <origin xyz="0 0 ${(1.5+1/16)*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="${name}_top_back_right_standoff"
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_top_back_right_standoff"
                         parent="${name}_back_right_standoff"
                         length="${2*INCH_TO_M}">
       <origin xyz="0 0 ${(1.5+1/16)*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:standoff_632>
+    </xacro:standoff>
     <xacro:aluminium_sheet name="${name}_top_plate"
                            parent="${name}_top_front_left_standoff" 
                            thickness="${0.0625*INCH_TO_M}"

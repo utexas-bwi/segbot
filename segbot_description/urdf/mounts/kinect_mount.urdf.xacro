@@ -5,7 +5,7 @@
       xmlns:xacro="http://ros.org/wiki/xacro">
 
   <xacro:include filename="$(find segbot_description)/urdf/components/beam_8020.urdf.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/components/standoff_632.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/sensors/kinect_camera.urdf.xacro" />
 
@@ -18,22 +18,22 @@
                            <origin xyz="${0.5*INCH_TO_M} 0 ${length/2}" rpy="${M_PI/2} 0 ${M_PI/2}" />
     </xacro:aluminium_sheet>
 
-    <xacro:standoff_632 name="${name}_standoff_1" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
+    <xacro:standoff radius="0.003175" name="${name}_standoff_1" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
       <origin xyz="${1.5*INCH_TO_M} ${-4*INCH_TO_M} ${0.0625*INCH_TO_M}" 
               rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="${name}_standoff_2" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_standoff_2" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
       <origin xyz="${1.5*INCH_TO_M} ${4*INCH_TO_M} ${0.0625*INCH_TO_M}" 
               rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="${name}_standoff_3" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_standoff_3" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
       <origin xyz="${-1.5*INCH_TO_M} ${4*INCH_TO_M} ${0.0625*INCH_TO_M}" 
               rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="${name}_standoff_4" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_standoff_4" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
       <origin xyz="${-1.5*INCH_TO_M} ${-4*INCH_TO_M} ${0.0625*INCH_TO_M}" 
               rpy="0 0 0" />
-    </xacro:standoff_632>
+    </xacro:standoff>
 
     <xacro:aluminium_sheet name="${name}_top_plate" parent="${name}_standoff_1" 
                            thickness="${0.0625*INCH_TO_M}" length="${4*INCH_TO_M}" width="${9*INCH_TO_M}">

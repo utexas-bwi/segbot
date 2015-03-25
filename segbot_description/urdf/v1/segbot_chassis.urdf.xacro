@@ -7,7 +7,7 @@
   <xacro:include filename="$(find segbot_description)/urdf/components/battery_box.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/beam_8020.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/laptop.urdf.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/components/standoff_632.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
 
   <xacro:macro name="segbot_chassis" params="parent *origin">
 
@@ -18,22 +18,22 @@
     </xacro:aluminium_sheet>
 
     <!-- add chassis mount plate -->
-    <xacro:standoff_632 name="chassis_front_left_standoff" parent="chassis_base_plate"
+    <xacro:standoff radius="0.003175" name="chassis_front_left_standoff" parent="chassis_base_plate"
                         length="${0.5*INCH_TO_M}">
       <origin xyz="${8.25*INCH_TO_M} ${4.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="chassis_front_right_standoff" parent="chassis_base_plate"
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="chassis_front_right_standoff" parent="chassis_base_plate"
                         length="${0.5*INCH_TO_M}">
       <origin xyz="${8.25*INCH_TO_M} ${-4.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="chassis_back_left_standoff" parent="chassis_base_plate"
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="chassis_back_left_standoff" parent="chassis_base_plate"
                         length="${0.5*INCH_TO_M}">
       <origin xyz="${6.25*INCH_TO_M} ${4.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:standoff_632>
-    <xacro:standoff_632 name="chassis_back_right_standoff" parent="chassis_base_plate"
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="chassis_back_right_standoff" parent="chassis_base_plate"
                         length="${0.5*INCH_TO_M}">
       <origin xyz="${6.25*INCH_TO_M} ${-4.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:standoff_632>
+    </xacro:standoff>
     <xacro:aluminium_sheet name="chassis_mount_plate" parent="chassis_front_left_standoff" 
                            thickness="${0.0625*INCH_TO_M}" length="${11*INCH_TO_M}"
                            width="${9.5*INCH_TO_M}">
