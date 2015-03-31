@@ -2,6 +2,9 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.3.1 (2015-03-24)
 ------------------
 * removed redundant segbot v1 models.

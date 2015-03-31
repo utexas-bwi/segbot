@@ -2,6 +2,12 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* added sensor plate and sonars to tf tree for segbot v2.
+* make standoff urdf more generic. dropped the 632 suffix and added radius as a parameter
+* Contributors: Piyush Khandelwal
+
 0.3.1 (2015-03-24)
 ------------------
 * removed redundant segbot v1 models.
