@@ -1,6 +1,6 @@
 <package>
   <name>segbot_sensors</name>
-  <version>0.3.1</version>
+  <version>0.3.2</version>
   <description>
     Contains sensor specific launch files and all the relevant filters that are
     applied on sensor data before being used by the segbot.
