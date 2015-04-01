@@ -48,7 +48,7 @@ from sensor_msgs.msg import Range
 class SonarAttributes(Range):
     """ Subclass of sensor_msgs/Range, for filling in sonar attributes."""
     def __init__(self, frame_id,
-                 field_of_view=0.5, min_range=0.01, max_range=2.0):
+                 field_of_view=0.4, min_range=0.01, max_range=2.0):
         super(SonarAttributes, self).__init__(
             radiation_type=Range.ULTRASOUND,
             field_of_view=field_of_view,
