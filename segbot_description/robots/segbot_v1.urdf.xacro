@@ -23,7 +23,7 @@
   </xacro:kinect_mount>
   
   <!-- Add the hokuyo -->
-  <xacro:hokuyo_mount name="nav_hokuyo" parent="front_left_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}" ros_topic="scan" update_rate="10" min_angle="${-(5 * M_PI)/12}" max_angle="${(5 * M_PI)/12}">
+  <xacro:hokuyo_mount name="nav_hokuyo" parent="front_left_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}" ros_topic="scan" update_rate="10" min_angle="${-(5 * M_PI)/12}" max_angle="${(5 * M_PI)/12}" range="4.0">
     <origin xyz="0 -${0.5*INCH_TO_M} ${7*INCH_TO_M}" rpy="${M_PI/2} ${M_PI/2} 0" />
   </xacro:hokuyo_mount>
 

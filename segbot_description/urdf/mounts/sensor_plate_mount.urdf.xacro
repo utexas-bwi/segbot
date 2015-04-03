@@ -8,13 +8,13 @@
   <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
 
-  <xacro:macro name="sensor_plate_mount_without_beam" params="parent length" />
+  <xacro:macro name="sensor_plate_mount_without_beam" params="parent length">
 
-  <xacro:standoff name="left_sensor_plate_standoff" parent="${parent}" length="${0.5*INCH_TO_M}" radius="${0.25*INCH_TO_M}">
-      <origin xyz="-${1/2*INCH_TO_M} 0 ${length - 2.5*INCH_TO_M}" rpy="-${M_PI/2} 0 ${M_PI/2}" />
+    <xacro:standoff name="left_sensor_plate_standoff" parent="${parent}" length="${0.5*INCH_TO_M}" radius="${0.25*INCH_TO_M}">
+      <origin xyz="-${1/2*INCH_TO_M} 0 ${length/2 - 2.5*INCH_TO_M}" rpy="-${M_PI/2} 0 ${M_PI/2}" />
     </xacro:standoff>
     <xacro:standoff name="right_sensor_plate_standoff" parent="${parent}" length="${0.5*INCH_TO_M}" radius="${0.25*INCH_TO_M}">
-      <origin xyz="-${1/2*INCH_TO_M} 0 ${length + 2.5*INCH_TO_M}" rpy="-${M_PI/2} 0 ${M_PI/2}" />
+      <origin xyz="-${1/2*INCH_TO_M} 0 ${length/2 + 2.5*INCH_TO_M}" rpy="-${M_PI/2} 0 ${M_PI/2}" />
     </xacro:standoff>
     <xacro:aluminium_sheet name="sensor_plate" parent="left_sensor_plate_standoff" thickness="0.003" length="${4.5*INCH_TO_M}" width="${9*INCH_TO_M}">
       <origin xyz="-${1/4*INCH_TO_M} -${2.5*INCH_TO_M} ${1/2*INCH_TO_M}" rpy="0 0 0" />
@@ -34,7 +34,7 @@
           iyy="0.01"  iyz="0.0"
           izz="0.01" />
       </inertial>
-     <visual>
+      <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <box size="0.001 0.001 0.001" />
@@ -56,7 +56,7 @@
           iyy="0.01"  iyz="0.0"
           izz="0.01" />
       </inertial>
-     <visual>
+      <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <box size="0.001 0.001 0.001" />
@@ -77,7 +77,7 @@
           iyy="0.01"  iyz="0.0"
           izz="0.01" />
       </inertial>
-     <visual>
+      <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <box size="0.012 0.044 0.023" />
@@ -99,7 +99,7 @@
           iyy="0.01"  iyz="0.0"
           izz="0.01" />
       </inertial>
-     <visual>
+      <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <box size="0.012 0.044 0.023" />
@@ -121,7 +121,7 @@
           iyy="0.01"  iyz="0.0"
           izz="0.01" />
       </inertial>
-     <visual>
+      <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <box size="0.001 0.001 0.001" />
@@ -142,7 +142,7 @@
           iyy="0.01"  iyz="0.0"
           izz="0.01" />
       </inertial>
-     <visual>
+      <visual>
         <origin xyz="0 0 0" rpy="0 0 0" />
         <geometry>
           <box size="0.012 0.044 0.023" />

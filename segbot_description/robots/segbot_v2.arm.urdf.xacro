@@ -14,9 +14,9 @@
 
   <!-- Add the segbot base -->
   <xacro:segbot />
-  <xacro:segbot_chassis parent="base">
+  <xacro:segbot_chassis_arm parent="base">
     <origin xyz="${BASE_PLATE_X_OFFSET*INCH_TO_M} 0 ${BASE_PLATE_Z_OFFSET*INCH_TO_M}"/>
-  </xacro:segbot_chassis>
+  </xacro:segbot_chassis_arm>
 
   <!-- Add the forward facing kinect sensor for navigation -->
   <xacro:kinect_mount name="nav_kinect" parent="back_right_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}">
@@ -36,9 +36,19 @@
   <!-- Add the sensor plate mount -->
   <xacro:sensor_plate_mount_without_beam parent="hokuyo_sonar_sensor_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}"/>
 
-  <!-- Add a beam at top so that the robot looks complete. We'll probably have a different sensor mount here eventually. -->
-  <xacro:beam_8020 name="front_cap_beam" parent="front_right_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}">
-    <origin xyz="0 -${0.5*INCH_TO_M} ${36.5*INCH_TO_M}" rpy="-${M_PI/2} 0 0" />
+  <!-- Add the left sensor beam -->
+  <xacro:beam_8020 name="left_sensor_beam" parent="laptop_base_plate" length="${30*INCH_TO_M}">
+    <origin xyz="0 ${8.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
+  </xacro:beam_8020>
+
+  <!-- Add the right sensor beam -->
+  <xacro:beam_8020 name="right_sensor_beam" parent="laptop_base_plate" length="${30*INCH_TO_M}">
+    <origin xyz="0 -${8.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
+  </xacro:beam_8020>
+
+  <!-- Add the top sensor beam -->
+  <xacro:beam_8020 name="top_sensor_beam" parent="right_sensor_beam" length="${18*INCH_TO_M}">
+    <origin xyz="0 -${0.5*INCH_TO_M} ${30.5*INCH_TO_M}" rpy="-${M_PI/2} 0 0" />
   </xacro:beam_8020>
 
   <xacro:gazebo_segbot_ros_controllers />
