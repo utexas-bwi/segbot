@@ -1,0 +1,41 @@
+<launch>
+
+  <!-- Launch nodes for testing Arduino-attached sensors. -->
+
+  <arg name="baud" default="115200" />
+  <arg name="frame_id" default="sensor_base" />
+  <arg name="port" default="/dev/ttyACM0" />
+  <arg name="publish_tf" default="true" />
+  <arg name="tf_prefix" default="" /> 
+
+  <param name="tf_prefix" value="$(arg tf_prefix)" />
+
+  <!-- Publish static transforms from each sensor to the sensor base plate.
+
+       Uses tf2_ros static transform broadcaster, because that version
+       publishes once to a latched "/tf2_static" topic.
+
+       The correct version of these transforms are declared in the
+       URDF, but this is useful for testing.
+  -->
+  <group if="$(arg publish_tf)">
+    <node name="sonar0_broadcaster"
+          pkg="tf2_ros" type="static_transform_publisher"
+          args="0.02 -0.095 0.016 0 0 -0.426 0.905 $(arg frame_id) sonar0" />
+    <node name="sonar1_broadcaster"
+          pkg="tf2_ros" type="static_transform_publisher"
+          args="0 0 0.016 0 0 0 1 $(arg frame_id) sonar1" />
+    <node name="sonar2_broadcaster"
+          pkg="tf2_ros" type="static_transform_publisher"
+          args="0.02 0.095 0.016 0 0 0.426 0.905 $(arg frame_id) sonar2" />
+  </group>
+
+  <!-- run the Arduino interface driver and conversion nodelets -->
+  <include file="$(find segbot_sensors)/launch/arduino/arduino.launch">
+    <arg name="baud" value="$(arg baud)" />
+    <arg name="frame_id" value="$(arg frame_id)" />
+    <arg name="port" value="$(arg port)" />
+    <arg name="tf_prefix" value="$(arg tf_prefix)" />
+  </include>
+  
+</launch>
