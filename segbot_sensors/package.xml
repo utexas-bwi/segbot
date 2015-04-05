@@ -34,6 +34,7 @@
 
   <run_depend>camera1394</run_depend>
   <run_depend>depthimage_to_laserscan</run_depend>
+  <run_depend>diagnostic_aggregator</run_depend>
   <run_depend>diagnostic_msgs</run_depend>
   <run_depend>filters</run_depend>
   <run_depend>freenect_launch</run_depend>
@@ -48,6 +49,7 @@
   <run_depend>python-serial</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
+  <run_depend>rqt_robot_monitor</run_depend>
   <run_depend>rviz</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>smart_battery_msgs</run_depend>
