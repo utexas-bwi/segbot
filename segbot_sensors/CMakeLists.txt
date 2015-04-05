@@ -24,7 +24,6 @@ catkin_package(
   CATKIN_DEPENDS
     diagnostic_msgs
     geometry_msgs
-    hokuyo_node
     laser_filters
     message_runtime
     nodelet
