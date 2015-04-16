@@ -61,7 +61,7 @@ class SonarAttributes(Range):
 class SonarMessages(object):
     """ ROS message translation for UTexas BWI segbot Arduino sonar ranges. """
     def __init__(self):
-        self.pub = rospy.Publisher('sonar', Range)
+        self.pub = rospy.Publisher('sonar', Range, queue_size=6)
         self.parser = re.compile(r'(\d+)=(\d+)cm')
         """ Extracts list of distances from the Arduino serial message.
 

@@ -56,7 +56,8 @@ class VoltmeterMessages(object):
         """ Extracts voltage reading from the Arduino serial message.
         :returns: voltage data string reported, may be empty.
         """
-        self.pub = rospy.Publisher('battery0', SmartBatteryStatus)
+        self.pub = rospy.Publisher('battery0', SmartBatteryStatus,
+                                   queue_size=1)
         # initialize constant fields in battery message
         self.battery = SmartBatteryStatus(
             rate=float('nan'),
