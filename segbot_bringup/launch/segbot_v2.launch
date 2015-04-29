@@ -35,6 +35,7 @@
 
   <!-- Arduino -->
   <include file="$(find segbot_sensors)/launch/arduino/arduino.launch">
+    <arg name="port" value="/dev/arduino" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
 
