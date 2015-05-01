@@ -1,7 +1,7 @@
 <launch>
 
   <!-- Set necessary parameters -->
-  <param name="email_alert_outbound" type="string" value="bwioperators@cs.utexas.edu" />
+  <param name="email_alert_outbound" type="string" value="bwi-operators@cs.utexas.edu" />
   <param name="email_alert_sender" type="string" value="utexas.bwi@gmail.com" />
   <param name="weighted_average_const" type="double" value=".5" />
   <!-- Launch the aggregator --> 
