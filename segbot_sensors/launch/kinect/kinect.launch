@@ -38,7 +38,6 @@
   <group unless="$(arg use_openni)">
     <include file="$(find freenect_launch)/launch/freenect.launch">
       <arg name="camera" value="$(arg name)" />
-      <arg name="tf_prefix" value="$(arg tf_prefix)" />
       <arg name="device_id" value="$(arg device_id)" />
       <arg name="publish_tf" value="$(arg publish_tf)" />
       <arg name="enable_depth_diagnostics" value="true" />
