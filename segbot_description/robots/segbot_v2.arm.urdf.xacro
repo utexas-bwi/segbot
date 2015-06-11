@@ -85,7 +85,7 @@
   <xacro:mico_arm parent="arm_link"/>
 	
   <!-- add the xtion -->
-  <xacro:kinect_camera name="camera" parent="arm">
+  <xacro:kinect_camera name="xtion_camera" parent="arm">
       <origin xyz="0.05 +0.245 0.75" rpy="0 0.74 ${-M_PI/2}" />
     </xacro:kinect_camera>
 
