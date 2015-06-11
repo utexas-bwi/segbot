@@ -7,7 +7,7 @@
   <xacro:include filename="$(find segbot_description)/urdf/v2/common.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/gazebo/segbot.gazebo.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/segbot_base.urdf.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/v2/segbot_chassis.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/v2/segbot_chassis.urdf.arm.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/kinect_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/sensor_plate_mount.urdf.xacro" />
