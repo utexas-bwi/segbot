@@ -33,5 +33,9 @@
     <arg name="tf_prefix" default="$(arg tf_prefix)" /> 
     <arg name="use_registered_topic" default="true" />
   </include>
+  
+  <!-- the ARM -->
+  <include file="$(find jaco_driver)/launch/mico_arm.launch">
+  </include>
 
 </launch>
