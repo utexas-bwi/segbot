@@ -83,7 +83,7 @@
 
     <!-- laptop -->
     <xacro:laptop name="laptop" parent="laptop_base_plate"> 
-      <origin xyz="-${6.0*INCH_TO_M} 0 ${0.125*INCH_TO_M}" rpy="0 0 0" />
+      <origin xyz="-${3.0*INCH_TO_M} 0 ${0.125*INCH_TO_M}" rpy="0 0 0" />
     </xacro:laptop>
 
   </xacro:macro>
