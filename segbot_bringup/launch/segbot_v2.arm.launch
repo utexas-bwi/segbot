@@ -35,7 +35,7 @@
   </include>
   
   <!-- the ARM -->
-  <include file="$(find jaco_driver)/launch/mico_arm.launch">
+  <include file="$(find jaco_driver)/launch/segbot_mico_arm.launch">
   </include>
 
 </launch>
