@@ -72,9 +72,9 @@ class SonarMessages(object):
         # Our version 2 segbots have three sonars.
         # TODO: define this configuration information using ROS parameters
         self.sonars = [
-            SonarAttributes('sonar0'),
-            SonarAttributes('sonar1'),
-            SonarAttributes('sonar2')]
+            SonarAttributes('sonar0_link'),
+            SonarAttributes('sonar1_link'),
+            SonarAttributes('sonar2_link')]
 
     def publish(self, serial_msg):
         """ Publish a ROS Range message for each reading.
