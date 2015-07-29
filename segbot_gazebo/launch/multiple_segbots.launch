@@ -1,0 +1,43 @@
+<launch>
+
+  <arg name="robot_configuration" default="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v1.hokuyo_only.launch.xml" />
+  <arg name="use_full_gazebo_model" default="true" />
+  
+  <!-- launch the simulated world -->
+  <include file="$(find segbot_gazebo)/launch/segbot_test_world.launch" />
+
+  <!-- launch the map server for the simulated world -->
+  <include file="$(find segbot_gazebo)/launch/segbot_test_world_map_server.launch" />
+
+  <group ns="robot1">
+    <include file="$(find segbot_gazebo)/launch/segbot_mobile_base.launch">
+      <arg name="robotid" value="robot1" />
+      <arg name="configuration_file" value="$(arg robot_configuration)" />
+      <arg name="x" value="0" />
+      <arg name="y" value="0" />
+      <arg name="tf_prefix" value="robot1" />
+      <arg name="launch_localization" value="true" />
+      <arg name="launch_move_base" value="true" />
+      <arg name="use_full_gazebo_model" value="$(arg use_full_gazebo_model)" />
+    </include>
+  </group>
+
+  <group ns="robot2">
+    <include file="$(find segbot_gazebo)/launch/segbot_mobile_base.launch">
+      <arg name="robotid" value="robot2" />
+      <arg name="configuration_file" value="$(arg robot_configuration)" />
+      <arg name="x" value="0" />
+      <arg name="y" value="5.1" />
+      <arg name="tf_prefix" value="robot2" />
+      <arg name="launch_localization" value="true" />
+      <arg name="launch_move_base" value="true" />
+      <arg name="use_full_gazebo_model" value="$(arg use_full_gazebo_model)" />
+    </include>
+  </group>
+
+  <!-- launch vizualization -->
+  <node name="rviz" pkg="rviz" type="rviz" 
+    args="-d $(find segbot_gazebo)/config/multiple_segbots.rviz" 
+        launch-prefix="$(optenv OPTIRUN_LAUNCH_PREFIX)" />
+
+</launch>

@@ -22,10 +22,12 @@
   <run_depend>segbot_bringup</run_depend>
   <run_depend>segbot_description</run_depend>
   <run_depend>segbot_firmware</run_depend>
+  <run_depend>segbot_gazebo</run_depend>
   <run_depend>segbot_gui</run_depend>
   <run_depend>segbot_logical_translator</run_depend>
   <run_depend>segbot_navigation</run_depend>
   <run_depend>segbot_sensors</run_depend>
+  <run_depend>segbot_simulation_apps</run_depend>
 
   <export>
     <metapackage/>
