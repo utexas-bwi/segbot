@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+
+import rospy
+
+# Brings in the SimpleActionClient
+import actionlib
+from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
+from geometry_msgs.msg import PoseStamped
+
+def handle_move_base_simple_request(msg):
+    # Creates the SimpleActionClient, passing the type of the action
+    # (FibonacciAction) to the constructor.
+    client = actionlib.SimpleActionClient('move_base_interruptable', MoveBaseAction)
+
+    # Waits until the action server has started up and started
+    # listening for goals.
+    client.wait_for_server()
+
+    # Creates a goal to send to the action server.
+    goal = MoveBaseGoal(msg)
+
+    # Sends the goal to the action server.
+    client.send_goal(goal)
+
+if __name__ == '__main__':
+    try:
+        rospy.init_node('move_base_interruptable_simple')
+        sub = rospy.Subscriber('move_base_interruptable_simple/goal', PoseStamped, handle_move_base_simple_request)
+        rospy.spin()
+    except rospy.ROSInterruptException:
+        pass
