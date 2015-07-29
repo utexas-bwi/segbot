@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+tmpfile=`mktemp /tmp/tempfile.XXXXXXXXX`
+cp `rospack find segbot_navigation`/rviz/nav_eband_marvin.rviz $tmpfile
+if [ "$1" == "ns" ]
+then
+  # A robot name has been specified. Simply replace the keyword marvin with supplied robot name.
+  sed -i "s/marvin/$2/g" $tmpfile
+else
+  # No robot name specified, run everything in top level namespace.
+  sed -i "s/\/marvin//g" $tmpfile
+  sed -i "s/marvin\///g" $tmpfile
+  sed -i "s/marvin//g" $tmpfile
+fi
+$OPTIRUN_LAUNCH_PREFIX rosrun rviz rviz -d $tmpfile
+rm -f $tmpfile

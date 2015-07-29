@@ -1,0 +1,14 @@
+<launch>
+
+  <arg name="map_file" default="$(find utexas_gdc)/maps/3ne-real-new.yaml" />
+  <arg name="robot_configuration" 
+       default="$(find segbot_bringup)/launch/segbot_v2.launch"/>
+
+  <include file="$(arg robot_configuration)" />
+
+  <include file="$(find segbot_navigation)/launch/gmapping.launch">
+    <arg name="scan_topic" value="scan_filtered" />
+  </include>
+  <include file="$(find segbot_navigation)/launch/rviz.launch" />
+
+</launch>

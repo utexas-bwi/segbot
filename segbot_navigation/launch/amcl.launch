@@ -1,0 +1,82 @@
+<launch>
+
+  <arg name="use_map_topic" default="true"/>
+  <arg name="map_service" default="static_map" />
+  <arg name="map_topic" default="map" />
+
+  <arg name="scan_topic" default="scan_filtered" />
+
+  <arg name="initial_pose_x" default="0.0" />
+  <arg name="initial_pose_y" default="0.0" />
+  <arg name="initial_pose_a" default="0.0" />
+
+  <arg name="map_frame_id" default="map" />
+  <arg name="base_frame_id" default="base_footprint" />
+  <arg name="odom_frame_id" default="odom" />
+
+  <arg name="odom_alpha1" default="0.4" />
+  <arg name="odom_alpha2" default="0.4" />
+  <arg name="odom_alpha3" default="0.4" />
+  <arg name="odom_alpha4" default="0.4" />
+  <arg name="odom_alpha5" default="0.4" />
+
+  <arg name="laser_max_range" default="20.0" />
+
+  <!-- run amcl -->
+  <node pkg="amcl" type="amcl" name="amcl">
+    <!-- Publish scans from best pose at a max of 10 Hz -->
+
+    <param name="gui_publish_rate" value="10.0"/>
+
+    <param name="min_particles" value="10000"/>
+    <param name="max_particles" value="40000"/>
+    <param name="kld_err" value="0.05"/>
+    <param name="kld_z" value="0.99"/>
+
+    <param name="odom_model_type" value="diff"/>
+    <param name="odom_alpha5" value="$(arg odom_alpha5)"/>
+
+    <param name="odom_alpha1" value="$(arg odom_alpha1)"/>
+    <param name="odom_alpha2" value="$(arg odom_alpha2)"/>
+
+    <!-- translation std dev, m -->
+    <param name="odom_alpha3" value="$(arg odom_alpha3)"/>
+    <param name="odom_alpha4" value="$(arg odom_alpha4)"/>
+
+    <param name="laser_z_hit" value="0.6"/>
+    <param name="laser_z_short" value="0.06"/>
+    <param name="laser_z_max" value="0.04"/>
+    <param name="laser_z_rand" value="0.3"/>
+    <param name="laser_sigma_hit" value="0.2"/>
+    <param name="laser_lambda_short" value="0.1"/>
+    <param name="laser_model_type" value="likelihood_field"/>
+    <param name="laser_max_beams" value="60"/>
+    <param name="laser_max_range" value="$(arg laser_max_range)"/> <!-- defaults to max range supplied by sensor -->
+    <param name="laser_likelihood_max_dist" value="2.0"/>
+
+    <!-- <param name="laser_model_type" value="beam"/> -->
+
+    <param name="update_min_d" value="0.25"/>
+    <param name="update_min_a" value="0.2"/>
+    <param name="resample_interval" value="1"/>
+
+    <!-- Increase tolerance because the computer can get quite busy -->
+    <param name="transform_tolerance" value="1.0"/>
+    <param name="recovery_alpha_slow" value="0.000"/>
+    <param name="recovery_alpha_fast" value="0.0"/>
+    <remap from="scan" to="$(arg scan_topic)"/>
+
+    <param name="initial_pose_x" value="$(arg initial_pose_x)"/>
+    <param name="initial_pose_y" value="$(arg initial_pose_y)"/>
+    <param name="initial_pose_a" value="$(arg initial_pose_a)"/>
+    <param name="base_frame_id" value="$(arg base_frame_id)" />
+    <param name="global_frame_id" value="$(arg map_frame_id)" />
+    <param name="odom_frame_id" value="$(arg odom_frame_id)" />
+
+    <param name="use_map_topic" value="$(arg use_map_topic)"/>
+    <remap from="static_map" to="$(arg map_service)" />
+    <remap from="map" to="$(arg map_topic)" />
+
+  </node>
+
+</launch>
