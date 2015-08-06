@@ -2,6 +2,11 @@
 Changelog for package segbot_logical_translator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* merge segbot_apps packages into segbot (`#46 <https://github.com/utexas-bwi/segbot/issues/46>`_)
+* Contributors: Jack O'Quin
+
 0.3.1 (2015-03-31)
 ------------------
 * Closes `#29 <https://github.com/utexas-bwi/segbot_apps/issues/29>`_

@@ -2,6 +2,11 @@
 Changelog for package segbot_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* merge segbot_apps packages into segbot (`#46 <https://github.com/utexas-bwi/segbot/issues/46>`_)
+* Contributors: Jack O'Quin
+
 0.3.1 (2015-03-31)
 ------------------
 * Allow explicit amcl laser max range paramter instantiation. closes `#31 <https://github.com/utexas-bwi/segbot_apps/issues/31>`_.

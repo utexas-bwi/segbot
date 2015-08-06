@@ -2,6 +2,11 @@
 Changelog for package segbot_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* merge segbot_simulator packages into segbot (`#46 <https://github.com/utexas-bwi/segbot/issues/46>`_)
+* Contributors: Jack O'Quin
+
 0.3.1 (2015-03-31)
 ------------------
 * updated setting amcl laser max range. see segbot_apps`#31 <https://github.com/utexas-bwi/segbot_simulator/issues/31>`_.
