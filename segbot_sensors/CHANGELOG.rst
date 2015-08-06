@@ -2,8 +2,8 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.3 (2015-08-05)
+------------------
 * partial fix to `#48 <https://github.com/utexas-bwi/segbot/issues/48>`_.
 * segbot_sensors: lower bettery diagnostics smoothing parameter (`#40 <https://github.com/utexas-bwi/segbot/issues/40>`_)
 * segbot_sensors: set rospy.Publisher queue_size (fixes `#38 <https://github.com/utexas-bwi/segbot/issues/38>`_)

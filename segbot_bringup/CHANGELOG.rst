@@ -2,8 +2,8 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.3 (2015-08-05)
+------------------
 * segbot_bringup: launch stop controller with segway base (`#41 <https://github.com/utexas-bwi/segbot/issues/41>`_)
 * segbot_bringup: pass correct port to Arduino driver
 * fixed launch command for arduino and diagnostics. closes `#36 <https://github.com/utexas-bwi/segbot/issues/36>`_.

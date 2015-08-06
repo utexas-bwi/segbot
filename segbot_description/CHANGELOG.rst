@@ -2,8 +2,8 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.3 (2015-08-05)
+------------------
 * fixed long standing issue of robot not rotating in place correctly using gazebo_ros_planar_move.
 * Contributors: Piyush Khandelwal
 
