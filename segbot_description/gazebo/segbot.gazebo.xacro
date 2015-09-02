@@ -5,8 +5,8 @@
 
   <xacro:macro name="gazebo_segbot_base_link_surface">
     <gazebo reference="base_link">
-      <mu1 value="100.0" />
-      <mu2 value="100.0" />
+      <mu1 value="1.0" />
+      <mu2 value="1.0" />
       <kp  value="1000000.0" />
       <kd  value="1.0" />
     </gazebo>
@@ -14,8 +14,8 @@
 
   <xacro:macro name="gazebo_segbot_castor_wheel_link_surface">
     <gazebo reference="caster_wheel_link">
-      <mu1 value="10.0" />
-      <mu2 value="10.0" />
+      <mu1 value="1.0" />
+      <mu2 value="1.0" />
       <kp  value="1000000.0" />
       <kd  value="1.0" />
     </gazebo>
@@ -23,8 +23,8 @@
 
   <xacro:macro name="gazebo_segbot_wheel_surface" params="parent suffix">
     <gazebo reference="${parent}_${suffix}_wheel_link" >
-      <mu1 value="10.0" />
-      <mu2 value="10.0" />
+      <mu1 value="1.0" />
+      <mu2 value="1.0" />
       <kp  value="1000000.0" />
       <kd  value="1.0" />
     </gazebo>

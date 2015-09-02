@@ -1,6 +1,6 @@
 <package>
   <name>segbot</name>
-  <version>0.3.2</version>
+  <version>0.3.3</version>
   <description>
     ROS drivers for controlling Segway RMP 50 based robots at Learning Agents 
     Research Group (LARG), AI Laboratory, Department of Computer Science, 
@@ -22,7 +22,12 @@
   <run_depend>segbot_bringup</run_depend>
   <run_depend>segbot_description</run_depend>
   <run_depend>segbot_firmware</run_depend>
+  <run_depend>segbot_gazebo</run_depend>
+  <run_depend>segbot_gui</run_depend>
+  <run_depend>segbot_logical_translator</run_depend>
+  <run_depend>segbot_navigation</run_depend>
   <run_depend>segbot_sensors</run_depend>
+  <run_depend>segbot_simulation_apps</run_depend>
 
   <export>
     <metapackage/>

@@ -24,7 +24,6 @@ catkin_package(
   CATKIN_DEPENDS
     diagnostic_msgs
     geometry_msgs
-    hokuyo_node
     laser_filters
     message_runtime
     nodelet
@@ -88,6 +87,7 @@ if (CATKIN_ENABLE_TESTING)
   find_package(roslaunch REQUIRED)
   roslaunch_add_file_check(launch)
   roslaunch_add_file_check(launch/arduino)
+  roslaunch_add_file_check(launch/diagnostic)
   roslaunch_add_file_check(launch/hokuyo)
   roslaunch_add_file_check(launch/kinect)
   roslaunch_add_file_check(launch/ptgrey)

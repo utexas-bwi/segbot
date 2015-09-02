@@ -1,6 +1,6 @@
-<package>
+<package format="2">
   <name>segbot_bringup</name>
-  <version>0.3.2</version>
+  <version>0.3.3</version>
   <description>
     Contains launch files and runtime scripts necessary for running
     segbots in simulation and in the real world.
@@ -18,14 +18,14 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>roslaunch</build_depend> <!-- unit test only -->
+  <exec_depend>joint_state_publisher</exec_depend>
+  <exec_depend>python-netifaces</exec_depend>
+  <exec_depend version_gte="1.9.10">robot_state_publisher</exec_depend>
+  <exec_depend>segbot_description</exec_depend>
+  <exec_depend>segbot_sensors</exec_depend>
+  <exec_depend>segway_rmp</exec_depend>
+  <exec_depend>tf</exec_depend>
 
-  <run_depend>joint_state_publisher</run_depend>
-  <run_depend>python-netifaces</run_depend>
-  <run_depend version_gte="1.9.10">robot_state_publisher</run_depend>
-  <run_depend>segbot_description</run_depend>
-  <run_depend>segbot_sensors</run_depend>
-  <run_depend>segway_rmp</run_depend>
-  <run_depend>tf</run_depend>
+  <test_depend>roslaunch</test_depend>
 
 </package>

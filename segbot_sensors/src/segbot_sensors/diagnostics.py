@@ -44,7 +44,7 @@ class Diagnostics(object):
     """ ROS diagnostics interface for the Arduino device driver node. """
 
     def __init__(self, topic='/diagnostics'):
-        self.pub = rospy.Publisher(topic, DiagnosticArray)
+        self.pub = rospy.Publisher(topic, DiagnosticArray, queue_size=1)
         self.lock = threading.RLock()
         """ Mutex lock for updating diagnostic status. """
         self.timer = rospy.Timer(rospy.Duration(1.0), self.publish)

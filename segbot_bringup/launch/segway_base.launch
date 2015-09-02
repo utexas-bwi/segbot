@@ -6,6 +6,10 @@
   <!-- Set use_sim_time to false if the hardware segway driver is being loaded --> 
   <param name="/use_sim_time" value="false"/>
 
+  <!-- Launch stop base controller -->
+  <node name="stop_base_controller" pkg="stop_base" type="stop_base_controller"
+        output="screen" required="true"/>
+
   <!-- Launch Segway driver -->
   <node name="segway_rmp_node" pkg="segway_rmp" type="segway_rmp_node" output="screen" required="true">
 
@@ -38,7 +42,7 @@
 
     <param name="reset_odometry" value="true" />
 
-    <remap from="~cmd_vel" to="cmd_vel" />
+    <remap from="~cmd_vel" to="cmd_vel_safe" />
     <remap from="~odom" to="odom" />
 
   </node>

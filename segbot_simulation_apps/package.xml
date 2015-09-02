@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<package>
+  <name>segbot_simulation_apps</name>
+  <version>0.3.3</version>
+  <description>
+    Applications designed specifically to be used in a simulation
+    environment, such as opening and closing doors inside the building
+    simulation.
+  </description>
+
+  <maintainer email="piyushk@gmail.com">Piyush Khandelwal</maintainer>
+  <maintainer email="jack.oquin@gmail.com">Jack O'Quin</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://wiki.ros.org/segbot_simulation_apps</url>
+  <url type="repository">https://github.com/utexas-bwi/segbot_simulator.git</url>
+  <url type="bugtracker">https://github.com/utexas-bwi/segbot_simulator/issues</url>
+
+  <author email="piyushk@gmail.com">Piyush Khandelwal</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>boost</build_depend>
+  <build_depend>bwi_msgs</build_depend>
+  <build_depend>bwi_planning_common</build_depend>
+  <build_depend>bwi_tools</build_depend>
+  <build_depend>gazebo_msgs</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>multi_level_map_msgs</build_depend>
+  <build_depend>roscpp</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_depend>tf</build_depend>
+  
+  <run_depend>boost</run_depend>
+  <run_depend>bwi_msgs</run_depend>
+  <run_depend>bwi_planning_common</run_depend>
+  <run_depend>bwi_tools</run_depend>
+  <run_depend>gazebo_msgs</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>multi_level_map_msgs</run_depend>
+  <run_depend>roscpp</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <run_depend>tf</run_depend>
+
+  <!-- test dependencies -->
+  <build_depend>roslaunch</build_depend>
+
+</package>

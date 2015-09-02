@@ -20,7 +20,6 @@
     <arg name="depth_only" value="false" />
   </include>
 
-
   <!-- launch the hokuyo sensor -->
   <include file="$(find segbot_sensors)/launch/hokuyo/eth_hokuyo.launch">
     <arg name="name" value="nav_hokuyo" />
@@ -30,8 +29,17 @@
 
   <!-- COMMON aux information -->
   <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v2.launch.xml">
-    <arg name="tf_prefix" default="$(arg tf_prefix)" /> 
+    <arg name="tf_prefix" default="$(arg tf_prefix)" />
     <arg name="use_registered_topic" default="true" />
   </include>
+
+  <!-- Arduino -->
+  <include file="$(find segbot_sensors)/launch/arduino/arduino.launch">
+    <arg name="port" value="/dev/arduino" />
+    <arg name="tf_prefix" value="$(arg tf_prefix)" />
+  </include>
+
+  <!-- Diagnostics and battery monitor -->
+  <include file="$(find segbot_sensors)/launch/diagnostic/diagnostics.launch"/>
 
 </launch>
