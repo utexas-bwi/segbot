@@ -7,16 +7,17 @@
   <xacro:include filename="$(find segbot_description)/urdf/v2/common.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/gazebo/segbot.gazebo.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/segbot_base.urdf.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/v2/segbot_chassis.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/v2/segbot_chassis.urdf.arm.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/kinect_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/sensor_plate_mount.urdf.xacro" />
+  <xacro:include filename="$(find jaco_model)/urdf/mico_arm.xacro" />
 
   <!-- Add the segbot base -->
   <xacro:segbot />
-  <xacro:segbot_chassis parent="base">
+  <xacro:segbot_chassis_arm parent="base">
     <origin xyz="${BASE_PLATE_X_OFFSET*INCH_TO_M} 0 ${BASE_PLATE_Z_OFFSET*INCH_TO_M}"/>
-  </xacro:segbot_chassis>
+  </xacro:segbot_chassis_arm>
 
   <!-- Add the forward facing kinect sensor for navigation -->
   <xacro:kinect_mount name="nav_kinect" parent="back_right_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}">
@@ -36,10 +37,58 @@
   <!-- Add the sensor plate mount -->
   <xacro:sensor_plate_mount_without_beam parent="hokuyo_sonar_sensor_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}"/>
 
-  <!-- Add a beam at top so that the robot looks complete. We'll probably have a different sensor mount here eventually. -->
-  <xacro:beam_8020 name="front_cap_beam" parent="front_right_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}">
-    <origin xyz="0 -${0.5*INCH_TO_M} ${36.5*INCH_TO_M}" rpy="-${M_PI/2} 0 0" />
+  <!-- Add the left sensor beam -->
+  <xacro:beam_8020 name="left_sensor_beam" parent="laptop_base_plate" length="${30*INCH_TO_M}">
+    <origin xyz="${-4.5*INCH_TO_M} ${8.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
   </xacro:beam_8020>
+
+  <!-- Add the right sensor beam -->
+  <xacro:beam_8020 name="right_sensor_beam" parent="laptop_base_plate" length="${30*INCH_TO_M}">
+    <origin xyz="${-4.5*INCH_TO_M} -${8.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
+  </xacro:beam_8020>
+
+  <!-- Add the top sensor beam -->
+  <xacro:beam_8020 name="top_sensor_beam" parent="right_sensor_beam" length="${18*INCH_TO_M}">
+    <origin xyz="0 -${0.5*INCH_TO_M} ${30.5*INCH_TO_M}" rpy="-${M_PI/2} 0 0" />
+  </xacro:beam_8020>
+  
+
+
+  <!-- add the arm -->
+  
+  <!--this is needed as the mico_arm xacro file doesn't accept origin as argument -->
+  <joint name="arm_fixed_joint" type="fixed">
+	  <origin xyz="${6*INCH_TO_M} 0 ${1.5*INCH_TO_M}" rpy="0 0 ${0.0*M_PI/2}" />
+      <parent link="laptop_base_plate_link"/>
+      <child link="arm_link"/>
+    </joint>
+	
+	<link name="arm_link">
+      <visual>
+	<origin xyz="0 0 0" rpy="0 0 0" />
+	<geometry>
+	  <box size = "0 0 0"/> <!--making it slightly bigger in x and z direction-->
+	</geometry>
+	<!--<material name="Black" /> -->
+      </visual>
+    
+    <collision>
+	<origin xyz="0 0 0" rpy="0 0 0" />
+	
+	<geometry>
+	  <box size = "0 0 0"/> <!--making it slightly bigger in x and z direction-->
+	</geometry>
+      </collision>     
+    </link>
+
+  
+  <xacro:mico_arm parent="arm_link"/>
+	
+  <!-- add the xtion -->
+  <xacro:kinect_camera name="xtion_camera" parent="arm">
+     <!-- <origin xyz="0.05 +0.245 0.75" rpy="0 0.74 ${M_PI/2}" /> -->
+      <origin xyz="-0.265 +0.17 0.74" rpy="0 0.78 0" />
+    </xacro:kinect_camera>
 
   <xacro:gazebo_segbot_ros_controllers />
 
