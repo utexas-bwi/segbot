@@ -1,6 +1,6 @@
-<package>
+<package format="2">
   <name>segbot_sensors</name>
-  <version>0.3.2</version>
+  <version>0.3.3</version>
   <description>
     Contains sensor specific launch files and all the relevant filters that are
     applied on sensor data before being used by the segbot.
@@ -18,46 +18,37 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>diagnostic_msgs</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>laser_filters</build_depend>
+  <depend>diagnostic_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>laser_filters</depend>
+  <depend>nodelet</depend>
+  <depend>pcl_ros</depend>
+  <depend>pluginlib</depend>
+  <depend>roscpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>smart_battery_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>tf</depend>
+
   <build_depend>message_generation</build_depend>
-  <build_depend>nodelet</build_depend>
-  <build_depend>pcl_ros</build_depend>
-  <build_depend>pluginlib</build_depend>
-  <build_depend>roscpp</build_depend>
   <build_depend>roslint</build_depend>
-  <build_depend>sensor_msgs</build_depend>
-  <build_depend>smart_battery_msgs</build_depend>
-  <build_depend>std_msgs</build_depend>
-  <build_depend>tf</build_depend>
 
-  <run_depend>camera1394</run_depend>
-  <run_depend>depthimage_to_laserscan</run_depend>
-  <run_depend>diagnostic_msgs</run_depend>
-  <run_depend>filters</run_depend>
-  <run_depend>freenect_launch</run_depend>
-  <run_depend>geometry_msgs</run_depend>
-  <run_depend>hokuyo_node</run_depend>
-  <run_depend>laser_filters</run_depend>
-  <run_depend>message_runtime</run_depend>
-  <run_depend>nodelet</run_depend>
-  <run_depend>openni_launch</run_depend>
-  <run_depend>pcl_ros</run_depend>
-  <run_depend>pluginlib</run_depend>
-  <run_depend>python-serial</run_depend>
-  <run_depend>roscpp</run_depend>
-  <run_depend>rospy</run_depend>
-  <run_depend>rviz</run_depend>
-  <run_depend>sensor_msgs</run_depend>
-  <run_depend>smart_battery_msgs</run_depend>
-  <run_depend>std_msgs</run_depend>
-  <run_depend>tf</run_depend>
-  <run_depend>tf2_ros</run_depend>
-  <run_depend>urg_node</run_depend>
+  <exec_depend>camera1394</exec_depend>
+  <exec_depend>depthimage_to_laserscan</exec_depend>
+  <exec_depend>diagnostic_aggregator</exec_depend>
+  <exec_depend>filters</exec_depend>
+  <exec_depend>freenect_launch</exec_depend>
+  <exec_depend>hokuyo_node</exec_depend>
+  <exec_depend>message_runtime</exec_depend>
+  <exec_depend>openni_launch</exec_depend>
+  <exec_depend>python-serial</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>rqt_robot_monitor</exec_depend>
+  <exec_depend>rviz</exec_depend>
+  <exec_depend>tf2_ros</exec_depend>
+  <exec_depend>urg_node</exec_depend>
 
-  <!-- test dependencies -->
-  <build_depend>roslaunch</build_depend>
+  <test_depend>roslaunch</test_depend>
 
   <export>
     <filters plugin="${prefix}/segbot_sensors_plugins.xml"/>

@@ -48,7 +48,7 @@ from sensor_msgs.msg import Range
 class SonarAttributes(Range):
     """ Subclass of sensor_msgs/Range, for filling in sonar attributes."""
     def __init__(self, frame_id,
-                 field_of_view=0.5, min_range=0.01, max_range=2.0):
+                 field_of_view=0.4, min_range=0.01, max_range=2.0):
         super(SonarAttributes, self).__init__(
             radiation_type=Range.ULTRASOUND,
             field_of_view=field_of_view,
@@ -61,7 +61,7 @@ class SonarAttributes(Range):
 class SonarMessages(object):
     """ ROS message translation for UTexas BWI segbot Arduino sonar ranges. """
     def __init__(self):
-        self.pub = rospy.Publisher('sonar', Range)
+        self.pub = rospy.Publisher('sonar', Range, queue_size=6)
         self.parser = re.compile(r'(\d+)=(\d+)cm')
         """ Extracts list of distances from the Arduino serial message.
 
@@ -72,9 +72,9 @@ class SonarMessages(object):
         # Our version 2 segbots have three sonars.
         # TODO: define this configuration information using ROS parameters
         self.sonars = [
-            SonarAttributes('sonar0'),
-            SonarAttributes('sonar1'),
-            SonarAttributes('sonar2')]
+            SonarAttributes('sonar0_link'),
+            SonarAttributes('sonar1_link'),
+            SonarAttributes('sonar2_link')]
 
     def publish(self, serial_msg):
         """ Publish a ROS Range message for each reading.

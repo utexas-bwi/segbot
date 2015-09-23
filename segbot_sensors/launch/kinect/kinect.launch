@@ -3,7 +3,6 @@
   <arg name="name" default="camera" />
   <arg name="tf_prefix" default="" />
   <arg name="device_id" default="#1" />
-  <arg name="use_openni" default="false" />
   <arg name="depth_only" default="false" />
   <arg name="publish_tf" default="false" />
 
@@ -19,39 +18,21 @@
   <arg unless="$(arg depth_only)" name="depth_processing" value="false" />
   <arg unless="$(arg depth_only)" name="depth_registered_processing" value="true" />
 
-  <group if="$(arg use_openni)">
-    <include file="$(find openni_launch)/launch/openni.launch">
-      <arg name="camera" value="$(arg name)" />
-      <arg name="tf_prefix" value="$(arg tf_prefix)" />
-      <arg name="device_id" value="$(arg device_id)" />
-      <arg name="publish_tf" value="$(arg publish_tf)" />
-      <arg name="depth_registration" value="$(arg depth_registration)" />
-      <arg name="rgb_processing" value="$(arg rgb_processing)" />
-      <arg name="ir_processing" value="false" />
-      <arg name="depth_processing" value="$(arg depth_processing)" />
-      <arg name="depth_registered_processing" value="$(arg depth_registered_processing)" />
-      <arg name="disparity_processing" value="false" />
-      <arg name="disparity_registered_processing" value="false" />
-    </include>
-  </group>
-
-  <group unless="$(arg use_openni)">
-    <include file="$(find freenect_launch)/launch/freenect.launch">
-      <arg name="camera" value="$(arg name)" />
-      <arg name="tf_prefix" value="$(arg tf_prefix)" />
-      <arg name="device_id" value="$(arg device_id)" />
-      <arg name="publish_tf" value="$(arg publish_tf)" />
-      <arg name="enable_depth_diagnostics" value="true" />
-      <arg name="enable_rgb_diagnostics" value="$(arg enable_rgb_diagnostics)" />
-      <arg name="depth_registration" value="$(arg depth_registration)" />
-      <arg name="rgb_processing" value="$(arg rgb_processing)" />
-      <arg name="ir_processing" value="false" />
-      <arg name="depth_processing" value="$(arg depth_processing)" />
-      <arg name="depth_registered_processing" value="$(arg depth_registered_processing)" />
-      <arg name="disparity_processing" value="false" />
-      <arg name="disparity_registered_processing" value="false" />
-    </include>
-  </group>
+  <include file="$(find freenect_launch)/launch/freenect_tf_prefix.launch">
+    <arg name="camera" value="$(arg name)" />
+    <arg name="tf_prefix" value="$(arg tf_prefix)" />
+    <arg name="device_id" value="$(arg device_id)" />
+    <arg name="publish_tf" value="$(arg publish_tf)" />
+    <arg name="enable_depth_diagnostics" value="true" />
+    <arg name="enable_rgb_diagnostics" value="$(arg enable_rgb_diagnostics)" />
+    <arg name="depth_registration" value="$(arg depth_registration)" />
+    <arg name="rgb_processing" value="$(arg rgb_processing)" />
+    <arg name="ir_processing" value="false" />
+    <arg name="depth_processing" value="$(arg depth_processing)" />
+    <arg name="depth_registered_processing" value="$(arg depth_registered_processing)" />
+    <arg name="disparity_processing" value="false" />
+    <arg name="disparity_registered_processing" value="false" />
+  </include>
 
 </launch>
 

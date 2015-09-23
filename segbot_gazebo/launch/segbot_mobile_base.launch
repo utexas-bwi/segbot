@@ -1,0 +1,93 @@
+<launch>
+
+  <arg name="world" default="gazebo" />
+  <arg name="map_frame" default="map" />
+  <arg name="map_service" default="/static_map" />
+  <arg name="map_topic" default="/map" />
+  <arg name="navigation_map_topic" default="$(arg map_topic)" />
+  <arg name="x" default="0" />
+  <arg name="y" default="0" />
+  <arg name="z" default="0" />
+  <arg name="roll" default="0" />
+  <arg name="pitch" default="0" />
+  <arg name="yaw" default="0" />
+  <arg name="robotid" default="segbot" />
+  <arg name="tf_prefix" default="" />
+  <arg name="use_full_gazebo_model" default="true" />
+  <arg name="configuration_file" default="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v1.hokuyo_only.launch.xml" />
+
+  <!-- whether to launch autonomous stuff or not -->
+  <arg name="launch_localization" default="false" />
+  <arg name="use_fake_localization" default="false" />
+  <arg name="launch_move_base" default="false" />
+  <arg name="move_base_server" default="move_base" />
+
+  <!-- set tf prefix (used by gazebo plugins) -->
+  <param name="tf_prefix" value="$(arg tf_prefix)" />
+  <arg name="base_frame_id" default="$(arg tf_prefix)/base_footprint" />
+  <arg name="odom_frame_id" default="$(arg tf_prefix)/odom" />
+  <arg name="map_frame_with_prefix" default="$(arg tf_prefix)/$(arg map_frame)" />
+
+  <!-- launch robot description and robot internal tf tree, along with any common nodes between h/w and software -->
+  <include file="$(arg configuration_file)">
+    <arg name="use_full_gazebo_model" value="$(arg use_full_gazebo_model)" />
+    <arg name="tf_prefix" value="$(arg tf_prefix)" />
+  </include>
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
+    args="-param robot_description
+    -urdf
+    -x $(arg x)
+    -y $(arg y)
+    -z $(arg z)
+    -R $(arg roll)
+    -P $(arg pitch)
+    -Y $(arg yaw)
+    -model $(arg robotid)
+    -gazebo_namespace /$(arg world)"
+    respawn="false" output="screen">
+  </node>
+
+  <!-- launch localization -->
+  <group if="$(arg launch_localization)">
+    <group unless="$(arg use_fake_localization)">
+      <include file="$(find segbot_navigation)/launch/amcl.launch">
+        <arg name="initial_pose_x" value="$(arg x)" />
+        <arg name="initial_pose_y" value="$(arg y)" />
+        <arg name="initial_pose_a" value="$(arg yaw)" />
+        <arg name="map_service" value="$(arg map_service)" />
+        <arg name="map_topic" value="$(arg map_topic)" />
+        <arg name="map_frame_id" value="$(arg map_frame_with_prefix)" />
+        <arg name="base_frame_id" value="$(arg base_frame_id)" />
+        <arg name="odom_frame_id" value="$(arg odom_frame_id)" />
+        <arg name="odom_alpha1" value="0.05" />
+        <arg name="odom_alpha2" value="0.05" />
+        <arg name="odom_alpha3" value="0.05" />
+        <arg name="odom_alpha4" value="0.05" />
+        <arg name="odom_alpha5" value="0.05" />
+        <arg name="laser_max_range" value="20.0" />
+      </include>
+    </group>
+    <group if="$(arg use_fake_localization)">
+      <node name="fake_localization" pkg="fake_localization" type="fake_localization">
+        <remap from="base_pose_ground_truth" to="odom"/>
+        <param name="global_frame_id" value="$(arg map_frame_with_prefix)" />
+        <param name="base_frame_id" value="$(arg base_frame_id)" />
+        <param name="odom_frame_id" value="$(arg odom_frame_id)" />
+      </node>
+    </group>
+  </group>
+
+  <!-- launch move base -->
+  <group if="$(arg launch_move_base)">
+    <include file="$(find segbot_navigation)/launch/move_base_eband.launch">
+      <arg name="global_frame" value="$(arg map_frame)" />
+      <arg name="move_base_server" value="$(arg move_base_server)" />
+      <arg name="map_topic" value="$(arg navigation_map_topic)" />
+      <arg name="eband_rotational_threshold_multiplier" value="0.25" />
+      <arg name="eband_disallow_hysteresis" value="true" />
+    </include>
+  </group>
+
+</launch>

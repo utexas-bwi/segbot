@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+
+<robot name="obstacle">
+
+  <!-- root link, on the ground just below door origin -->
+  <link name="base_footprint">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <box size="0.001 0.001 0.001" />
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="base_link_joint" type="fixed">
+    <origin xyz="0.0 0 0.20" rpy="0 0 0" />
+    <parent link="base_footprint"/>
+    <child link="base_link" />
+  </joint>
+
+  <!-- the door (a box) -->
+  <link name="base_link">
+    <inertial>
+      <mass value="100" />
+      <origin xyz="0 0 0" />
+      <inertia ixx="100.0" ixy="0.0" ixz="0.0"
+        iyy="100.0" iyz="0.0" 
+        izz="100.0" />
+    </inertial>
+    <visual>
+      <geometry>
+        <box size="0.4 0.4 0.4" /> 
+      </geometry>
+      <material name="blue" />
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.4 0.4 0.4" /> 
+      </geometry>
+    </collision>
+  </link>
+
+  <gazebo reference="base_link">
+    <material>Gazebo/Blue</material>
+  </gazebo>
+
+</root>

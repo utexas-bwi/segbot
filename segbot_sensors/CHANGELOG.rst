@@ -2,6 +2,19 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.3 (2015-08-05)
+------------------
+* partial fix to `#48 <https://github.com/utexas-bwi/segbot/issues/48>`_.
+* segbot_sensors: lower bettery diagnostics smoothing parameter (`#40 <https://github.com/utexas-bwi/segbot/issues/40>`_)
+* segbot_sensors: set rospy.Publisher queue_size (fixes `#38 <https://github.com/utexas-bwi/segbot/issues/38>`_)
+* updated kinect launch file to work on both hydro and indigo.
+* segbot_sensors: convert to package format two (`#35 <https://github.com/utexas-bwi/segbot/issues/35>`_)
+* segbot_sensors: add missing diagnostics dependencies (`#35 <https://github.com/utexas-bwi/segbot/issues/35>`_)
+  add launch check for diagnostics script
+* segbot_sensors: separate basic arduino launch from test scaffolding (`#35 <https://github.com/utexas-bwi/segbot/issues/35>`_)
+* segbot_sensors: use narrower sonar field of view, experimentally measured
+* Contributors: Jack O'Quin, Maxwell Svetlik, Piyush Khandelwal
+
 0.3.2 (2015-03-31)
 ------------------
 

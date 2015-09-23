@@ -1,0 +1,31 @@
+<launch>
+
+  <arg name="robot_configuration" default="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v1.hokuyo_only.launch.xml" />
+  <arg name="use_full_gazebo_model" default="true" />
+  
+  <!-- launch the simulated world -->
+  <include file="$(find segbot_gazebo)/launch/segbot_test_world.launch" />
+
+  <!-- launch the map server for the simulated world -->
+  <include file="$(find segbot_gazebo)/launch/segbot_test_world_map_server.launch" />
+  
+  <!-- launch default robot configuration into the world -->
+  <include file="$(find segbot_gazebo)/launch/segbot_mobile_base.launch">
+    <arg name="configuration_file" value="$(arg robot_configuration)" />
+    <arg name="launch_localization" default="true" />
+    <arg name="launch_move_base" default="true" />
+    <arg name="use_full_gazebo_model" value="$(arg use_full_gazebo_model)" />
+  </include>
+
+  <!-- launch localization manually - amcl -->
+  <!-- <include file="$(find segbot_navigation)/launch/amcl.launch" /> -->
+  
+  <!-- launch the eband based move base approach manually -->
+  <!-- <include file="$(find segbot_navigation)/launch/move_base_eband.launch" /> -->
+
+  <!-- launch vizualization -->
+  <include file="$(find segbot_navigation)/launch/rviz.launch">
+    <arg name="config" value="nav_eband" />
+  </include>
+
+</launch>

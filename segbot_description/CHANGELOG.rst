@@ -2,6 +2,11 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.3 (2015-08-05)
+------------------
+* fixed long standing issue of robot not rotating in place correctly using gazebo_ros_planar_move.
+* Contributors: Piyush Khandelwal
+
 0.3.2 (2015-03-31)
 ------------------
 * added sensor plate and sonars to tf tree for segbot v2.

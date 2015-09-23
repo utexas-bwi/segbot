@@ -1,6 +1,6 @@
 <package>
   <name>segbot_description</name>
-  <version>0.3.2</version>
+  <version>0.3.3</version>
   <description>
     Contains URDF descriptions of all robot components and sensors for the
     segbot, as well as all the different sensor configurations for a segbot.

@@ -94,7 +94,7 @@ class ImuMessages(object):
 
         :returns: List of IMU data strings reported, may be empty.
         """
-        self.pubs = [rospy.Publisher('imu0', Imu)]
+        self.pubs = [rospy.Publisher('imu0', Imu, queue_size=1)]
         self.imus = [ImuAttributes('imu0')]
 
     def publish(self, serial_msg):
