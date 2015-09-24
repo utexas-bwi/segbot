@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<root xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+      xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+      xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+      xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find segbot_description)/urdf/components/beam_8020.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
+
+  <xacro:macro name="sensor_plate_mount_without_beam" params="parent length">
+
+    <xacro:standoff name="left_sensor_plate_standoff" parent="${parent}" length="${0.5*INCH_TO_M}" radius="${0.25*INCH_TO_M}">
+      <origin xyz="-${1/2*INCH_TO_M} 0 ${length/2 - 2.5*INCH_TO_M}" rpy="-${M_PI/2} 0 ${M_PI/2}" />
+    </xacro:standoff>
+    <xacro:standoff name="right_sensor_plate_standoff" parent="${parent}" length="${0.5*INCH_TO_M}" radius="${0.25*INCH_TO_M}">
+      <origin xyz="-${1/2*INCH_TO_M} 0 ${length/2 + 2.5*INCH_TO_M}" rpy="-${M_PI/2} 0 ${M_PI/2}" />
+    </xacro:standoff>
+    <xacro:aluminium_sheet name="sensor_plate" parent="left_sensor_plate_standoff" thickness="0.003" length="${4.5*INCH_TO_M}" width="${9*INCH_TO_M}">
+      <origin xyz="-${1/4*INCH_TO_M} -${2.5*INCH_TO_M} ${1/2*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:aluminium_sheet>
+
+    <joint name="sonar_center_joint" type="fixed">
+      <origin xyz="-${8.58*INCH_TO_M} 0 ${0.003 + 0.012}" />
+      <parent link="sensor_plate_link"/>
+      <child link="sonar_center_link"/>
+    </joint>
+    <!-- sonar_center_link is an empty link that marks the start -->
+    <link name="sonar_center_link">
+      <inertial>
+        <mass value="0.1" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
+          iyy="0.01"  iyz="0.0"
+          izz="0.01" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.001 0.001 0.001" />
+        </geometry>
+      </visual>
+    </link>
+
+    <!-- sonar0 - right -->
+    <joint name="sonar0_rotated_center_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 -${M_PI/9}"/>
+      <parent link="sonar_center_link"/>
+      <child link="sonar0_rotated_center_link"/>
+    </joint>
+    <link name="sonar0_rotated_center_link">
+      <inertial>
+        <mass value="0.1" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
+          iyy="0.01"  iyz="0.0"
+          izz="0.01" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.001 0.001 0.001" />
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="sonar0_joint" type="fixed">
+      <origin xyz="${10.33*INCH_TO_M} 0 0" />
+      <parent link="sonar0_rotated_center_link"/>
+      <child link="sonar0_link"/>
+    </joint>
+    <link name="sonar0_link">
+      <inertial>
+        <mass value="0.1" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
+          iyy="0.01"  iyz="0.0"
+          izz="0.01" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.012 0.044 0.023" />
+        </geometry>
+      </visual>
+    </link>
+
+    <!-- sonar1 - center -->
+    <joint name="sonar1_joint" type="fixed">
+      <origin xyz="${10.33*INCH_TO_M} 0 0" />
+      <parent link="sonar_center_link"/>
+      <child link="sonar1_link"/>
+    </joint>
+    <link name="sonar1_link">
+      <inertial>
+        <mass value="0.1" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
+          iyy="0.01"  iyz="0.0"
+          izz="0.01" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.012 0.044 0.023" />
+        </geometry>
+      </visual>
+    </link>
+
+    <!-- sonar2 - left -->
+    <joint name="sonar2_rotated_center_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 ${M_PI/9}"/>
+      <parent link="sonar_center_link"/>
+      <child link="sonar2_rotated_center_link"/>
+    </joint>
+    <link name="sonar2_rotated_center_link">
+      <inertial>
+        <mass value="0.1" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
+          iyy="0.01"  iyz="0.0"
+          izz="0.01" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.001 0.001 0.001" />
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="sonar2_joint" type="fixed">
+      <origin xyz="${10.33*INCH_TO_M} 0 0" />
+      <parent link="sonar2_rotated_center_link"/>
+      <child link="sonar2_link"/>
+    </joint>
+    <link name="sonar2_link">
+      <inertial>
+        <mass value="0.1" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
+          iyy="0.01"  iyz="0.0"
+          izz="0.01" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.012 0.044 0.023" />
+        </geometry>
+      </visual>
+    </link>
+  </xacro:macro>
+
+  <xacro:macro name="sensor_plate_mount" params="parent *origin length">
+
+    <xacro:beam_8020 name="sensor_plate_beam" parent="${parent}" length="${length}">
+      <xacro:insert_block name="origin" />
+    </xacro:beam_8020>
+
+    <xacro:sensor_plate_mount_without_beam parent="${name}_beam" length="${length}" />
+
+  </xacro:macro>
+
+</root>
+

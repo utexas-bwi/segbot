@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 
-<root 
+<root
       xmlns:xacro="http://ros.org/wiki/xacro">
 
-  <xacro:macro name="hokuyo_04lx_laser_gazebo" params="name ros_topic update_rate min_angle max_angle">
+  <xacro:macro name="hokuyo_laser_gazebo" params="name ros_topic update_rate min_angle max_angle range">
     <gazebo reference="${name}_link">
       <sensor type="ray" name="${name}">
         <always_on>true</always_on>
@@ -22,7 +22,7 @@
           </scan>
           <range>
             <min>0.02</min>
-            <max>21.0</max>
+            <max>${range}</max>
             <resolution>0.03</resolution>
           </range>
         </ray>
