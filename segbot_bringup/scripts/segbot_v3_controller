@@ -1,0 +1,127 @@
+#!/usr/bin/env python
+
+import rospy
+import signal
+
+from geometry_msgs.msg import Twist
+from nav_msgs.msg import Odometry
+from segway_msgs.msg import ConfigCmd
+from segway_msgs.msg import Status
+
+segway_initialized_in_tractor_mode = False
+
+cmd_pub = None
+odom_pub = None
+cfg_pub = None
+
+cmd_sub = None
+odom_sub = None
+status_sub = None
+
+stop_timer = None
+
+target_linear_vel = 0.0
+target_angular_vel = 0.0
+
+terminate = False
+
+def status_callback(msg):
+    if msg.operational_state == 3:
+        cfg_cmd = ConfigCmd()
+        cfg_cmd.gp_cmd = 'GENERAL_PURPOSE_CMD_SET_OPERATIONAL_MODE'
+        cfg_cmd.gp_param = 5 # TRACTOR_REQUEST
+        cfg_pub.publish(cfg_cmd)
+    status_sub.unregister()
+
+def odom_callback(msg):
+    # TODO check frame_id
+    odom_pub.publish(msg)
+
+def timer_callback(event):
+    target_linear_vel = 0
+    target_angular_vel = 0
+
+def cmd_callback(msg):
+    target_linear_vel = -msg.linear.x
+    target_angular_vel = msg.angular.z
+    if stop_timer is not None:
+        stop_timer.shutdown()
+    stop_timer = rospy.Timer(rospy.Duration(0.5), timer_callback)
+
+def sigint_handler(signal, frame):
+    terminate = True
+
+if __name__=="__main__":
+
+    rospy.init_node('teleop_twist_keyboard')
+    signal.signal(signal.SIGINT, sigint_handler)
+
+    cmd_pub = rospy.Publisher('/segway/cmd_vel', Twist, queue_size=10)
+    odom_pub = rospy.Publisher('odom', Odometry, queue_size=10)
+
+    cmd_sub = rospy.Subscriber('cmd_vel', Twist, cmd_callback)
+    odom_sub = rospy.Subscriber('/segway/odometry/local_filtered', Odometry, odom_callback)
+    status_sub = rospy.Subscriber('/segway/feedback/status', Status, status_callback)
+
+    frame_rate = rospy.get_param('~cmd_publish_rate', 20)
+
+    # Supplied in m/s^2
+    linear_pos_accel_limit = rospy.get_param('~linear_pos_accel_limit', 1.0)
+    linear_neg_accel_limit = rospy.get_param('~linear_neg_accel_limit', 1.0)
+    angular_pos_accel_limit = rospy.get_param('~angular_pos_accel_limit', 1.0)
+    angular_neg_accel_limit = rospy.get_param('~angular_neg_accel_limit', 1.0)
+
+    # Converted to cmd publish rate
+    linear_pos_accel_limit /= frame_rate
+    linear_neg_accel_limit /= frame_rate
+    angular_pos_accel_limit /= frame_rate
+    angular_neg_accel_limit /= frame_rate
+
+    rate = rospy.rate(frame_rate)
+
+    linear_vel = 0
+    angular_vel = 0
+
+    while (not rospy.is_shutdown()) and (not terminate):
+
+        if linear_vel < target_linear_vel:
+            # Increase speed
+            if (linear_pos_accel_limit == 0.0 or
+                target_linear_vel - linear_vel < linear_pos_accel_limit):
+                linear_vel = target_linear_vel
+            else:
+                linear_vel += linear_pos_accel_limit
+        elif linear_vel > target_linear_vel:
+            # Decrease speed
+            if (linear_neg_accel_limit == 0.0 or
+                linear_vel - target_linear_vel < linear_neg_accel_limit):
+                linear_vel = target_linear_vel
+            else:
+                linear_vel -= linear_neg_accel_limit
+
+        if angular_vel < target_angular_vel:
+            # Increase speed
+            if (angular_pos_accel_limit == 0.0 or
+                target_angular_vel - angular_vel < angular_pos_accel_limit):
+                angular_vel = target_angular_vel
+            else:
+                angular_vel += angular_pos_accel_limit
+        elif angular_vel > target_angular_vel:
+            # Decrease speed
+            if (angular_neg_accel_limit == 0.0 or
+                angular_vel - target_angular_vel < angular_neg_accel_limit):
+                angular_vel = target_angular_vel
+            else:
+                angular_vel -= angular_neg_accel_limit
+
+        twist = Twist()
+        twist.linear.x = linear_vel
+        twist.angular.z = angular_vel
+        cmd_pub.publish(twist)
+        rate.sleep()
+
+    # Shutdown base and switch to standby
+    cfg_cmd = ConfigCmd()
+    cfg_cmd.gp_cmd = 'GENERAL_PURPOSE_CMD_SET_OPERATIONAL_MODE'
+    cfg_cmd.gp_param = 4 # STANDBY_REQUEST
+    cfg_pub.publish(cfg_cmd)
