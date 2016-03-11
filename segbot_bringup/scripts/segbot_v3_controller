@@ -77,7 +77,7 @@ class Controller():
 
         while (not rospy.is_shutdown()) and (not self.terminate):
 
-            if self.linear_vel < self.target_linear_vel:
+            if linear_vel < self.target_linear_vel:
                 # Increase speed
                 if (self.linear_pos_accel_limit == 0.0 or
                     self.target_linear_vel - linear_vel < self.linear_pos_accel_limit):
