@@ -8,8 +8,6 @@ from nav_msgs.msg import Odometry
 from segway_msgs.msg import ConfigCmd
 from segway_msgs.msg import Status
 
-segway_initialized_in_tractor_mode = False
-
 cmd_pub = None
 odom_pub = None
 cfg_pub = None
@@ -44,20 +42,23 @@ def timer_callback(event):
 def cmd_callback(msg):
     target_linear_vel = -msg.linear.x
     target_angular_vel = msg.angular.z
-    if stop_timer is not None:
-        stop_timer.shutdown()
-    stop_timer = rospy.Timer(rospy.Duration(0.5), timer_callback)
+    print target_linear_vel
+    #if stop_timer is not None:
+    #    stop_timer.shutdown()
+    #stop_timer = rospy.Timer(rospy.Duration(0.5), timer_callback)
 
 def sigint_handler(signal, frame):
     terminate = True
+    print "here"
 
 if __name__=="__main__":
 
-    rospy.init_node('teleop_twist_keyboard')
-    signal.signal(signal.SIGINT, sigint_handler)
+    rospy.init_node('segbot_v3_controller')
+ #   signal.signal(signal.SIGINT, sigint_handler)
 
     cmd_pub = rospy.Publisher('/segway/cmd_vel', Twist, queue_size=10)
     odom_pub = rospy.Publisher('odom', Odometry, queue_size=10)
+    cfg_pub = rospy.Publisher('/segway/gp_command', ConfigCmd, queue_size=10)
 
     cmd_sub = rospy.Subscriber('cmd_vel', Twist, cmd_callback)
     odom_sub = rospy.Subscriber('/segway/odometry/local_filtered', Odometry, odom_callback)
@@ -77,13 +78,16 @@ if __name__=="__main__":
     angular_pos_accel_limit /= frame_rate
     angular_neg_accel_limit /= frame_rate
 
-    rate = rospy.rate(frame_rate)
+    rate = rospy.Rate(frame_rate)
 
     linear_vel = 0
     angular_vel = 0
 
-    while (not rospy.is_shutdown()) and (not terminate):
+    while (not rospy.is_shutdown()):
+ #and (not terminate):
 
+        print target_linear_vel
+        
         if linear_vel < target_linear_vel:
             # Increase speed
             if (linear_pos_accel_limit == 0.0 or
