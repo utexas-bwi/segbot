@@ -1,0 +1,23 @@
+<launch>
+
+  <arg name="tf_prefix" default="" />
+
+  <arg name="out_topic" default="scan_filtered" />
+  <arg name="min_height" default="-0.5" />
+  <arg name="max_height" default="0.5" />
+
+  <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan">
+    <param name="min_height" value="$(arg min_height)" />
+    <param name="max_height" value="$(arg max_height)" />
+    <param name="angle_min" value="-1.5708" /> <!-- -pi -->
+    <param name="angle_max" value="1.5708" /> <!-- pi -->
+    <param name="scan_time" value="0.1" />
+    <param name="range_max" value="20.0" />
+    <param name="range_min" value="0.4" />
+    <remap from="cloud_in" to="velodyne/points"/>
+    <remap from="scan" to="scan_filtered"/> <!-- Don't do this if you're going to call filters separately -->
+  </node>
+
+
+</launch>
+
