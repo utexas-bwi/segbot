@@ -5,41 +5,28 @@
   <arg name="device_id" default="#1" />
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
-  <!-- launch the segway base -->
-  <include file="$(find segbot_bringup)/launch/segway_base.launch">
-    <arg name="robot_frame_id" value="$(arg tf_prefix)/base_footprint" />
-    <arg name="odom_frame_id" value="$(arg tf_prefix)/odom" />
-  </include>
+  <!-- Segway Base platform ROS Driver -->
+  <node pkg="segway_ros" ns="segway" type="segway_driver" name="segway_driver" respawn="true" output="screen">
+    <param name="platform" value="$(optenv SEGWAY_BASE_PLATFORM false)" />
+  </node>
 
-  <!-- launch the kinect sensor in laserscan configuration -->
+  <!-- Our wrapper around Stanley's driver -->
+  <node pkg="segbot_bringup" name="segbot_v3_controller" type="segbot_v3_controller">
+    <param name="robot_frame_id" value="$(arg tf_prefix)/base_footprint" />
+    <param name="odom_frame_id" value="$(arg tf_prefix)/odom" />
+  </node>
 
-  <include file="$(find segbot_sensors)/launch/kinect/kinect.launch">
-    <arg name="name" value="nav_kinect" />
-    <arg name="tf_prefix" value="$(arg tf_prefix)" />
-    <arg name="device_id" value="$(arg device_id)" />
-    <arg name="depth_only" value="false" />
-  </include>
-
-  <!-- launch the hokuyo sensor -->
-  <include file="$(find segbot_sensors)/launch/hokuyo/eth_hokuyo.launch">
-    <arg name="name" value="nav_hokuyo" />
-    <arg name="tf_prefix" value="$(arg tf_prefix)" />
-    <arg name="publish_tf" value="false" /> <!-- already published by urdf -->
-  </include>
-
-  <!-- COMMON aux information -->
-  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v2.launch.xml">
+  <!-- common aux nodes -->
+  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v3.launch.xml">
     <arg name="tf_prefix" default="$(arg tf_prefix)" />
-    <arg name="use_registered_topic" default="true" />
   </include>
 
-  <!-- Arduino -->
+  <!-- Velodyne -->
   <include file="$(find segbot_sensors)/launch/arduino/arduino.launch">
     <arg name="port" value="/dev/arduino" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
 
-  <!-- Diagnostics and battery monitor -->
-  <include file="$(find segbot_sensors)/launch/diagnostic/diagnostics.launch"/>
+  <!-- TODO Diagnostics and battery monitor -->
 
 </launch>
