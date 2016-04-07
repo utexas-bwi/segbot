@@ -2,8 +2,9 @@
 
 import rospy
 #import signal
+import tf
 
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Quaternion, Twist
 from nav_msgs.msg import Odometry
 from segway_msgs.msg import ConfigCmd
 from segway_msgs.msg import Status
@@ -19,6 +20,9 @@ class Controller():
         self.cmd_sub = rospy.Subscriber('cmd_vel', Twist, self.cmd_callback)
         self.odom_sub = rospy.Subscriber('/segway/odometry/local_filtered', Odometry, self.odom_callback)
         self.status_sub = rospy.Subscriber('/segway/feedback/status', Status, self.status_callback)
+
+        self.odom_frame_id = rospy.get_param('~odom_frame_id', 'odom')
+        self.robot_frame_id = rospy.get_param('~robot_frame_id', 'base_footprint')
 
         self.stop_timer = None
 
@@ -52,7 +56,24 @@ class Controller():
         self.status_sub.unregister()
 
     def odom_callback(self, msg):
-        # TODO check frame_id
+        msg.header.frame_id = self.odom_frame_id
+        msg.child_frame_id = self.robot_frame_id
+
+        # Modify position appropriately.
+        msg.pose.pose.position.x = -msg.pose.pose.position.x # reverse x
+        msg.pose.pose.position.y = -msg.pose.pose.position.y # reverse y
+        quaternion = (msg.pose.pose.orientation.x,
+                      msg.pose.pose.orientation.y,
+                      msg.pose.pose.orientation.z,
+                      msg.pose.pose.orientation.w)
+        euler = tf.transformations.euler_from_quaternion(quaternion)
+        euler[2] = -euler[2] # reverse yaw
+        quaternion = tf.transformations.quaternion_from_euler(*euler)
+        msg.pose.pose.orientation = Quaternion(*quaternion)
+
+        # Modify velocity appropriately.
+        msg.twist.twist.linear.x = -msg.twist.twist.linear.x
+
         self.odom_pub.publish(msg)
 
     def timer_callback(self, event):
