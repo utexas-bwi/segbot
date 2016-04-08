@@ -3,6 +3,7 @@
 import rospy
 #import signal
 import tf
+import time
 
 from geometry_msgs.msg import Quaternion, Twist
 from nav_msgs.msg import Odometry
@@ -144,4 +145,6 @@ if __name__=="__main__":
 
     rospy.init_node('segbot_v3_controller')
     controller = Controller()
+    # TODO: figure out if segway is ready here, instead of arbitrary 5s sleep.
+    time.sleep(5)
     controller.run()

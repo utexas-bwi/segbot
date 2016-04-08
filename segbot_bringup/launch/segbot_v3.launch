@@ -10,6 +10,10 @@
     <param name="platform" value="$(optenv SEGWAY_BASE_PLATFORM false)" />
   </node>
 
+  <!-- Platform specific configuration -->
+  <node name="dynamic_reconfigure_load" pkg="dynamic_reconfigure" type="dynparam"
+    args="load /segway/segway_driver $(find segway_ros)/launch/config/$(optenv SEGWAY_PLATFORM_NAME RMP210)/segway_params.yaml" />
+        
   <!-- Our wrapper around Stanley's driver -->
   <node pkg="segbot_bringup" name="segbot_v3_controller" type="segbot_v3_controller">
     <param name="robot_frame_id" value="$(arg tf_prefix)/base_footprint" />
@@ -22,8 +26,7 @@
   </include>
 
   <!-- Velodyne -->
-  <include file="$(find segbot_sensors)/launch/arduino/arduino.launch">
-    <arg name="port" value="/dev/arduino" />
+  <include file="$(find segbot_sensors)/launch/velodyne/velodyne.launch">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
 
