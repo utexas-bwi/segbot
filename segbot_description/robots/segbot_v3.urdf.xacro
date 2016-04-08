@@ -7,6 +7,8 @@
   <xacro:include filename="$(find segbot_description)/urdf/segway_110_base.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/v3/common.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/v3/segbot_chassis.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/velodyne_mount.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/gazebo/segbot.gazebo.xacro" />
 
   <!-- Add the segbot base -->
   <xacro:segway_robot />
@@ -16,7 +18,17 @@
 
   <!-- Add the velodyne -->
   <xacro:velodyne_mount name="velodyne" parent="back_left_vertical_beam">
-    <origin xyz="${1*INCH_TO_M} -${0.5*INCH_TO_M} ${11.5*INCH_TO_M}" rpy="-${M_PI/2} -${M_PI/2} 0" />
+    <origin xyz="0 0 ${14*INCH_TO_M}" rpy="${M_PI} 0 -${M_PI/2}" />
   </xacro:velodyne_mount>
+
+  <gazebo>
+    <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+      <commandTopic>cmd_vel</commandTopic>
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+      <odometryRate>100</odometryRate>
+    </plugin>
+  </gazebo>
 
 </robot>

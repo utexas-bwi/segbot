@@ -49,11 +49,12 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
   <xacro:property name="wheel_radius" value="0.2405681" />
 
   <xacro:macro name="segway_robot">
-    <gazebo>
-      <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
-        <robotNamespace>/</robotNamespace>
-      </plugin>
-    </gazebo>
+
+    <!-- <gazebo> -->
+    <!--   <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"> -->
+    <!--     <robotNamespace>/</robotNamespace> -->
+    <!--   </plugin> -->
+    <!-- </gazebo> -->
 
     <!-- Base footprint is the center of the robot's chassis between the motors projected on the ground -->
     <link name="base_footprint"/>

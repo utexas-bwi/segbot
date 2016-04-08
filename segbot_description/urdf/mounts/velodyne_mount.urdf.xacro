@@ -6,7 +6,7 @@
 
   <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
-  <xacro:include filename="$(find velodyne_description)/urdf/VLP-16.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/sensors/VLP-16.urdf.xacro" />
 
   <xacro:macro name="velodyne_mount" params="name parent *origin">
 

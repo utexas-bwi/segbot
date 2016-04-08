@@ -18,6 +18,8 @@
 
   <!-- whether to launch autonomous stuff or not -->
   <arg name="launch_localization" default="false" />
+  <arg name="laser_max_range" default="scan_filtered" />
+  <arg name="localization_scan_topic" default="scan_filtered" />
   <arg name="use_fake_localization" default="false" />
   <arg name="launch_move_base" default="false" />
   <arg name="move_base_server" default="move_base" />
@@ -67,6 +69,7 @@
         <arg name="odom_alpha4" value="0.05" />
         <arg name="odom_alpha5" value="0.05" />
         <arg name="laser_max_range" value="20.0" />
+        <arg name="scan_topic" value="$(arg localization_scan_topic)" />
       </include>
     </group>
     <group if="$(arg use_fake_localization)">
