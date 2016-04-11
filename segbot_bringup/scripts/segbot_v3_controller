@@ -19,7 +19,7 @@ class Controller():
         self.cfg_pub = rospy.Publisher('/segway/gp_command', ConfigCmd, queue_size=10)
 
         self.cmd_sub = rospy.Subscriber('cmd_vel', Twist, self.cmd_callback)
-        self.odom_sub = rospy.Subscriber('/segway/odometry/local_filtered', Odometry, self.odom_callback)
+        self.odom_sub = rospy.Subscriber('/segway/feedback/wheel_odometry', Odometry, self.odom_callback)
         self.status_sub = rospy.Subscriber('/segway/feedback/status', Status, self.status_callback)
 
         self.odom_frame_id = rospy.get_param('~odom_frame_id', 'odom')
@@ -68,8 +68,7 @@ class Controller():
                       msg.pose.pose.orientation.z,
                       msg.pose.pose.orientation.w)
         euler = tf.transformations.euler_from_quaternion(quaternion)
-        euler[2] = -euler[2] # reverse yaw
-        quaternion = tf.transformations.quaternion_from_euler(*euler)
+        quaternion = tf.transformations.quaternion_from_euler(euler[0], euler[1], -euler[2])
         msg.pose.pose.orientation = Quaternion(*quaternion)
 
         # Modify velocity appropriately.
