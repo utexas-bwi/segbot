@@ -24,6 +24,7 @@ class Controller():
 
         self.odom_frame_id = rospy.get_param('~odom_frame_id', 'odom')
         self.robot_frame_id = rospy.get_param('~robot_frame_id', 'base_footprint')
+        self.publish_tf = rospy.get_param('~publish_tf', True)
 
         self.stop_timer = None
 
@@ -74,6 +75,13 @@ class Controller():
         # Modify velocity appropriately.
         msg.twist.twist.linear.x = -msg.twist.twist.linear.x
 
+        if self.publish_tf:
+            br = tf.TransformBroadcaster()
+            br.sendTransform((msg.pose.pose.position.x, msg.pose.pose.position.y, msg.pose.pose.position.z),
+                             quaternion,
+                             msg.header.stamp,
+                             self.robot_frame_id,
+                             self.odom_frame_id)
         self.odom_pub.publish(msg)
 
     def timer_callback(self, event):
