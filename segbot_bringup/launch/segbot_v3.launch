@@ -12,7 +12,7 @@
 
   <!-- Platform specific configuration -->
   <node name="dynamic_reconfigure_load" pkg="dynamic_reconfigure" type="dynparam"
-    args="load /segway/segway_driver $(find segway_ros)/launch/config/$(optenv SEGWAY_PLATFORM_NAME RMP210)/segway_params.yaml" />
+    args="load /segway/segway_driver $(find segbot_bringup)/config/segway_110_params.yaml" />
         
   <!-- Our wrapper around Stanley's driver -->
   <node pkg="segbot_bringup" name="segbot_v3_controller" type="segbot_v3_controller">
