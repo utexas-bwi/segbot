@@ -20,5 +20,15 @@
     <arg name="max_range" value="$(arg max_range)" />
   </include>
 
+  <!-- Remove statistical outliers -->
+  <node pkg="nodelet" type="nodelet" name="" args="load pcl/PassThrough velodyne_nodelet_manager" output="screen">
+    <remap from="~input" to="velodyne_points" />
+    <remap from="~output" to="velodyne/points_filtered" />
+    <rosparam>
+      mean_k: 10
+      stddev: 2
+    </rosparam>
+  </node>
+
 </launch>
 
