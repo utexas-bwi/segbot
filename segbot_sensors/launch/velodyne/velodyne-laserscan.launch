@@ -12,7 +12,7 @@
     <param name="angle_min" value="-3.1416" /> <!-- -pi -->
     <param name="angle_max" value="3.1416" /> <!-- pi -->
     <param name="scan_time" value="0.1" />
-    <param name="range_max" value="20.0" />
+    <param name="range_max" value="40.0" />
     <param name="range_min" value="0.4" />
     <remap from="cloud_in" to="velodyne_points"/>
     <remap from="scan" to="velodyne/scan_filtered"/> <!-- Don't do this if you're going to call filters separately -->
