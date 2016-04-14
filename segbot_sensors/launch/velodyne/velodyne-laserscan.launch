@@ -15,9 +15,14 @@
     <param name="range_max" value="40.0" />
     <param name="range_min" value="0.4" />
     <remap from="cloud_in" to="velodyne_points"/>
-    <remap from="scan" to="velodyne/scan_filtered"/> <!-- Don't do this if you're going to call filters separately -->
+    <remap from="scan" to="velodyne/scan" />
     <param name="use_inf" value="true" />
   </node>
+
+  <include file="$(find segbot_sensors)/launch/velodyne/velodyne-filters.launch">
+    <arg name="in_topic" value="velodyne/scan" />
+    <arg name="out_topic" value="velodyne/$(arg out_topic)" />
+  </include>
 
 </launch>
 

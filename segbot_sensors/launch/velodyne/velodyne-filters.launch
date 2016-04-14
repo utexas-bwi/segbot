@@ -1,0 +1,9 @@
+<launch>
+  <arg name="in_topic" default="velodyne/scan" />
+  <arg name="out_topic" default="velodyne/scan_filtered" />
+  <node name="velodyne_laser_filters" pkg="laser_filters" type="scan_to_scan_filter_chain">
+    <rosparam command="load" file="$(find segbot_sensors)/config/velodyne_filters.yaml" />
+    <remap from="scan" to="$(arg in_topic)" />
+    <remap from="scan_filtered" to="$(arg out_topic)" />
+  </node>
+</launch>
