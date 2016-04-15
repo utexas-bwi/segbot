@@ -5,6 +5,7 @@ project(segbot_sensors)
 find_package(catkin REQUIRED
   COMPONENTS
     diagnostic_msgs
+    dynamic_reconfigure
     geometry_msgs
     laser_filters
     message_generation
@@ -20,9 +21,14 @@ find_package(catkin REQUIRED
 
 catkin_python_setup()
 
+generate_dynamic_reconfigure_options(
+  cfg/SegbotVelodyneOutlierRemoval.cfg
+)
+
 catkin_package(
   CATKIN_DEPENDS
     diagnostic_msgs
+    dynamic_reconfigure
     geometry_msgs
     laser_filters
     message_runtime
@@ -43,7 +49,9 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_subdirectory(src/sonar)
 
-add_library(segbot_sensors_filters src/segbot_sensors_filters.cpp)
+add_library(segbot_sensors_filters 
+  src/segbot_sensors_filters.cpp
+  src/segbot_velodyne_outlier_removal.cpp)
 target_link_libraries(segbot_sensors_filters 
   ${Boost_LIBRARIES} 
   ${catkin_LIBRARIES}

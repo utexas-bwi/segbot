@@ -19,6 +19,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <depend>diagnostic_msgs</depend>
+  <depend>dynamic_reconfigure</depend>
   <depend>geometry_msgs</depend>
   <depend>laser_filters</depend>
   <depend>nodelet</depend>
