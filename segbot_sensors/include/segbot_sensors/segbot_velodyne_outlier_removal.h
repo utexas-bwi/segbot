@@ -175,6 +175,10 @@ namespace segbot_sensors
       filter (const PointCloud2::ConstPtr &input, const IndicesPtr &indices, 
               PointCloud2 &output)
       {
+        output = *input;
+        return;
+        
+
         frame_ = input->header.frame_id;
         boost::mutex::scoped_lock lock (mutex_);
         pcl::PCLPointCloud2::Ptr pcl_cloud(new pcl::PCLPointCloud2);
@@ -222,7 +226,7 @@ namespace segbot_sensors
 
     private:
       std::vector<geometry_msgs::Point> footprint_;
-      ros::Publisher footprint_publisher_;
+      boost::shared_ptr<ros::Publisher> footprint_publisher_;
       std::string frame_;
   };
 }

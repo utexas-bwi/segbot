@@ -251,7 +251,8 @@ segbot_sensors::SegbotVelodyneOutlierRemoval::child_init (ros::NodeHandle &nh, b
   srv_->setCallback (f);
 
   // Latched publication.
-  footprint_publisher_ = nh.advertise<geometry_msgs::PolygonStamped>("~footprint", 1, true);
+  footprint_publisher_.reset(new ros::Publisher);
+  *footprint_publisher_ = nh.advertise<geometry_msgs::PolygonStamped>("~footprint", 1, true);
 
   return (true);
 }
@@ -289,16 +290,18 @@ segbot_sensors::SegbotVelodyneOutlierRemoval::config_callback (segbot_sensors::S
   }
 
   // Publish polygon corresponding to footprint - visualization
-  geometry_msgs::PolygonStamped polygon_msg;
-  polygon_msg.header.frame_id = frame_;
-  polygon_msg.header.stamp = ros::Time::now();
-  polygon_msg.polygon.points.resize(footprint_.size());
-  for (uint32_t i = 0; i < footprint_.size(); ++i) {
-    polygon_msg.polygon.points[i].x = footprint_[i].x;
-    polygon_msg.polygon.points[i].y = footprint_[i].y;
-    polygon_msg.polygon.points[i].z = 0;
+  if (footprint_publisher_) {
+    geometry_msgs::PolygonStamped polygon_msg;
+    polygon_msg.header.frame_id = frame_;
+    polygon_msg.header.stamp = ros::Time::now();
+    polygon_msg.polygon.points.resize(footprint_.size());
+    for (uint32_t i = 0; i < footprint_.size(); ++i) {
+      polygon_msg.polygon.points[i].x = footprint_[i].x;
+      polygon_msg.polygon.points[i].y = footprint_[i].y;
+      polygon_msg.polygon.points[i].z = 0;
+    }
+    footprint_publisher_->publish(polygon_msg);
   }
-  footprint_publisher_.publish(polygon_msg);
 }
 
 typedef segbot_sensors::SegbotVelodyneOutlierRemoval SegbotVelodyneOutlierRemoval;
