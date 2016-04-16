@@ -113,31 +113,31 @@ namespace segbot_sensors
         * \param nh ROS node handle
         * \param has_service set to true if the child has a Dynamic Reconfigure service
         */
-      virtual bool 
-      child_init (ros::NodeHandle &nh, bool &has_service) 
-      { 
-        has_service = false; 
-        return (true); 
+      virtual bool
+      child_init (ros::NodeHandle &nh, bool &has_service)
+      {
+        has_service = false;
+        return (true);
       }
 
-      /** \brief Virtual abstract filter method. To be implemented by every child. 
+      /** \brief Virtual abstract filter method. To be implemented by every child.
         * \param input the input point cloud dataset.
-        * \param indices a pointer to the vector of point indices to use.   
+        * \param indices a pointer to the vector of point indices to use.
         * \param output the resultant filtered PointCloud2
-        */ 
-      virtual void 
-      filter (const PointCloud2::ConstPtr &input, const IndicesPtr &indices, 
+        */
+      virtual void
+      filter (const PointCloud2::ConstPtr &input, const IndicesPtr &indices,
               PointCloud2 &output) = 0;
 
       /** \brief Nodelet initialization routine. */
-      virtual void 
+      virtual void
       onInit ();
 
       /** \brief Call the child filter () method, optionally transform the result, and publish it.
         * \param input the input point cloud dataset.
-        * \param indices a pointer to the vector of point indices to use.   
+        * \param indices a pointer to the vector of point indices to use.
         */
-      void 
+      void
       computePublish (const PointCloud2::ConstPtr &input, const IndicesPtr &indices);
 
     private:
@@ -149,12 +149,12 @@ namespace segbot_sensors
       boost::shared_ptr<message_filters::Synchronizer<sync_policies::ApproximateTime<PointCloud2, PointIndices> > > sync_input_indices_a_;
 
       /** \brief Dynamic reconfigure service callback. */
-      virtual void 
+      virtual void
       config_callback (pcl_ros::FilterConfig &config, uint32_t level);
 
       /** \brief PointCloud2 + Indices data callback. */
-      void 
-      input_indices_callback (const PointCloud2::ConstPtr &cloud, 
+      void
+      input_indices_callback (const PointCloud2::ConstPtr &cloud,
                               const PointIndicesConstPtr &indices);
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -166,20 +166,15 @@ namespace segbot_sensors
       /** \brief Pointer to a dynamic reconfigure service. */
       boost::shared_ptr <dynamic_reconfigure::Server<SegbotVelodyneOutlierRemovalConfig> > srv_;
 
-      /** \brief Call the actual filter. 
+      /** \brief Call the actual filter.
         * \param input the input point cloud dataset
         * \param indices the input set of indices to use from \a input
         * \param output the resultant filtered dataset
         */
       inline void
-      filter (const PointCloud2::ConstPtr &input, const IndicesPtr &indices, 
+      filter (const PointCloud2::ConstPtr &input, const IndicesPtr &indices,
               PointCloud2 &output)
       {
-        output = *input;
-        return;
-        
-
-        frame_ = input->header.frame_id;
         boost::mutex::scoped_lock lock (mutex_);
         pcl::PCLPointCloud2::Ptr pcl_cloud(new pcl::PCLPointCloud2);
         pcl_conversions::toPCL(*input, *pcl_cloud);

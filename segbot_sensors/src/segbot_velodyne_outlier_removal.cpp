@@ -206,7 +206,7 @@ segbot_sensors::Filter::input_indices_callback (const PointCloud2::ConstPtr &clo
     NODELET_DEBUG ("[%s::input_indices_callback]\n"
                    "                                 - PointCloud with %d data points (%s), stamp %f, and frame %s on topic %s received.\n"
                    "                                 - PointIndices with %zu values, stamp %f, and frame %s on topic %s received.",
-                   getName ().c_str (), 
+                   getName ().c_str (),
                    cloud->width * cloud->height, pcl::getFieldsList (*cloud).c_str (), cloud->header.stamp.toSec (), cloud->header.frame_id.c_str (), pnh_->resolveName ("input").c_str (),
                    indices->indices.size (), indices->header.stamp.toSec (), indices->header.frame_id.c_str (), pnh_->resolveName ("indices").c_str ());
   else
@@ -246,13 +246,9 @@ segbot_sensors::SegbotVelodyneOutlierRemoval::child_init (ros::NodeHandle &nh, b
   // Enable the dynamic reconfigure service
   has_service = true;
   srv_ = boost::make_shared <dynamic_reconfigure::Server<segbot_sensors::SegbotVelodyneOutlierRemovalConfig> > (nh);
-  dynamic_reconfigure::Server<segbot_sensors::SegbotVelodyneOutlierRemovalConfig>::CallbackType f = 
+  dynamic_reconfigure::Server<segbot_sensors::SegbotVelodyneOutlierRemovalConfig>::CallbackType f =
     boost::bind (&SegbotVelodyneOutlierRemoval::config_callback, this, _1, _2);
   srv_->setCallback (f);
-
-  // Latched publication.
-  footprint_publisher_.reset(new ros::Publisher);
-  *footprint_publisher_ = nh.advertise<geometry_msgs::PolygonStamped>("~footprint", 1, true);
 
   return (true);
 }
@@ -268,40 +264,46 @@ segbot_sensors::SegbotVelodyneOutlierRemoval::config_callback (segbot_sensors::S
   bool at_near = true;
   float near_range = 0.3f;
   for (int angle_idx = 0; angle_idx < 8; ++angle_idx) {
-    // Assuming the wire conduit increases the 6th and 7th angles. 
+    // Assuming the wire conduit increases the 6th and 7th angles.
     float angle = (angle_idx == 5 || angle_idx == 6) ? config.wire_conduit_angle : config.support_struct_angle;
     std::vector<float> ranges;
     if (at_near) {
       angle += (angle_idx / 2) * M_PI/2;
-      ranges.push_back(near_range); 
+      ranges.push_back(near_range);
       ranges.push_back(config.range);
     } else {
       angle = ((angle_idx + 1) / 2) * M_PI/2 - angle;
       ranges.push_back(config.range);
-      ranges.push_back(near_range); 
+      ranges.push_back(near_range);
     }
     for (int range_idx = 0; range_idx < 2; ++range_idx) {
       geometry_msgs::Point p;
-      p.x = cosf(angle) * ranges[range_idx]; 
-      p.y = sinf(angle) * ranges[range_idx]; 
+      p.x = cosf(angle) * ranges[range_idx];
+      p.y = sinf(angle) * ranges[range_idx];
       footprint_.push_back(p);
     }
-    at_near != at_near;
+    at_near = !at_near;
   }
 
   // Publish polygon corresponding to footprint - visualization
-  if (footprint_publisher_) {
-    geometry_msgs::PolygonStamped polygon_msg;
-    polygon_msg.header.frame_id = frame_;
-    polygon_msg.header.stamp = ros::Time::now();
-    polygon_msg.polygon.points.resize(footprint_.size());
-    for (uint32_t i = 0; i < footprint_.size(); ++i) {
-      polygon_msg.polygon.points[i].x = footprint_[i].x;
-      polygon_msg.polygon.points[i].y = footprint_[i].y;
-      polygon_msg.polygon.points[i].z = 0;
-    }
-    footprint_publisher_->publish(polygon_msg);
+  if (!footprint_publisher_) {
+    // Latched publication.
+    footprint_publisher_ = boost::make_shared<ros::Publisher>();
+    *footprint_publisher_ = getPrivateNodeHandle().advertise<geometry_msgs::PolygonStamped>("footprint", 1, true);
   }
+
+  geometry_msgs::PolygonStamped polygon_msg;
+  // TODO parametrize
+  polygon_msg.header.frame_id = "velodyne";
+  polygon_msg.header.stamp = ros::Time::now();
+  polygon_msg.polygon.points.resize(footprint_.size());
+  for (uint32_t i = 0; i < footprint_.size(); ++i) {
+    polygon_msg.polygon.points[i].x = footprint_[i].x;
+    polygon_msg.polygon.points[i].y = footprint_[i].y;
+    polygon_msg.polygon.points[i].z = 0;
+  }
+  footprint_publisher_->publish(polygon_msg);
+
 }
 
 typedef segbot_sensors::SegbotVelodyneOutlierRemoval SegbotVelodyneOutlierRemoval;
