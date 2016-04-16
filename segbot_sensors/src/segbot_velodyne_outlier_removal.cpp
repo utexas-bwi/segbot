@@ -265,7 +265,7 @@ segbot_sensors::SegbotVelodyneOutlierRemoval::config_callback (segbot_sensors::S
   float near_range = 0.3f;
   for (int angle_idx = 0; angle_idx < 8; ++angle_idx) {
     // Assuming the wire conduit increases the 6th and 7th angles.
-    float angle = (angle_idx == 5 || angle_idx == 6) ? config.wire_conduit_angle : config.support_struct_angle;
+    float angle = (angle_idx == 3 || angle_idx == 4) ? config.wire_conduit_angle : config.support_struct_angle;
     std::vector<float> ranges;
     if (at_near) {
       angle += (angle_idx / 2) * M_PI/2;
