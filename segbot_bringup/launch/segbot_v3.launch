@@ -22,7 +22,9 @@
 
   <!-- common aux nodes -->
   <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v3.launch.xml">
-    <arg name="tf_prefix" default="$(arg tf_prefix)" />
+    <arg name="tf_prefix" value="$(arg tf_prefix)" />
+    <arg name="velodyne_pointcloud_topic" value="velodyne/points_filtered" />
+    <arg name="launch_velodyne_nodelet_manager" value="false" />
   </include>
 
   <!-- Velodyne -->
