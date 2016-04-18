@@ -4,7 +4,6 @@
   <arg name="use_full_gazebo_model" default="false" />
   <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_v3.urdf.xacro" />
 
-  <arg name="velodyne_pointcloud_topic" default="velodyne_points" />
   <arg name="launch_velodyne_nodelet_manager" default="true" />
 
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
@@ -22,7 +21,7 @@
   <!-- Velodyne specific: launch the laserscan converter -->
   <include file="$(find segbot_sensors)/launch/velodyne/velodyne-laserscan.launch">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
-    <arg name="in_topic" value="$(arg velodyne_pointcloud_topic)" />
+    <arg name="in_topic" value="velodyne/points_filtered" />
     <arg name="launch_nodelet_manager" value="$(arg launch_velodyne_nodelet_manager)" />
   </include>
 

@@ -45,7 +45,7 @@
       <origin xyz="0 0 ${3.125*INCH_TO_M}" rpy="0 0 0" />
     </xacro:aluminium_sheet>
 
-    <xacro:VLP-16 parent="${name}_top_plate_link" name="${name}" topic="${name}_points">
+    <xacro:VLP-16 parent="${name}_top_plate_link" name="${name}" topic="${name}/points_filtered">
       <origin xyz="0 0 ${0.125*INCH_TO_M}" rpy="0 0 -${M_PI/4}" />
     </xacro:VLP-16>
 

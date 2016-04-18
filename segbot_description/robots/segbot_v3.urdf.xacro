@@ -22,12 +22,24 @@
   </xacro:velodyne_mount>
 
   <gazebo>
-    <plugin name="object_controller" filename="libgazebo_ros_planar_move.so">
+    <!-- <plugin name="object_controller" filename="libgazebo_ros_planar_move.so"> -->
+    <!--   <commandTopic>cmd_vel</commandTopic> -->
+    <!--   <odometryTopic>odom</odometryTopic> -->
+    <!--   <odometryFrame>odom</odometryFrame> -->
+    <!--   <robotBaseFrame>base_footprint</robotBaseFrame> -->
+    <!--   <odometryRate>100</odometryRate> -->
+    <!-- </plugin> -->
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <updateRate>100</updateRate>
+      <leftJoint>right_wheel</leftJoint>
+      <rightJoint>left_wheel</rightJoint>
+      <wheelSeparation>0.479111</wheelSeparation>
+      <wheelDiameter>0.46228</wheelDiameter>
+      <wheelTorque>13</wheelTorque>
       <commandTopic>cmd_vel</commandTopic>
       <odometryTopic>odom</odometryTopic>
       <odometryFrame>odom</odometryFrame>
       <robotBaseFrame>base_footprint</robotBaseFrame>
-      <odometryRate>100</odometryRate>
     </plugin>
   </gazebo>
 
