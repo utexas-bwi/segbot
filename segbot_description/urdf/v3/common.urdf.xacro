@@ -8,7 +8,7 @@
 
   <!-- robot constants -->
   <!-- distance between the robot origin and the base plate center along the x axis (robot forward) -->
-  <xacro:property name="BASE_PLATE_X_OFFSET" value="0" /> <!-- inches -->
+  <xacro:property name="BASE_PLATE_X_OFFSET" value="-3.375" /> <!-- inches -->
 
   <!-- distance between the robot origin and the bottom of the base plate along the z axis (robot up) -->
   <xacro:property name="BASE_PLATE_Z_OFFSET" value="8.875" /> <!-- inches -->
