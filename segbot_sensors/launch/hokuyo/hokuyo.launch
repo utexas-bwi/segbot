@@ -4,6 +4,8 @@
   <arg name="name" default="laser" />
   <arg name="publish_tf" default="true" />
 
+  <arg name="topic" default="scan" />
+
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- construct the link from the base of the hokuyo to the laser -->
@@ -19,6 +21,7 @@
     <param name="frame_id" value="$(arg tf_prefix)/$(arg name)_laser_link" />
     <param name="min_ang" value="-1.309" /> <!-- -5pi/12-->
     <param name="max_ang" value="1.309" /> <!-- 5pi/12 -->
+    <remap from="scan" to="$(arg topic)" />
   </node>
   
 </launch>

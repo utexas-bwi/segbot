@@ -8,6 +8,7 @@
   <xacro:include filename="$(find segbot_description)/urdf/v3/common.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/v3/segbot_chassis.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/velodyne_mount.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/gazebo/segbot.gazebo.xacro" />
 
   <!-- Add the segbot base -->
@@ -20,6 +21,18 @@
   <xacro:velodyne_mount name="velodyne" parent="back_left_vertical_beam">
     <origin xyz="0 0 ${14*INCH_TO_M}" rpy="${M_PI} 0 -${M_PI/2}" />
   </xacro:velodyne_mount>
+
+  <xacro:hokuyo_mount 
+    name="nav_hokuyo" 
+    parent="front_left_vertical_beam" 
+    length="${12*INCH_TO_M}" 
+    ros_topic="nav_hokuyo/scan" 
+    update_rate="10" 
+    min_angle="${-(5 * M_PI)/12}" 
+    max_angle="${(5 * M_PI)/12}" 
+    range="4.1">
+    <origin xyz="${1*INCH_TO_M} ${0.5*INCH_TO_M} ${3.75*INCH_TO_M}" rpy="${M_PI/2} ${M_PI/2} 0" />
+  </xacro:hokuyo_mount>
 
   <gazebo>
     <!-- <plugin name="object_controller" filename="libgazebo_ros_planar_move.so"> -->
