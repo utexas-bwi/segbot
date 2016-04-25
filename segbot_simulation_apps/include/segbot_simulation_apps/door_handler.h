@@ -2,10 +2,12 @@
 #define SEGBOT_SIM_APPS_DOOR_HANDLER_H
 
 #include <boost/shared_ptr.hpp>
-#include <bwi_planning_common/structures.h>
-#include <geometry_msgs/Pose.h>
-#include <multi_level_map_msgs/MultiLevelMapData.h>
 #include <ros/ros.h>
+
+#include <bwi_planning_common/structures.h>
+#include <multi_level_map_msgs/MultiLevelMapData.h>
+
+#include <segbot_simulation_apps/common.h>
 
 namespace segbot_simulation_apps {
 
@@ -30,11 +32,6 @@ namespace segbot_simulation_apps {
 
       void closeAllDoorsFarAwayFromPoint(
           const geometry_msgs::Pose& point, float distance = 2.0);
-      bool checkClosePoses(const geometry_msgs::Pose& p1,
-          const geometry_msgs::Pose& p2, float threshold = 0.05,
-          bool check_yaw = true);
-      bool teleportEntity(const std::string& entity,
-          const geometry_msgs::Pose& pose);
 
       void spawnObject(bool is_door, int index = 0);      
 

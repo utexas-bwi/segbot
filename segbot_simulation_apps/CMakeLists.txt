@@ -40,6 +40,7 @@ include_directories(
 )
 
 add_library(${PROJECT_NAME}
+  src/libsegbot_simulation_apps/common.cpp
   src/libsegbot_simulation_apps/door_handler.cpp
 )
 target_link_libraries(${PROJECT_NAME}
