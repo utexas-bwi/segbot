@@ -93,6 +93,7 @@ class SegbotLogicalNavigator : public segbot_logical_translator::SegbotLogicalTr
 
     bool resolveChangeFloorRequest(const std::string& new_room,
                                    const std::string& facing_door,
+                                   std::string& floor_name,
                                    geometry_msgs::PoseWithCovarianceStamped& pose,
                                    std::string& error_message);
 
@@ -181,7 +182,7 @@ SegbotLogicalNavigator::SegbotLogicalNavigator() :
                                                           false));
 
   change_floor_resolution_server_ = nh_->advertiseService("resolve_change_floor",
-                                                          &SegbotLogicalNavigator::resolveChangeFloorRequest,
+                                                          &SegbotLogicalNavigator::changeFloorResolutionHandler,
                                                           this);
 
   current_level_subscriber_ = nh_->subscribe("level_mux/current_level",
@@ -499,11 +500,11 @@ bool SegbotLogicalNavigator::approachObject(const std::string& object_name,
 
 bool SegbotLogicalNavigator::resolveChangeFloorRequest(const std::string& new_room,
                                                        const std::string& facing_door,
+                                                       std::string& floor_name,
                                                        geometry_msgs::PoseWithCovarianceStamped& pose,
                                                        std::string& error_message) {
 
   // Make sure we can change floors and all arguments are correct.
-  std::string floor_name;
   if (!change_level_client_available_) {
     error_message = "SegbotLogicalNavigator has not received the multimap. Cannot change floors!";
     return false;
@@ -580,10 +581,13 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
   observations.clear();
 
   multi_level_map_msgs::ChangeCurrentLevel srv;
-  srv.request.new_level_id = floor_name;
   srv.request.publish_initial_pose = true;
 
-  if (!(resolveChangeFloorRequest(new_room, facing_door, srv.request.initial_pose, error_message))) {
+  if (!(resolveChangeFloorRequest(new_room, 
+                                  facing_door, 
+                                  srv.request.new_level_id, 
+                                  srv.request.initial_pose, 
+                                  error_message))) {
     return false;
   }
 
@@ -595,7 +599,7 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
 
     // Yea! the call succeeded! Wait for current_level_id_ to be changed once everything gets updated.
     ros::Rate r(1);
-    while (current_level_id_ != floor_name) r.sleep();
+    while (current_level_id_ != srv.request.new_level_id) r.sleep();
 
     // Publish the observable fluents
     senseState(observations);
@@ -663,7 +667,7 @@ void SegbotLogicalNavigator::execute(const bwi_msgs::LogicalNavigationGoalConstP
 
 bool SegbotLogicalNavigator::changeFloorResolutionHandler(bwi_msgs::ResolveChangeFloor::Request  &req,
                                                           bwi_msgs::ResolveChangeFloor::Response &res) {
-  res.success = resolveChangeFloorRequest(req.new_room, req.facing_door, res.pose, res.error_message);
+  res.success = resolveChangeFloorRequest(req.new_room, req.facing_door, res.floor_name, res.pose, res.error_message);
   return true;
 }
 
