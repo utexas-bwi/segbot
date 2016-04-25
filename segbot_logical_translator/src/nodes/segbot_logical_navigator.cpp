@@ -56,6 +56,7 @@
 #include <tf/transform_datatypes.h>
 #include <tf/transform_listener.h>
 
+#include <bwi_msgs/ResolveChangeFloor.h>
 #include <bwi_msgs/LogicalNavigationAction.h>
 #include <segbot_logical_translator/segbot_logical_translator.h>
 
@@ -69,7 +70,11 @@ class SegbotLogicalNavigator : public segbot_logical_translator::SegbotLogicalTr
     typedef actionlib::SimpleActionServer<bwi_msgs::LogicalNavigationAction> LogicalNavActionServer;
 
     SegbotLogicalNavigator();
+
     void execute(const bwi_msgs::LogicalNavigationGoalConstPtr &goal);
+    bool changeFloorResolutionHandler(bwi_msgs::ResolveChangeFloor::Request &req,
+                                      bwi_msgs::ResolveChangeFloor::Response &res);
+
 
   protected:
 
@@ -85,6 +90,11 @@ class SegbotLogicalNavigator : public segbot_logical_translator::SegbotLogicalTr
     bool approachObject(const std::string& object_name,
         std::vector<PlannerAtom>& observations,
         std::string& error_message);
+
+    bool resolveChangeFloorRequest(const std::string& new_room,
+                                   const std::string& facing_door,
+                                   geometry_msgs::PoseWithCovarianceStamped& pose,
+                                   std::string& error_message);
 
     bool changeFloor(const std::string& new_room,
                      const std::string& facing_door,
@@ -110,6 +120,7 @@ class SegbotLogicalNavigator : public segbot_logical_translator::SegbotLogicalTr
     boost::shared_ptr<LogicalNavActionServer> execute_action_server_;
     bool execute_action_server_started_;
 
+    ros::ServiceServer change_floor_resolution_server_;
     boost::shared_ptr<actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> > robot_controller_;
 
     boost::shared_ptr<tf::TransformListener> tf_;
@@ -168,6 +179,10 @@ SegbotLogicalNavigator::SegbotLogicalNavigator() :
                                                           "execute_logical_goal",
                                                           boost::bind(&SegbotLogicalNavigator::execute, this, _1),
                                                           false));
+
+  change_floor_resolution_server_ = nh_->advertiseService("resolve_change_floor",
+                                                          &SegbotLogicalNavigator::resolveChangeFloorRequest,
+                                                          this);
 
   current_level_subscriber_ = nh_->subscribe("level_mux/current_level",
                                              1,
@@ -482,13 +497,10 @@ bool SegbotLogicalNavigator::approachObject(const std::string& object_name,
   return false;
 }
 
-bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
-                                         const std::string& facing_door,
-                                         std::vector<PlannerAtom>& observations,
-                                         std::string& error_message) {
-
-  error_message = "";
-  observations.clear();
+bool SegbotLogicalNavigator::resolveChangeFloorRequest(const std::string& new_room,
+                                                       const std::string& facing_door,
+                                                       geometry_msgs::PoseWithCovarianceStamped& pose,
+                                                       std::string& error_message) {
 
   // Make sure we can change floors and all arguments are correct.
   std::string floor_name;
@@ -546,11 +558,7 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
     return false;
   }
 
-  multi_level_map_msgs::ChangeCurrentLevel srv;
-  srv.request.new_level_id = floor_name;
-  srv.request.publish_initial_pose = true;
-
-  geometry_msgs::PoseWithCovarianceStamped &pose = srv.request.initial_pose;
+  /* Setup return values */
   pose.header.stamp = ros::Time::now();
   pose.header.frame_id = global_frame_id_;
   pose.pose.pose.position.x = approach_pt.x;
@@ -559,6 +567,25 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
   pose.pose.covariance[0] = 0.1;
   pose.pose.covariance[7] = 0.1f;
   pose.pose.covariance[35] = 0.25f;
+
+  return true;
+}
+
+bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
+                                         const std::string& facing_door,
+                                         std::vector<PlannerAtom>& observations,
+                                         std::string& error_message) {
+
+  error_message = "";
+  observations.clear();
+
+  multi_level_map_msgs::ChangeCurrentLevel srv;
+  srv.request.new_level_id = floor_name;
+  srv.request.publish_initial_pose = true;
+
+  if (!(resolveChangeFloorRequest(new_room, facing_door, srv.request.initial_pose, error_message))) {
+    return false;
+  }
 
   if (change_level_client_.call(srv)) {
     if (!srv.response.success) {
@@ -632,6 +659,12 @@ void SegbotLogicalNavigator::execute(const bwi_msgs::LogicalNavigationGoalConstP
     execute_action_server_->setAborted(res);
   }
 
+}
+
+bool SegbotLogicalNavigator::changeFloorResolutionHandler(bwi_msgs::ResolveChangeFloor::Request  &req,
+                                                          bwi_msgs::ResolveChangeFloor::Response &res) {
+  res.success = resolveChangeFloorRequest(req.new_room, req.facing_door, res.pose, res.error_message);
+  return true;
 }
 
 int main(int argc, char *argv[]) {
