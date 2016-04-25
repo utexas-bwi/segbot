@@ -53,9 +53,15 @@ add_executable(door_handler
 target_link_libraries(door_handler
   ${PROJECT_NAME}
 )
-add_dependencies(door_handler segbot_simulation_apps_gencpp)
 
-install(TARGETS ${PROJECT_NAME} door_handler
+add_executable(robot_teleporter
+  src/nodes/robot_teleporter.cpp
+)
+target_link_libraries(robot_teleporter
+  ${PROJECT_NAME}
+)
+
+install(TARGETS ${PROJECT_NAME} door_handler robot_teleporter
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
