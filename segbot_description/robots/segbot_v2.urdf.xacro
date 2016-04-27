@@ -30,7 +30,7 @@
 
   <!-- Add the hokuyo mount without the beam -->
   <xacro:hokuyo_mount_without_beam name="nav_hokuyo" parent="hokuyo_sonar_sensor_beam" ros_topic="scan" update_rate="10" min_angle="${-(5 * M_PI)/12}" max_angle="${(5 * M_PI)/12}" range="20.0">
-    <origin xyz="${0.5*INCH_TO_M} 0 ${SENSOR_BEAM_LENGTH/2*INCH_TO_M}" rpy="${M_PI/2} 0 ${M_PI/2}" />
+    <origin xyz="${.5*INCH_TO_M} ${0.75*INCH_TO_M} ${SENSOR_BEAM_LENGTH/2*INCH_TO_M}" rpy="${M_PI/2} 0 ${M_PI/2}" />
   </xacro:hokuyo_mount_without_beam>
 
   <!-- Add the sensor plate mount -->
