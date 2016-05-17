@@ -23,6 +23,7 @@
   <arg name="use_fake_localization" default="false" />
   <arg name="launch_move_base" default="false" />
   <arg name="move_base_server" default="move_base" />
+  <arg name="move_base_config" default="segbotv2" />
 
   <!-- set tf prefix (used by gazebo plugins) -->
   <param name="tf_prefix" value="$(arg tf_prefix)" />
@@ -90,6 +91,7 @@
       <arg name="map_topic" value="$(arg navigation_map_topic)" />
       <arg name="eband_rotational_threshold_multiplier" value="0.25" />
       <arg name="eband_disallow_hysteresis" value="true" />
+      <arg name="config" value="$(arg move_base_config)" />
     </include>
   </group>
 
