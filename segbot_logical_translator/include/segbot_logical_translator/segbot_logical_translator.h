@@ -145,7 +145,12 @@ namespace segbot_logical_translator {
 
       boost::shared_ptr<ros::NodeHandle> nh_;
       ros::ServiceClient make_plan_client_;
+      ros::ServiceClient static_costmap_toggle_client_;
       bool make_plan_client_initialized_;
+
+      bool static_costmap_toggle_client_initialized_;
+      void initializeStaticCostmapToggleService();
+      void enableStaticCostmap(bool value);
 
       bool initialized_;
 

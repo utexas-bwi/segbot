@@ -43,7 +43,6 @@
 #include <boost/foreach.hpp>
 #include <boost/thread/thread.hpp>
 #include <bwi_tools/resource_resolver.h>
-#include <dynamic_reconfigure/Reconfigure.h>
 #include <message_filters/subscriber.h>
 #include <move_base_msgs/MoveBaseAction.h>
 #include <multi_level_map_msgs/ChangeCurrentLevel.h>
@@ -428,21 +427,13 @@ bool SegbotLogicalNavigator::approachDoor(const std::string& door_name,
     float approach_yaw = 0;
     bool door_approachable = false;
 
-    ros::NodeHandle n;
-    ros::ServiceClient static_costmap_service = 
-      n.serviceClient<dynamic_reconfigure::Reconfigure> ( "move_base/global_costmap/static_layer/set_parameters" );
-    dynamic_reconfigure::Reconfigure static_costmap_toggle_call;
-    static_costmap_toggle_call.request.config.bools.resize(1);
-    static_costmap_toggle_call.request.config.bools[0].name = "enabled";
-
     if (!gothrough) {
       publishNavigationMap(true, true);
       door_approachable = getApproachPoint(door_idx, bwi::Point2f(robot_x_, robot_y_), approach_pt, approach_yaw);
     } else {
-      static_costmap_toggle_call.request.config.bools[0].value = false;
-      static_costmap_service.call(static_costmap_toggle_call);
       publishNavigationMap(false, true);
       door_approachable = getThroughDoorPoint(door_idx, bwi::Point2f(robot_x_, robot_y_), approach_pt, approach_yaw);
+      enableStaticCostmap(false);
     }
 
     if (door_approachable) {
@@ -457,8 +448,7 @@ bool SegbotLogicalNavigator::approachDoor(const std::string& door_name,
       bool success = executeNavigationGoal(pose);
 
       if (gothrough) {
-        static_costmap_toggle_call.request.config.bools[0].value = true;
-        static_costmap_service.call(static_costmap_toggle_call);
+        enableStaticCostmap(true);
       }
       // Publish the observable fluents. Since we're likely going to sense the door, make sure the no-doors map was
       // published.
@@ -469,8 +459,7 @@ bool SegbotLogicalNavigator::approachDoor(const std::string& door_name,
     } else {
       // Planning failure
       if (gothrough) {
-        static_costmap_toggle_call.request.config.bools[0].value = true;
-        static_costmap_service.call(static_costmap_toggle_call);
+        enableStaticCostmap(true);
       }
       error_message = "Cannot interact with " + door_name + " from here.";
       return false;
