@@ -36,7 +36,7 @@
   <run_depend>gmapping</run_depend>
   <run_depend>map_server</run_depend>
   <run_depend version_gte="1.11.15">move_base</run_depend>
-  <run_depend>navfn</run_depend>
+  <run_depend>global_planner</run_depend>
   <run_depend>rviz</run_depend>
   <run_depend>segbot_bringup</run_depend>
 

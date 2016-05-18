@@ -253,7 +253,7 @@ Visualization Manager:
       Color: 25; 255; 0
       Enabled: true
       Name: Global Path
-      Topic: /marvin/move_base/NavfnROS/plan
+      Topic: /marvin/move_base/GlobalPlanner/plan
       Value: true
     - Class: rviz/Marker
       Enabled: true

@@ -42,6 +42,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
+#include <boost/thread/thread.hpp>
 #include <bwi_mapper/map_inflator.h>
 #include <bwi_mapper/map_loader.h>
 #include <bwi_mapper/map_utils.h>
@@ -130,6 +131,8 @@ namespace segbot_logical_translator {
     }
 
     enableStaticCostmap(false);
+    // TODO: this should not be necesary, since we make service calls 
+    boost::this_thread::sleep(boost::posix_time::milliseconds(250));
 
     bwi_mapper::Point2f start_pt, goal_pt;
     float start_yaw, goal_yaw;
@@ -162,12 +165,14 @@ namespace segbot_logical_translator {
 
     if (!make_plan_client_initialized_) {
       ROS_INFO_STREAM("SegbotLogicalTranslator: Waiting for make_plan service..");
-      make_plan_client_ = nh_->serviceClient<nav_msgs::GetPlan>("move_base/make_plan");
+      make_plan_client_ = nh_->serviceClient<nav_msgs::GetPlan>("move_base/GlobalPlanner/make_plan");
       make_plan_client_.waitForExistence();
       ROS_INFO_STREAM("SegbotLogicalTranslator: make_plan service found!");
       make_plan_client_initialized_ = true;
     }
 
+    // Check three times if this door is open. Sometimes, the costmap is out of sync or something, and the global
+    // planner returns paths through obstacles. This bug is true for both navfn and global_planner.
     for (int i = 0; i < 3; i++) {
       if (make_plan_client_.call(srv)) {
         if (srv.response.plan.poses.size() != 0) {
@@ -182,15 +187,17 @@ namespace segbot_logical_translator {
                              pow(current_pt.y - old_pt.y, 2));
             old_pt = current_pt;
           }
-          if (distance < 3 * min_distance) {
+          if (distance < 2 * min_distance) {
             //return true;
             counter++;
           } else {
             //return false; // returned path probably through some other door
+            ROS_INFO_STREAM("SegbotLogicalTranslator: sensedoor: Returned path is too long.");
             counter = 0;
           }
         } else {
           //return false; // this is ok. it means the door is closed
+          ROS_INFO_STREAM("SegbotLogicalTranslator: sensedoor: Could not find path.");
           counter = 0;
         }
       } else {
@@ -199,9 +206,10 @@ namespace segbot_logical_translator {
       }
     }
 
+    // TODO: set this to whatever state it was in.
     enableStaticCostmap(true);
 
-    if (counter == 3){
+    if (counter == 3) {
       // we have see the door open 3 consequitive times
       return true;
     } else {
