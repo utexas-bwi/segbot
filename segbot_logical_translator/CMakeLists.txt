@@ -7,6 +7,7 @@ find_package(catkin REQUIRED
     bwi_mapper
     bwi_msgs
     bwi_planning_common
+    dynamic_reconfigure
     map_msgs
     message_filters
     move_base_msgs
@@ -23,6 +24,7 @@ catkin_package(
     bwi_mapper
     bwi_msgs
     bwi_planning_common
+    dynamic_reconfigure
     map_msgs
     message_filters
     move_base_msgs

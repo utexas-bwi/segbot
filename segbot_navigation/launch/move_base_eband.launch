@@ -6,19 +6,22 @@
   <arg if="$(arg debug)" name="prefix" value="gdb -ex run --args" />
   <arg unless="$(arg debug)" name="prefix" value="" />
 
+  <arg name="config" default="segbotv2" />
+
   <arg name="global_frame" default="map" />
   <arg name="eband_rotational_threshold_multiplier" default="1.0" />
   <arg name="eband_disallow_hysteresis" default="false" />
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" launch-prefix="$(arg prefix)">
-    <rosparam file="$(find segbot_navigation)/config/eband/move_base_params.yaml" command="load" />
-    <rosparam file="$(find segbot_navigation)/config/eband/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find segbot_navigation)/config/eband/costmap_common_params.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find segbot_navigation)/config/eband/local_costmap_params.yaml" command="load" />
-    <rosparam file="$(find segbot_navigation)/config/eband/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find segbot_navigation)/config/$(arg config)/move_base_params.yaml" command="load" />
+    <rosparam file="$(find segbot_navigation)/config/$(arg config)/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find segbot_navigation)/config/$(arg config)/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find segbot_navigation)/config/$(arg config)/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find segbot_navigation)/config/$(arg config)/global_costmap_params.yaml" command="load" />
 
     <rosparam file="$(find segbot_navigation)/config/eband/eband_planner_params.yaml" command="load"/>
     <param name="base_local_planner" value="eband_local_planner/EBandPlannerROS" />
+    <param name="base_global_planner" value="global_planner/GlobalPlanner" />
 
     <param name="global_costmap/map_topic" value="$(arg map_topic)"/>
 

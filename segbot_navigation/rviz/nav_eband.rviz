@@ -314,7 +314,7 @@ Visualization Manager:
       Color: 25; 255; 0
       Enabled: true
       Name: Global Path
-      Topic: /move_base/NavfnROS/plan
+      Topic: /move_base/GlobalPlanner/plan
       Value: true
     - Class: rviz/Marker
       Enabled: true

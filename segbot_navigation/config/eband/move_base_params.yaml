@@ -1,6 +1,0 @@
-#footprint: [[-0.4, -0.3], [0.3, -0.3], [0.3, 0.3], [-0.4, 0.3]]
-robot_radius: 0.30
-planner_frequency: 1.0
-recovery_behaviors: [{name: conservative_reset, type: clear_costmap_recovery/ClearCostmapRecovery}, {name: rotate_recovery, type: rotate_recovery/RotateRecovery}]
-conservative_reset_dist: 0.5
-clearing_radius: 0.0

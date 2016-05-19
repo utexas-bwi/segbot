@@ -24,6 +24,7 @@
   <build_depend>bwi_mapper</build_depend>
   <build_depend>bwi_msgs</build_depend>
   <build_depend>bwi_planning_common</build_depend>
+  <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>map_msgs</build_depend>
   <build_depend>message_filters</build_depend>
   <build_depend>move_base_msgs</build_depend>
@@ -37,6 +38,7 @@
   <run_depend>bwi_mapper</run_depend>
   <run_depend>bwi_msgs</run_depend>
   <run_depend>bwi_planning_common</run_depend>
+  <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>map_msgs</run_depend>
   <run_depend>message_filters</run_depend>
   <run_depend>move_base_msgs</run_depend>

@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+
+<root xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Included URDF Files -->
+  <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/battery_box.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/beam_8020.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/laptop.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
+
+  <xacro:macro name="segbot_chassis" params="parent *origin">
+
+    <!-- bottom box plate -->
+    <xacro:aluminium_sheet name="bottom_box_plate" parent="${parent}"
+                           thickness="${0.25*INCH_TO_M}" length="${16*INCH_TO_M}" width="${14.25*INCH_TO_M}">
+      <xacro:insert_block name="origin" />
+    </xacro:aluminium_sheet>
+
+    <!-- left box plate -->
+    <xacro:aluminium_sheet name="left_box_plate" parent="bottom_box_plate"
+                           thickness="${0.25*INCH_TO_M}" length="${16*INCH_TO_M}" width="${4.5*INCH_TO_M}">
+      <origin xyz="0 ${6.875*INCH_TO_M} ${2.5*INCH_TO_M}" rpy="-${M_PI/2} 0 0" />
+    </xacro:aluminium_sheet>
+
+    <!-- right box plate -->
+    <xacro:aluminium_sheet name="right_box_plate" parent="bottom_box_plate"
+                           thickness="${0.25*INCH_TO_M}" length="${16*INCH_TO_M}" width="${4.5*INCH_TO_M}">
+      <origin xyz="0 -${6.875*INCH_TO_M} ${2.5*INCH_TO_M}" rpy="+${M_PI/2} 0 0" />
+    </xacro:aluminium_sheet>
+
+    <!-- top box plate -->
+    <xacro:aluminium_sheet name="top_box_plate" parent="bottom_box_plate"
+                           thickness="${0.25*INCH_TO_M}" length="${16*INCH_TO_M}" width="${14.25*INCH_TO_M}">
+      <origin xyz="0 0 ${4.75*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:aluminium_sheet>
+
+    <!-- 80/20 vertical beams -->
+    <xacro:beam_8020 name="back_left_vertical_beam" parent="top_box_plate" length="${24*INCH_TO_M}">
+      <origin xyz="-${5.5*INCH_TO_M} ${5.5*INCH_TO_M} ${0.25*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:beam_8020>
+    <xacro:beam_8020 name="front_left_vertical_beam" parent="top_box_plate" length="${24*INCH_TO_M}">
+      <origin xyz="${5.5*INCH_TO_M} ${5.5*INCH_TO_M} ${0.25*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:beam_8020>
+    <xacro:beam_8020 name="back_right_vertical_beam" parent="top_box_plate" length="${24*INCH_TO_M}">
+      <origin xyz="-${5.5*INCH_TO_M} -${5.5*INCH_TO_M} ${0.25*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:beam_8020>
+    <xacro:beam_8020 name="front_right_vertical_beam" parent="top_box_plate" length="${24*INCH_TO_M}">
+      <origin xyz="${5.5*INCH_TO_M} -${5.5*INCH_TO_M} ${0.25*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:beam_8020>
+
+    <!-- laptop base plate -->
+    <!-- from the left laptop support beam -->
+    <xacro:aluminium_sheet name="laptop_base_plate" parent="top_box_plate" 
+                           thickness="${0.125*INCH_TO_M}" length="${12*INCH_TO_M}" width="${14*INCH_TO_M}">
+      <origin xyz="0 0 ${24.25*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:aluminium_sheet>
+
+    <!-- laptop -->
+    <xacro:laptop name="laptop" parent="laptop_base_plate"> 
+      <origin xyz="-${2.1*INCH_TO_M} 0 ${0.125*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:laptop>
+
+  </xacro:macro>
+
+</root>

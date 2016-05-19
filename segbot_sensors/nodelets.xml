@@ -7,3 +7,14 @@
     </description>
   </class>
 </library>
+
+<library path="lib/libsegbot_sensors_filters">
+  <class name="segbot_sensors/SegbotVelodyneOutlierRemoval" 
+    type="SegbotVelodyneOutlierRemoval" 
+    base_class_type="nodelet::Nodelet">
+    <description>
+      SegbotVelodyneOutlierRemoval uses point neighborhood statistics to filter outlier data.
+    </description>
+  </class>
+</library>
+

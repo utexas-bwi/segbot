@@ -1,12 +1,13 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/foreach.hpp>
 #include <boost/regex.hpp>
+#include <stdexcept>
+
 #include <bwi_planning_common/utils.h>
 #include <bwi_tools/resource_resolver.h>
+#include <gazebo_msgs/SpawnModel.h>
 #include <gazebo_msgs/GetModelState.h>
 #include <gazebo_msgs/SetModelState.h>
-#include <gazebo_msgs/SpawnModel.h>
-#include <stdexcept>
 #include <tf/transform_datatypes.h>
 
 #include <bwi_tools/point.h>
@@ -170,7 +171,7 @@ namespace segbot_simulation_apps {
     std::string model_name = prefix +
       boost::lexical_cast<std::string>(index);
     geometry_msgs::Pose pose = getDefaultLocation(true, index);
-    bool success = teleportEntity(model_name, pose);
+    bool success = teleportEntity(model_name, pose, get_gazebo_model_client_, set_gazebo_model_client_);
     door_open_status_[index] = true;
     return success;
   }
@@ -201,7 +202,7 @@ namespace segbot_simulation_apps {
     std::string model_name = prefix +
       boost::lexical_cast<std::string>(index);
     geometry_msgs::Pose pose = getDoorLocation(index);
-    bool success = teleportEntity(model_name, pose);
+    bool success = teleportEntity(model_name, pose, get_gazebo_model_client_, set_gazebo_model_client_);
     door_open_status_[index] = false;
     return success;
   }
@@ -245,53 +246,6 @@ namespace segbot_simulation_apps {
         closeDoor(i);
       }
     }
-  }
-
-  bool DoorHandler::checkClosePoses(const geometry_msgs::Pose& p1, 
-                                    const geometry_msgs::Pose& p2, 
-                                    float threshold, 
-                                    bool check_yaw) {
-    float dist_diff = sqrtf(pow((p1.position.x - p2.position.x), 2) + pow((p1.position.y - p2.position.y), 2));
-    if (dist_diff > threshold) {
-      return false;
-    }
-    double yaw1 = tf::getYaw(p1.orientation);
-    double yaw2 = tf::getYaw(p2.orientation);
-    if (check_yaw && fabs(yaw1 - yaw2) > 0.1) {
-      return false;
-    }
-    return true;
-  }
-
-  bool DoorHandler::teleportEntity(const std::string& entity,
-      const geometry_msgs::Pose& pose) {
-
-    int count = 0;
-    int attempts = 5;
-    bool location_verified = false;
-    while (count < attempts and !location_verified) {
-      gazebo_msgs::GetModelState get_srv;
-      get_srv.request.model_name = entity;
-      get_gazebo_model_client_.call(get_srv);
-      location_verified = checkClosePoses(get_srv.response.pose, pose);
-      if (!location_verified) {
-        gazebo_msgs::SetModelState set_srv;
-        set_srv.request.model_state.model_name = entity;
-        set_srv.request.model_state.pose = pose;
-        set_gazebo_model_client_.call(set_srv);
-        if (!set_srv.response.success) {
-          ROS_WARN_STREAM("SetModelState service call failed for " << entity
-              << " to " << pose);
-        }
-      }
-      ++count;
-    }
-    if (!location_verified) {
-      ROS_ERROR_STREAM("Unable to teleport " << entity << " to " << pose
-          << " despite " << attempts << " attempts.");
-      return false;
-    }
-    return true;
   }
 
   void DoorHandler::spawnObject(bool is_door, int index) {

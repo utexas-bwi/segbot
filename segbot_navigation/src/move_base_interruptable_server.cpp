@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
   clear_costmap_service_->waitForExistence();
 
   make_plan_service_.reset(new ros::ServiceClient);
-  *make_plan_service_ = nh.serviceClient<nav_msgs::GetPlan>("move_base/NavfnROS/make_plan");
+  *make_plan_service_ = nh.serviceClient<nav_msgs::GetPlan>("move_base/GlobalPlanner/make_plan");
   make_plan_service_->waitForExistence();
 
   ROS_INFO_STREAM("move_base_interruptable :   Navigation services found!");

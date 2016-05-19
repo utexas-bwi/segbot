@@ -1,6 +1,8 @@
 robot_base_frame: base_footprint
 update_frequency:
 publish_frequency: 1.0
+inflation_radius: 1.0
+obstacle_layer/footprint_clearing_enabled: false
 
 # publish_voxel_map: true
 #
@@ -10,8 +12,7 @@ publish_frequency: 1.0
 # z_voxels: 10
 # unknown_threshold: 10
 # mark_threshold: 0
-#
-inflation_radius: 1.0
+
 observation_sources: scan kinect_scan
 scan: {data_type: LaserScan, topic: scan_filtered, marking: true, clearing: true, inf_is_valid: true, obstacle_range: 3.75, raytrace_range: 4.0}
 kinect_scan: {data_type: LaserScan, topic: nav_kinect/scan_filtered, marking: true, clearing: true, inf_is_valid: true, obstacle_range: 2.75, raytrace_range: 2.95} #raytrace_range must be less than max range of sensor.

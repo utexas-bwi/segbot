@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<root xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+      xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+      xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+      xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/sensors/VLP-16.urdf.xacro" />
+
+  <xacro:macro name="velodyne_mount" params="name parent *origin">
+
+    <!-- Create a fake link at the specified spot -->
+    <link name="${name}_mount_link" />
+    <joint name="${name}_mount_joint" type="fixed">
+      <parent link="${parent}_link" />
+      <child link="${name}_mount_link" />
+      <xacro:insert_block name="origin" />
+    </joint>
+
+    <xacro:aluminium_sheet name="${name}_base_plate" parent="${name}_mount" thickness="${0.125*INCH_TO_M}"
+      length="${15.55635*INCH_TO_M}" width="${5*INCH_TO_M}">
+      <origin xyz="${5.5*INCH_TO_M} -${5.5*INCH_TO_M} 0" rpy="0 0 -${M_PI/4}" />
+    </xacro:aluminium_sheet>
+
+    <xacro:standoff radius="0.003175" name="${name}_standoff_1" parent="${name}_base_plate" length="${3.0*INCH_TO_M}">
+      <origin xyz="${2*INCH_TO_M} ${-2*INCH_TO_M} ${0.125*INCH_TO_M}" 
+              rpy="0 0 0" />
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_standoff_2" parent="${name}_base_plate" length="${3.0*INCH_TO_M}">
+      <origin xyz="${2*INCH_TO_M} ${2*INCH_TO_M} ${0.125*INCH_TO_M}" 
+              rpy="0 0 0" />
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_standoff_3" parent="${name}_base_plate" length="${3.0*INCH_TO_M}">
+      <origin xyz="${-2*INCH_TO_M} ${2*INCH_TO_M} ${0.125*INCH_TO_M}" 
+              rpy="0 0 0" />
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_standoff_4" parent="${name}_base_plate" length="${3.0*INCH_TO_M}">
+      <origin xyz="${-2*INCH_TO_M} ${-2*INCH_TO_M} ${0.125*INCH_TO_M}" 
+              rpy="0 0 0" />
+    </xacro:standoff>
+
+    <xacro:aluminium_sheet name="${name}_top_plate" parent="${name}_base_plate" thickness="${0.125*INCH_TO_M}"
+      length="${5*INCH_TO_M}" width="${5*INCH_TO_M}">
+      <origin xyz="0 0 ${3.125*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:aluminium_sheet>
+
+    <xacro:VLP-16 parent="${name}_top_plate_link" name="${name}" topic="${name}/points_filtered">
+      <origin xyz="0 0 ${0.125*INCH_TO_M}" rpy="0 0 -${M_PI/4}" />
+    </xacro:VLP-16>
+
+  </xacro:macro>
+
+</root>
+
+

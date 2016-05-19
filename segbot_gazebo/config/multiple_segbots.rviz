@@ -59,7 +59,7 @@ Visualization Manager:
       Color: 0; 255; 0
       Enabled: true
       Name: Robot 1 - Path
-      Topic: /robot1/move_base/NavfnROS/plan
+      Topic: /robot1/move_base/GlobalPlanner/plan
       Value: true
     - Class: rviz/Marker
       Enabled: true
@@ -121,7 +121,7 @@ Visualization Manager:
       Color: 0; 0; 255
       Enabled: true
       Name: Robot 2 - Path
-      Topic: /robot2/move_base/NavfnROS/plan
+      Topic: /robot2/move_base/GlobalPlanner/plan
       Value: true
     - Class: rviz/Marker
       Enabled: true

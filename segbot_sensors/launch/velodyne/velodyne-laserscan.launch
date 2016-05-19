@@ -1,0 +1,37 @@
+<launch>
+
+  <arg name="tf_prefix" default="" />
+
+  <arg name="in_topic" default="velodyne_points" />
+  <arg name="out_topic" default="velodyne/scan_filtered" />
+
+  <arg name="min_height" default="-0.3" />
+  <arg name="max_height" default="0.3" />
+
+  <arg name="launch_nodelet_manager" default="true" />
+
+  <node pkg="nodelet" type="nodelet" name="velodyne_nodelet_manager" args="manager" if="$(arg launch_nodelet_manager)"/>
+
+  <node pkg="nodelet" type="nodelet" name="pointcloud_to_laserscan" 
+    args="load pointcloud_to_laserscan/pointcloud_to_laserscan_nodelet velodyne_nodelet_manager">
+    <remap from="cloud_in" to="$(arg in_topic)"/>
+    <remap from="scan" to="$(arg out_topic)" />
+
+    <param name="min_height" value="$(arg min_height)" />
+    <param name="max_height" value="$(arg max_height)" />
+    <param name="angle_min" value="-3.1416" /> <!-- -pi -->
+    <param name="angle_max" value="3.1416" /> <!-- pi -->
+    <param name="scan_time" value="0.1" />
+    <param name="range_max" value="40.0" />
+    <param name="range_min" value="0.4" />
+    <param name="use_inf" value="true" />
+
+  </node>
+
+  <!-- <include file="$(find segbot_sensors)/launch/velodyne/velodyne-filters.launch"> -->
+  <!--   <arg name="in_topic" value="velodyne/scan" /> -->
+  <!--   <arg name="out_topic" value="$(arg out_topic)" /> -->
+  <!-- </include> -->
+
+</launch>
+

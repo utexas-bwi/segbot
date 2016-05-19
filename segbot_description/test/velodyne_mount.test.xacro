@@ -5,7 +5,7 @@
 
   <!-- Included URDF Files -->
   <xacro:include filename="$(find segbot_description)/urdf/v3/common.urdf.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/mounts/kinect_mount.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/velodyne_mount.urdf.xacro" />
 
   <!-- add the root link -->
   <link name="base_link">
@@ -18,8 +18,8 @@
   </link>
 
   <!-- Add the kinect camera -->
-  <xacro:kinect_mount name="test_kinect" parent="base" length="${10.75*INCH_TO_M}">
-    <origin xyz="0 0 0" rpy="-${M_PI/2} -${M_PI/2} 0" />
-  </xacro:kinect_mount>
+  <xacro:velodyne_mount name="test_kinect" parent="base">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:velodyne_mount>
 
 </robot>
