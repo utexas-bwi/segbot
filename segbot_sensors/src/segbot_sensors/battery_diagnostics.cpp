@@ -1,3 +1,11 @@
+/* This node to incoming voltage level from the central battery in the segbot platform. 
+ * The default values are that of the segbot_v2, where the marine battery data is published through the arduino.
+ * You must change the launch file parameters to adjust to other segbot models, if needed.
+ *
+ * This node sends emails and requires that the local smtp client is setup properly.
+ * Please follow the instructions in  `segbot_sensors/sendmail_configure.sh`
+ */
+
 #include "ros/ros.h"
 #include "ros/time.h"
 #include <vector>
@@ -13,8 +21,7 @@
 #include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
 
-float voltage = 14.0; //initialize with a value that won't trigger mail service
-bool sentMail = false;
+float voltage;
 double alpha;
 
 void voltageCallback(const smart_battery_msgs::SmartBatteryStatus::ConstPtr& msg){
@@ -41,7 +48,7 @@ int sendMail(std::string outboundList, std::string sender){
   if(mailpipe != NULL){
     std::string to = "To: " + outboundList + "\n";
     std::string from = "From: " + sender + "\n";
-    std::string subject = "Subject: Segbot Altert: " + lhn + " Has a Low Battery\n";
+    std::string subject = "Subject: Segbot Alert: " + lhn + " Has a Low Battery\n";
     fputs(to.c_str(), mailpipe);
     fputs(from.c_str(), mailpipe);
     fputs(subject.c_str(), mailpipe);
@@ -58,9 +65,21 @@ int sendMail(std::string outboundList, std::string sender){
 int main(int argc, char **argv){
   ros::init(argc, argv, "battery_estimator");
   ros::NodeHandle n;
+  
+  double range, threshold;
+  bool sentMail = false;
+  std::string volt_topic;
+  
+  //parameters
+  n.param("weighted_average_const", alpha, .25);
+  n.param("voltage_threshold", threshold, 11.0);
+  n.param("range_percent", range, 1.12);
+  n.param("voltage_topic", volt_topic, (std::string) "/battery0");
+  voltage = threshold * 1.25; 			//initialize with a value that won't trigger mail service
+
   ros::Publisher battery_life_pub = n.advertise<diagnostic_msgs::DiagnosticArray>("diagnostics", 10);
-  ros::Subscriber voltage_sub = n.subscribe("/battery0", 10, voltageCallback);
-  ros::Rate loop_rate(1); //1hz
+  ros::Subscriber voltage_sub = n.subscribe(volt_topic, 10, voltageCallback);
+  ros::Rate loop_rate(1); 				//1hz
   diagnostic_msgs::DiagnosticStatus voltages;
   diagnostic_msgs::DiagnosticStatus status;
   diagnostic_msgs::DiagnosticArray diagAr;
@@ -71,27 +90,25 @@ int main(int argc, char **argv){
   voltages_val.value = voltage;
   voltages_val.key = "Current voltage: ";
   status.hardware_id = "005";
-  status.name = "battery_estimator"; //must match what the aggregator config file expects
+  status.name = "battery_estimator"; 	//must match what the aggregator config file expects
   status_val.key = "battery_value";
-  status_val.value = "183.0"; //dummy value
+  status_val.value = "183.0"; 			//dummy value
   std::ostringstream ss;
 
-  //parameters
-  n.param("weighted_average_const", alpha, .25);
-
+  
   while (ros::ok()){
     voltages_val.value = boost::lexical_cast<std::string>(voltage);
     diagAr.header.stamp = ros::Time::now();
     diagAr.header.frame_id = 1;
 
-    if(voltage > 11.0){
+    if(voltage > range + threshold){
       status.message = "Battery in good health";
-      status.level = 0; // 0 = OK
+      status.level = 0; 				// 0 = OK
       voltages.level = 0;
       voltages.message = "Voltage level OK";
-    }else if(voltage > 10 && voltage < 11){
+    }else if(voltage > threshold && voltage < (range + threshold)){
       status.message = "Battery low, return to lab.";
-      status.level = 1; // WARN
+      status.level = 1; 				//1 = WARN
       voltages.level = 1;
       voltages.message = "Voltage dropping";
       if(!sentMail){
@@ -115,7 +132,7 @@ int main(int argc, char **argv){
       status.level = 2;
     }else{
       status.message = "Battery CRITICALLY low, or voltmeter data is inaccurate (or missing). Ensure the volt sensor is connected properly and its publisher relaying data.";
-      status.level = 2; // CRITICAL
+      status.level = 2; 				//2 = CRITICAL
       voltages.level = 2;
       voltages.message = "ERROR: Ensure accurate volt readings!";
     }
