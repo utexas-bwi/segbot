@@ -1,0 +1,23 @@
+#Holds the parameters for the rqt_monitor diagnostics
+
+pub_rate: 1.0 # Optional
+base_path: '' # Optional, prepended to all diagnostic output
+
+analyzers:
+  sensors: #sets the namespace
+    type: GenericAnalyzer
+    path: Battery
+    startswith: [
+        'battery_estimator',
+        'voltage'
+    ]
+
+#computers:
+#    type: GenericAnalyzer
+#    path: Computers
+#    contains: [
+#      'HD Temp',
+#      'CPU Usage',
+#      'CPU Temperature',
+#      'HD Usage',
+#      'NFS']

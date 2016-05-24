@@ -31,7 +31,10 @@
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
 
-  <!-- TODO Diagnostics and battery monitor -->
+  <!-- Diagnostics and battery monitor -->
+  <include file="$(find segbot_sensors)/launch/diagnostic/v3_diagnostics.launch"/>
+
+  <!-- Hokuyo laser -->
   <include file="$(find segbot_sensors)/launch/hokuyo/hokuyo.launch">
     <arg name="name" value="nav_hokuyo" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />

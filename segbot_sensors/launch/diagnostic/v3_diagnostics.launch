@@ -1,0 +1,21 @@
+<launch>
+
+  <!-- Set necessary parameters -->
+  <param name="email_alert_outbound" type="string" value="bwi-operators@cs.utexas.edu" />
+  <param name="email_alert_sender" type="string" value="utexas.bwi@gmail.com" />
+  <param name="weighted_average_const" type="double" value="0.1" />
+
+  <!-- Launch the aggregator -->
+  <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator" >
+    <rosparam command="load"
+              file="$(find segbot_sensors)/config/v3_diagnostics_analyzer.yaml" />
+  </node>
+
+  <!-- Launch voltage-diagnostic publisher -->
+  <!-- This has to be done differently for the new base:
+  <node name="battery_diagnostics" pkg="segbot_sensors" type="battery_diagnostics" />
+  -->
+
+  <!-- run robot monitor -->
+  <node name="rqt_robot_monitor" pkg="rqt_robot_monitor" type="rqt_robot_monitor" />
+</launch>
