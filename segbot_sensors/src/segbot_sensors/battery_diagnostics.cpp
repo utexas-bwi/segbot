@@ -73,7 +73,7 @@ int main(int argc, char **argv){
   //parameters
   n.param("weighted_average_const", alpha, .25);
   n.param("voltage_threshold", threshold, 11.0);
-  n.param("range_percent", range, 1.12);
+  n.param("range_percent", range, 0.2);
   n.param("voltage_topic", volt_topic, (std::string) "/battery0");
   voltage = threshold * 1.25; 			//initialize with a value that won't trigger mail service
 
