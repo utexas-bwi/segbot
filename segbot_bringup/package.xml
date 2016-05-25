@@ -25,6 +25,7 @@
   <exec_depend>segbot_sensors</exec_depend>
   <exec_depend>segway_rmp</exec_depend>
   <exec_depend>tf</exec_depend>
+  <exec_depend>smart_battery_msgs</exec_depend>
 
   <test_depend>roslaunch</test_depend>
 

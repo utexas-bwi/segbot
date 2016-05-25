@@ -10,6 +10,8 @@ from geometry_msgs.msg import Quaternion, Twist
 from nav_msgs.msg import Odometry
 from segway_msgs.msg import ConfigCmd
 from segway_msgs.msg import Status
+from segway_msgs.msg import AuxPower
+from smart_battery_msgs.msg import SmartBatteryStatus
 
 class Controller():
 
@@ -18,10 +20,12 @@ class Controller():
         self.cmd_pub = rospy.Publisher('/segway/cmd_vel', Twist, queue_size=10)
         self.odom_pub = rospy.Publisher('odom', Odometry, queue_size=10)
         self.cfg_pub = rospy.Publisher('/segway/gp_command', ConfigCmd, queue_size=10)
+	self.bat_pub = rospy.Publisher('/battery0', SmartBatteryStatus, queue_size=10)
 
         self.cmd_sub = rospy.Subscriber('cmd_vel', Twist, self.cmd_callback)
         self.odom_sub = rospy.Subscriber('/segway/feedback/wheel_odometry', Odometry, self.odom_callback)
         self.status_sub = rospy.Subscriber('/segway/feedback/status', Status, self.status_callback)
+	self.bat_sub = rospy.Subscriber('/segway/feedback/aux_power', AuxPower, self.battery_callback)
 
         self.odom_frame_id = rospy.get_param('~odom_frame_id', 'odom')
         self.robot_frame_id = rospy.get_param('~robot_frame_id', 'base_footprint')
@@ -96,6 +100,11 @@ class Controller():
            self.stop_timer.shutdown()
         self.stop_timer = rospy.Timer(rospy.Duration(0.5), self.timer_callback)
 
+    def battery_callback(self, msg):
+	bat_msg = SmartBatteryStatus()
+	bat_msg.voltage = msg.aux_voltage_V[0]
+	bat_msg.header = msg.header
+	self.bat_pub.publish(bat_msg)
     def sigint_handler(self, signal, frame):
         self.terminate = True
 
