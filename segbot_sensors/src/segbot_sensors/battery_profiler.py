@@ -68,13 +68,12 @@ class battery_profiler:
     def get_time_estimate(self, A, K, C, voltage):
         return numpy.log((eol_voltage - C) / -A) / K - numpy.log((voltage - C) / -A) / K
 
-    def writeModelToFile(self, A, K, C, tot_time):
+    def writeModelToFile(self, A, K, C):
         print "Opening the file at {}...".format(self.model_filename)
         target = open(self.model_filename, 'w')
         target.write(str(A)+'\n')
         target.write(str(K)+'\n')
         target.write(str(C)+'\n')
-        target.write(str(tot_time)+'\n')
         target.close()
         print "Model written to configuration file successfully."
 
@@ -117,7 +116,7 @@ class battery_profiler:
         A, K, C = fit_exp_nonlinear(numpy.asarray(self.time_values), numpy.asarray(self.voltage_values))
         fit_y = model_func(numpy.asarray(self.time_values), A, K, C)
         print 'Model: -{} * exp({}x) + {}\n'.format(A, K, C)
-        self.writeModelToFile(A, K, C, total_time)
+        self.writeModelToFile(A, K, C)
 
         print 'Time est for 11.5V: {} * 30 minutes'.format(self.get_time_estimate(A,K,C, 11.5))
 
