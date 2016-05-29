@@ -43,11 +43,14 @@
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>openni_launch</exec_depend>
   <exec_depend>python-serial</exec_depend>
+  <exec_depend>python-scipy</exec_depend>
+  <exec_depend>python-numpy</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>rqt_robot_monitor</exec_depend>
   <exec_depend>rviz</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>urg_node</exec_depend>
+
 
   <test_depend>roslaunch</test_depend>
 
