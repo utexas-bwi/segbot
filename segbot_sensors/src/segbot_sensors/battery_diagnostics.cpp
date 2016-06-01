@@ -44,8 +44,10 @@ float getBatteryEstimate(double A, double K, double C, float voltage, double cut
   double max_life = std::log((cutoffVoltage - C) / -A) / K;
   //Catch the case where the starting voltage is greater than the model accounts for.
   //This can happen because the exponentially weighted voltage is initialized higher than the realized voltage.
-  if( voltage > C)
+  if( voltage > C){
      A *= -1;
+     return (std::log((voltage - C) / -A) / K + max_life) / 2;
+  }
   double cur_life = std::log((voltage - C) / -A) / K;
   return (max_life - cur_life) / 2; //Model is in 30-minute units. Divide by 2 to get intervals of 1 hour.
 }
@@ -138,7 +140,7 @@ int main(int argc, char **argv) {
       status_val.value = boost::lexical_cast<std::string>(getBatteryEstimate(A, K, C, voltage, threshold+range)).substr(0,4);
     
     if (voltage > range + threshold) {
-      status.message = status_val.value + " hours remain";
+      status.message = status_val.value + " hours ";
       status.level = 0;                   // 0 = OK
       voltages.level = 0;
     } else if (voltage > threshold && voltage < (range + threshold)) {

@@ -66,7 +66,12 @@ class battery_profiler:
     battery type. For instance, on a segbot_v3, this value should be around 71.5
     """
     def get_time_estimate(self, A, K, C, voltage):
-        return numpy.log((eol_voltage - C) / -A) / K - numpy.log((voltage - C) / -A) / K
+        max_life = numpy.log((eol_voltage - C) / -A) / K 
+	if voltage > C:
+		A = -A
+		return (numpy.log((voltage - C) / -A) / K + max_life)
+	cur_life = numpy.log((voltage - C) / -A) / K
+	return max_life - cur_life
 
     def writeModelToFile(self, A, K, C):
         print "Opening the file at {}...".format(self.model_filename)
@@ -118,7 +123,7 @@ class battery_profiler:
         print 'Model: -{} * exp({}x) + {}\n'.format(A, K, C)
         self.writeModelToFile(A, K, C)
 
-        print 'Time est for 11.5V: {} * 30 minutes'.format(self.get_time_estimate(A,K,C, 11.5))
+        print 'Time est for 12.5V: {} * 30 minutes'.format(self.get_time_estimate(A,K,C, 12.5))
 
         pyplot.plot(numpy.asarray(self.time_values), fit_y, "r--", label="Exponential Model")
         pyplot.show()
