@@ -40,16 +40,20 @@ std::string getLocalHostname() {
   return error;
 }
 
-float getBatteryEstimate(double A, double K, double C, float voltage, double cutoffVoltage){
+/*
+ * Given the voltage and the parameters of the model, return the estimated time remaining in hours
+  */
+float getBatteryEstimate(double A, double K, double C, float voltage, double cutoffVoltage) {
   double max_life = std::log((cutoffVoltage - C) / -A) / K;
+  int negation = 1;
   //Catch the case where the starting voltage is greater than the model accounts for.
   //This can happen because the exponentially weighted voltage is initialized higher than the realized voltage.
-  if( voltage > C){
+  if( voltage > C) {
      A *= -1;
-     return (std::log((voltage - C) / -A) / K + max_life) / 2;
+     negation = -1;
   }
   double cur_life = std::log((voltage - C) / -A) / K;
-  return (max_life - cur_life) / 2; //Model is in 30-minute units. Divide by 2 to get intervals of 1 hour.
+  return (max_life - negation * cur_life) / 2; //Model is in 30-minute units. Divide by 2 to get intervals of 1 hour.
 }
 
 int sendMail(std::string outboundList, std::string sender) {
@@ -106,7 +110,7 @@ int main(int argc, char **argv) {
   status.hardware_id = "005";
   status.name = "Remaining Battery Estimator";       //must match what the aggregator config file expects
   status_val.key = "Battery life remaining (hours)";
-  status_val.value = "183.0";            //dummy value
+  status_val.value = "Unknown. Battery profile not set.";
   std::ostringstream ss;
   bool profileExists = false;
 

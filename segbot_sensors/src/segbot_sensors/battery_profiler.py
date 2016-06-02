@@ -23,11 +23,10 @@ Currently, this
             plots the voltage data as well as the fitted model.
             writes the model to file for time-remaining estimation (handled elsewhere)
 
-TODO:
-    Make choosing bag file dynamic and consistent.
+Possible improvements:
     Have ways of merging multple runs into one model, or an existing model and an additional run
-    Make topic names, etc that are assumed rosparams?
-    Change from half hours to hours, without breaking fitting function
+    Change from half hours to hours, without breaking fitting function.
+        (note this would also requires changes to the battery diagnostics node)
 
 Author: Maxwell J Svetlik
 """
@@ -122,8 +121,6 @@ class battery_profiler:
         fit_y = model_func(numpy.asarray(self.time_values), A, K, C)
         print 'Model: -{} * exp({}x) + {}\n'.format(A, K, C)
         self.writeModelToFile(A, K, C)
-
-        print 'Time est for 12.5V: {} * 30 minutes'.format(self.get_time_estimate(A,K,C, 12.5))
 
         pyplot.plot(numpy.asarray(self.time_values), fit_y, "r--", label="Exponential Model")
         pyplot.show()
