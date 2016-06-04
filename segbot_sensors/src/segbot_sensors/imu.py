@@ -120,8 +120,8 @@ class ImuMessages(object):
         x = convert_accel(readings.group(2))
         y = convert_accel(readings.group(3))
         z = convert_accel(readings.group(4))
-        rospy.logdebug('IMU' + str(imu)
-                       + ' accel: ' + str(x) + ', ' + str(y) + ', ' + str(z))
+        rospy.logdebug('IMU' + str(imu) +
+                       ' accel: ' + str(x) + ', ' + str(y) + ', ' + str(z))
         msg = self.imus[imu]
         msg.linear_acceleration = Vector3(x, y, z)
         msg.header.stamp = now
