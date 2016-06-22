@@ -491,13 +491,19 @@ bool SegbotLogicalNavigator::approachObject(const std::string& object_name,
 
     // Publish the observable fluents
     senseState(observations, NO_DOOR_IDX);
-    PlannerAtom closeto;
-    closeto.name = "closeto";
-    closeto.value.push_back(object_name);
+    PlannerAtom facing;
+    facing.name = "facing";
+    facing.value.push_back(object_name);
+
+    PlannerAtom beside;
+    beside.name = "beside";
+    beside.value.push_back(object_name);
     if (!success) {
-      closeto.name = "-closeto";
+      facing.name = "-facing";
+      beside.name = "-beside";
     }
-    observations.push_back(closeto);
+    observations.push_back(facing);
+    observations.push_back(beside);
     return success;
   }
 
