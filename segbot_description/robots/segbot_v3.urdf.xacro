@@ -10,6 +10,9 @@
   <xacro:include filename="$(find segbot_description)/urdf/mounts/velodyne_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/gazebo/segbot.gazebo.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/kinect_mount.urdf.xacro" />
+  
+  <xacro:property name="SENSOR_BEAM_LENGTH" value="10.75" /> <!-- inches -->
 
   <!-- Add the segbot base -->
   <xacro:segway_robot />
@@ -21,6 +24,11 @@
   <xacro:velodyne_mount name="velodyne" parent="back_left_vertical_beam">
     <origin xyz="0 0 ${14*INCH_TO_M}" rpy="${M_PI} 0 -${M_PI/2}" />
   </xacro:velodyne_mount>
+
+  <!-- Add the forward facing kinect sensor for navigation -->
+  <xacro:kinect_mount name="nav_kinect" parent="back_right_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}">
+    <origin xyz="${1*INCH_TO_M} -${0.5*INCH_TO_M} ${11.5*INCH_TO_M}" rpy="-${M_PI/2} -${M_PI/2} 0" />
+  </xacro:kinect_mount>
 
   <xacro:hokuyo_mount 
     name="nav_hokuyo" 
