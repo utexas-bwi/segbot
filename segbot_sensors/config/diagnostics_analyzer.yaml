@@ -7,7 +7,7 @@ analyzers:
     type: GenericAnalyzer
     path: Battery
     startswith: [
-        'battery_estimator',
+        'Remaining Battery Estimator',
         'voltage'
     ]
 #computers:

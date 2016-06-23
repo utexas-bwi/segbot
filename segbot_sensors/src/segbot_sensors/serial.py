@@ -75,15 +75,15 @@ class ArduinoDevice(object):
         except IOError as e:
             # HACK: serial does not return errno.ENOTTY as it should,
             #       so check the exact string.
-            enotty = ("Could not configure port: "
-                      + "(25, 'Inappropriate ioctl for device')")
+            enotty = ("Could not configure port: " +
+                      "(25, 'Inappropriate ioctl for device')")
             if str(e) != enotty:        # is it a serial port?
-                rospy.logerr('Serial port open failed at '
-                             + str(self.baud) + ' baud: ' + str(e))
+                rospy.logerr('Serial port open failed at ' +
+                             str(self.baud) + ' baud: ' + str(e))
                 return False
         else:
-            rospy.loginfo('Serial port ' + self.port + ' opened at '
-                          + str(self.baud) + ' baud.')
+            rospy.loginfo('Serial port ' + self.port + ' opened at ' +
+                          str(self.baud) + ' baud.')
             self.dev.flushInput()       # discard any old data
             return True
 

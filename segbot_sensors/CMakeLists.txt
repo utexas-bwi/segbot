@@ -52,6 +52,7 @@ add_subdirectory(src/sonar)
 add_library(segbot_sensors_filters 
   src/segbot_sensors_filters.cpp
   src/segbot_velodyne_outlier_removal.cpp)
+add_dependencies(segbot_sensors_filters ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(segbot_sensors_filters 
   ${Boost_LIBRARIES} 
   ${catkin_LIBRARIES}

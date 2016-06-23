@@ -32,7 +32,8 @@
   </include>
 
   <!-- Diagnostics and battery monitor -->
-  <include file="$(find segbot_sensors)/launch/diagnostic/v3_diagnostics.launch"/>
+  <include file="$(find segbot_sensors)/launch/diagnostic/diagnostics.launch"/>
+  <param name="voltage_threshold" type="double" value="71.2" />
 
   <!-- Hokuyo laser -->
   <include file="$(find segbot_sensors)/launch/hokuyo/hokuyo.launch">

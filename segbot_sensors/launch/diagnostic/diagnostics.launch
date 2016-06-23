@@ -3,7 +3,11 @@
   <!-- Set necessary parameters -->
   <param name="email_alert_outbound" type="string" value="bwi-operators@cs.utexas.edu" />
   <param name="email_alert_sender" type="string" value="utexas.bwi@gmail.com" />
-  <param name="weighted_average_const" type="double" value="0.1" />
+  <param name="weighted_average_const" type="double" value="0.05" />
+  <param name="voltage_topic" type="string" value="/battery0" />
+  <param name="voltage_threshold" type="double" value="10.0" />
+  <param name="range_percent" type="double" value="1.0" />
+  
   <!-- Launch the aggregator --> 
   <node pkg="diagnostic_aggregator" type="aggregator_node" name="diagnostic_aggregator" >
     <rosparam command="load" 
