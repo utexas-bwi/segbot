@@ -1,17 +1,16 @@
-The segbot ROS meta-package
-===========================
+The segbot ROS metapackage
+==========================
 
-ROS drivers for controlling Segway RMP 50 based robots at Learning Agents 
-Research Group (LARG), AI Laboratory, Department of Computer Science, 
-The University of Texas at Austin. 
+[![Build Status](https://travis-ci.org/utexas-bwi/segbot.svg?branch=master)](https://travis-ci.org/utexas-bwi/segbot)
 
-Detailed documentation for this code-base can be found on the ROS wiki:
-* [segbot_bringup](http://wiki.ros.org/segbot_bringup)
-* [segbot_description](http://wiki.ros.org/segbot_description)
-* [segbot_firmware](http://wiki.ros.org/segbot_firmware)
-* [segbot_sensors](http://wiki.ros.org/segbot_sensors)
+ROS drivers for controlling Segway-based robots at the Learning Agents
+Research Group (LARG), AI Laboratory, Department of Computer Science,
+University of Texas at Austin.
 
-All the code in this package has been released using a modified BSD license, 
+Documentation for much of this code-base can be found on the ROS wiki:
+* [segbot](http://wiki.ros.org/segbot)
+
+All the code in this package has been released using a modified BSD license,
 which can be found with this package [here](LICENSE).
 
 All academic uses of this work should cite the following representative paper:
