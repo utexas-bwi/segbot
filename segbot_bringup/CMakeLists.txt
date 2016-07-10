@@ -23,17 +23,18 @@ install(PROGRAMS
 # unit tests are enabled selectively
 if (CATKIN_ENABLE_TESTING)
   find_package(roslaunch REQUIRED)
-  roslaunch_add_file_check(launch/includes)
 
-  ## launch/segbot_kinect*.launch files fail, see:
-  ## ros-drivers/openni_launch#10.
-  ##
-  ## Test the individual files that do work, restore testing of the
-  ## rest when openni_launch has been fixed.
+  ## Test individual files that do work, restore testing of the
+  #  rest when segway_v3 packages have been released.
   #roslaunch_add_file_check(launch) 
   roslaunch_add_file_check(launch/segbot_v1.launch)
   roslaunch_add_file_check(launch/segbot_v2.launch)
-  roslaunch_add_file_check(launch/includes/auxiliary.segbot_v1.hokuyo_only.launch.xml)
-  roslaunch_add_file_check(launch/includes/auxiliary.segbot_v1.no_sensors.launch.xml)
+  #roslaunch_add_file_check(launch/segbot_v3.launch)
   roslaunch_add_file_check(launch/segway_base.launch)
+  roslaunch_add_file_check(launch/includes)
+  roslaunch_add_file_check(launch/includes/auxiliary.segbot_v1.hokuyo_only.launch.xml)
+  roslaunch_add_file_check(launch/includes/auxiliary.segbot_v1.launch.xml)
+  roslaunch_add_file_check(launch/includes/auxiliary.segbot_v1.no_sensors.launch.xml)
+  roslaunch_add_file_check(launch/includes/auxiliary.segbot_v2.launch.xml)
+  #roslaunch_add_file_check(launch/includes/auxiliary.segbot_v3.launch.xml)
 endif()
