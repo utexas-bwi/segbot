@@ -3,8 +3,7 @@ project(segbot_led)
 find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
-  genmsg
-  message_generation
+  bwi_msgs
   roscpp
   serial
   std_msgs
@@ -12,25 +11,9 @@ find_package(catkin REQUIRED COMPONENTS
 
 add_definitions(-std=c++11)
 
-add_service_files(FILES 
-                  led_clear.srv
-                  set_camera_off.srv
-                  set_camera_on.srv
-                  set_every_fifth.srv
-                  set_first_five.srv
-                  test_strip.srv)
-
-add_action_files(DIRECTORY action
-                 FILES LED.action)
-
-add_message_files(DIRECTORY msg 
-                  FILES led_animations.msg)
-
-generate_messages(DEPENDENCIES actionlib_msgs std_msgs)
-
 catkin_package(
   INCLUDE_DIRS ledcomm
-  # CATKIN_DEPENDS actionlib_msgs roscpp serial std_msgs
+  CATKIN_DEPENDS actionlib_msgs bwi_msgs roscpp serial std_msgs
 )
 
 include_directories(

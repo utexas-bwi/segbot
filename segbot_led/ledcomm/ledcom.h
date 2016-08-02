@@ -32,19 +32,7 @@ void LedCOM::write(const uint8_t data[], const uint32_t data_size) {
 }
 
 void LedCOM::connect(const std::string port, const unsigned long baud) {
-
-  try{
-    serial_conn = new serial::Serial(port, baud, serial::Timeout::simpleTimeout(1000));
-  }
-  catch(const serial::IOException &e)
-  {
-      cerr << "EXCEPTION CAUGHT: serial::IOException could not open a connection." << endl;
-      cerr << endl << "Original exception: " << e.what() << endl;
-      cerr << endl << "Ensure device is connected and using port, " << port << ", with baud setting, " << baud << "." << endl;
-      cerr << endl << "Retrying to open connection after waiting 2 seconds." << endl;
-      sleep(2);
-      LedCOM::connect(port, baud);
-  }
+  serial_conn = new serial::Serial(port, baud, serial::Timeout::simpleTimeout(1000));
 }
 
 void LedCOM::setRGB(const uint8_t index, const uint8_t r, const uint8_t g, const uint8_t b){

@@ -17,18 +17,22 @@
 /*******************************************************
 *                   Service Headers                    *
 ********************************************************/
-#include "segbot_led/led_clear.h"
-#include "segbot_led/test_strip.h"
-#include "segbot_led/set_first_five.h"
-#include "segbot_led/set_every_fifth.h"
-#include "segbot_led/set_camera_on.h"
-#include "segbot_led/set_camera_off.h"
+#include "bwi_msgs/LEDClear.h"
+#include "bwi_msgs/LEDSetCamera.h"
+#include "bwi_msgs/LEDTestStrip.h"
 
 /*******************************************************
 *                   Action Headers                     *
 ********************************************************/
-#include "segbot_led/LEDAction.h"
-#include "segbot_led/led_animations.h"
+#include "bwi_msgs/LEDControlAction.h"
+
+/*******************************************************
+*                   Message Headers                    *
+********************************************************/
+#include "bwi_msgs/LEDActionResult.h"
+#include "bwi_msgs/LEDAnimations.h"
+#include "bwi_msgs/LEDCameraStatus.h"
+#include "bwi_msgs/LEDTestType.h"
 
 /*******************************************************
 *                 Global Variables                     *
@@ -37,6 +41,7 @@ LedCOM leds;
 int led_count;
 string serial_port;
 bool camera_on = false;
+bool connected = false;
 
 // LED Segments
 int front_center_left_start;
@@ -96,23 +101,41 @@ void check_camera_status()
   }
 }
 
-
-void service_reconnect()
+void connect(string port, int baud)
 {
-  ROS_ERROR("Service execution failed, unable to write to microcontroller,");
-  ROS_ERROR("Ensure LED microcontroller is connected.");
-  ROS_ERROR("Attempting to reconnect to LED microcontroller.");
+  while(!connected)
+  {
+    try
+    {
+        leds.connect(port, baud);
+        connected = true;
+        // Need to sleep to wait for connection to take full effect
+        sleep(3);
+    }
+    catch(const serial::IOException &e)
+    {
+        ROS_ERROR("EXCEPTION CAUGHT: serial::IOException could not open a connection.");
+        ROS_ERROR_STREAM("Original exception: " << e.what());
+        ROS_ERROR_STREAM("Ensure device is connected and using port, " << port << ", with baud setting, " << baud << ".");
+        ROS_ERROR("Retrying to open connection after waiting 2 seconds.");
+        sleep(1);
+    }
+  }
 
-  leds.connect(serial_port, 115200);
-  // Need to sleep at least 2 seconds to wait for connection to be established
-  sleep(3);
-  leds.setLEDCount(led_count);
+  try
+  {
+    leds.setLEDCount(led_count);
+    // Ensures strip is clear on initial start up
+    leds.clear();
+    sleep(1);
+  }
+  catch(const serial::SerialException &e)
+  {
+    connected = false;
+  }
 
-  ROS_INFO("Reconnected to led strip, ready to control LED strip with %d leds.", led_count);
+  ROS_INFO("Ready to control LED strip with %d leds.", led_count);
 
-  leds.clear();
-  ROS_INFO("Cleared LED Strip");
-  check_camera_status();
 }
 
 void ledSigintHandler(int sig)
@@ -126,17 +149,17 @@ void ledSigintHandler(int sig)
 *                   Action Server                      *
 *                                                      *
 ********************************************************/
-class LEDAction
+class LEDControlAction
 {
 protected:
 
   ros::NodeHandle nh_;
 
-  actionlib::SimpleActionServer<segbot_led::LEDAction> as_; 
+  actionlib::SimpleActionServer<bwi_msgs::LEDControlAction> as_; 
   std::string action_name_;
 
-  segbot_led::LEDFeedback feedback_;
-  segbot_led::LEDResult result_;
+  bwi_msgs::LEDControlFeedback feedback_;
+  bwi_msgs::LEDControlResult result_;
 
 public:
 
@@ -152,22 +175,22 @@ public:
     ROS_INFO("Goal has reached timeout.");
   }
 
-  LEDAction(std::string name) :
-    as_(nh_, name, boost::bind(&LEDAction::executeCB, this, _1), false),
+  LEDControlAction(std::string name) :
+    as_(nh_, name, boost::bind(&LEDControlAction::executeCB, this, _1), false),
     action_name_(name)
   {
-    timeout_timer = nh_.createTimer(ros::Duration(100), boost::bind(&LEDAction::timerCallback, this, _1));
+    timeout_timer = nh_.createTimer(ros::Duration(100), boost::bind(&LEDControlAction::timerCallback, this, _1));
     timeout_timer.stop();
     as_.start();
   }
 
-  ~LEDAction(void)
+  ~LEDControlAction(void)
   {
   }
 
-  void executeCB(const segbot_led::LEDGoalConstPtr &goal)
+  void executeCB(const bwi_msgs::LEDControlGoalConstPtr &goal)
   {
-    ROS_INFO("%s: Executing LED Action: %d", action_name_.c_str(), goal->type);
+    ROS_INFO_STREAM(action_name_ << " : Executing LED Action: " << goal->type.led_animations);
 
     leds.clear();
     // Microseconds
@@ -175,11 +198,11 @@ public:
 
     timeout_timer.stop();
 
-    if (goal->timeout > 0) 
+    if (goal->timeout > ros::Duration(0)) 
     {
       timeout = false;
-      ROS_INFO("Creating timeout for: %d seconds.", goal->timeout);
-      timeout_timer.setPeriod(ros::Duration(goal->timeout));
+      ROS_INFO_STREAM("Creating timeout for: " << goal->timeout);
+      timeout_timer.setPeriod(goal->timeout);
       timeout_timer.start();
     }
 
@@ -196,6 +219,8 @@ public:
           timeout_timer.stop();
           leds.clear();
           ROS_INFO("Cleared LED Strip");
+          result_.result = bwi_msgs::LEDActionResult::PREEMPTED;
+          result_.status = "Action Preempted";
           success = false;
           timeout = false;
           check_camera_status();
@@ -210,6 +235,8 @@ public:
           timeout_timer.stop();
           leds.clear();
           ROS_INFO("Cleared LED Strip");
+          result_.result = bwi_msgs::LEDActionResult::SHUTDOWN;
+          result_.status = "Action terminated due to ROS Shutdown";
           check_camera_status();
           success = false;
           timeout = false;
@@ -217,471 +244,477 @@ public:
         }
 
         // Determines which animation to execute based on goal->type value
-        switch(goal->type)
+        switch(goal->type.led_animations)
         {
           // Left Turn Animation
-          case 1: {
-                    // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
-                    while(!as_.isPreemptRequested() && !timeout && ros::ok())
-                    {
-                      // Creates an animation of leds which travels left along the strip
+          case bwi_msgs::LEDAnimations::LEFT_TURN: 
+            {
+              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
+              while(!as_.isPreemptRequested() && !timeout && ros::ok())
+              {
+                // Creates an animation of leds which travels left along the strip
 
-                      int j = back_center_left_start+1;
+                int j = back_center_left_start+1;
 
-                      for (int i = front_center_left_start-1; i < front_center_left_end+1;) 
-                      {
-                        // Terminate goal if preempted, timeout is reached, or ros fails
-                        if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+                for (int i = front_center_left_start-1; i < front_center_left_end+1;) 
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
 
-                        if (i == front_center_left_start-1) 
-                        {
-                          leds.setHSV(i, 22, 1, .1);
-                          leds.setHSV(i+1, 22, 1, .1);
+                  if (i == front_center_left_start-1) 
+                  {
+                    leds.setHSV(i, 22, 1, .1);
+                    leds.setHSV(i+1, 22, 1, .1);
 
-                          leds.setHSV(j, 22, 1, .1);
-                          leds.setHSV(j-1, 22, 1, .1);
+                    leds.setHSV(j, 22, 1, .1);
+                    leds.setHSV(j-1, 22, 1, .1);
 
-                          i+=2;
-                          j-=2;
-                        }
-                        else 
-                        {
-                          leds.setHSV(i, 22, 1, .1);
-                          leds.setHSV(j, 22, 1, .1);
-                          i+=1;
-                          j-=1;
-                        }
-
-                        if (i > front_center_left_start-1) 
-                        {
-                          leds.setRGB(i-2, 0, 0, 0);
-                          leds.setRGB(j+2, 0, 0, 0);
-                        }
-
-                        leds.flush();
-                        // Microseconds
-                        usleep(100000);
-
-                        if (i == front_center_left_end+1)
-                        {
-                          leds.setRGB(i, 0, 0, 0);
-                          leds.setRGB(i-1, 0, 0, 0);
-
-                          leds.setRGB(j, 0, 0, 0);
-                          leds.setRGB(j+1, 0, 0, 0);
-
-                          i+=1;
-                          j-=1;
-
-                          leds.flush();
-                          // Microseconds
-                          usleep(100000);
-                        }
-                      }
-                    }
-                    break;
+                    i+=2;
+                    j-=2;
+                  }
+                  else 
+                  {
+                    leds.setHSV(i, 22, 1, .1);
+                    leds.setHSV(j, 22, 1, .1);
+                    i+=1;
+                    j-=1;
                   }
 
-          // Right Turn Animation
-          case 2: {
-                    // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
-                    while(!as_.isPreemptRequested() && !timeout && ros::ok())
-                    {
-                      // Creates an animation of leds which travels right along the strip
-
-                      int j = front_center_right_start+1;
-
-                      for (int i = back_center_right_start-1; i < back_center_right_end+1;) 
-                      {
-                        // Terminate goal if preempted, timeout is reached, or ros fails
-                        if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
-
-                        if (i == back_center_right_start-1) 
-                        {
-                          leds.setHSV(i, 22, 1, .1);
-                          leds.setHSV(i+1, 22, 1, .1);
-
-                          leds.setHSV(j, 22, 1, .1);
-                          leds.setHSV(j-1, 22, 1, .1);
-
-                          i+=2;
-                          j-=2;
-                        }
-                        else 
-                        {
-                          leds.setHSV(i, 22, 1, .1);
-                          leds.setHSV(j, 22, 1, .1);
-                          i+=1;
-                          j-=1;
-                        }
-
-                        if (i > back_center_right_start-1) 
-                        {
-                          leds.setRGB(i-2, 0, 0, 0);
-                          leds.setRGB(j+2, 0, 0, 0);
-                        }
-
-                        leds.flush();
-                        // Microseconds
-                        usleep(100000);
-
-                        if (i == back_center_right_end+1)
-                        {
-                          leds.setRGB(i, 0, 0, 0);
-                          leds.setRGB(i-1, 0, 0, 0);
-
-                          leds.setRGB(j, 0, 0, 0);
-                          leds.setRGB(j+1, 0, 0, 0);
-
-                          i+=1;
-                          j-=1;
-
-                          leds.flush();
-                          // Microseconds
-                          usleep(100000);
-                        }
-                      }
-                    }
-                    break;
+                  if (i > front_center_left_start-1) 
+                  {
+                    leds.setRGB(i-2, 0, 0, 0);
+                    leds.setRGB(j+2, 0, 0, 0);
                   }
 
-          // Reverse Animtion
-          case 3: {
-                    // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
-                    while(!as_.isPreemptRequested() && !timeout && ros::ok())
-                    {
-                      // Creates a pulsing animation
+                  leds.flush();
+                  // Microseconds
+                  usleep(100000);
 
-                      // Increase brightness
-                      for (float b = 0.0; b < 0.5; b += 0.02) 
-                      {
-                        // Terminate goal if preempted, timeout is reached, or ros fails
-                        if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+                  if (i == front_center_left_end+1)
+                  {
+                    leds.setRGB(i, 0, 0, 0);
+                    leds.setRGB(i-1, 0, 0, 0);
 
-                        int j = back_left_beam_start;
-                        int k = back_center_end;
+                    leds.setRGB(j, 0, 0, 0);
+                    leds.setRGB(j+1, 0, 0, 0);
 
-                        for (int i = back_right_beam_end; i >= back_right_beam_start; i--) 
-                        {
-                          leds.setHSV(i, 360, 1, b);
-                          leds.setHSV(j, 360, 1, b);
+                    i+=1;
+                    j-=1;
 
-                          if (k >= back_center_start)
-                          {
-                            leds.setHSV(k, 360, 1, b);
-                            k--;
-                          }
-
-                          j--;
-                        }
-
-                        leds.flush();
-                        // Microseconds
-                        usleep(22500);
-                      }
-                      // Microseconds
-                      usleep(500000);
-
-                      // Decreases Brightness
-                      for (float b = 0.5; b >= 0.0; b -= 0.02) 
-                      {
-                        // Terminate goal if preempted, timeout is reached, or ros fails
-                        if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
-
-                        int j = back_left_beam_start;
-                        int k = back_center_end;
-
-                        for (int i = back_right_beam_end; i >= back_right_beam_start; i--) 
-                        {
-                          leds.setHSV(i, 360, 1, b);
-                          leds.setHSV(j, 360, 1, b);
-
-                          if (k >= back_center_start)
-                          {
-                            leds.setHSV(k, 360, 1, b);
-                            k--;
-                          }
-
-                          j--;
-                        }
-
-                        leds.flush();
-                        // Microseconds
-                        usleep(22500);
-                      }
-                      // Microseconds
-                      usleep(500000);
-                    }
-                    break;
-                  }
-
-          // Blocked Animation
-          case 4: {
-                    // Turns on strip 
-                    for (int i = led_count; i >= 0; i--) 
-                    {
-                      leds.setHSV(i, 360, 1, .5);
-                    }
                     leds.flush();
                     // Microseconds
                     usleep(100000);
-
-                    // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
-                    while(!as_.isPreemptRequested() && !timeout && ros::ok())
-                    {
-                      // Creates an animation of leds which travels along a lighted strip
-
-                      for (int i = led_count; i >= 0;) 
-                      {
-                        // Terminate goal if preempted, timeout is reached, or ros fails
-                        if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
-
-                        if (i == led_count) 
-                        {
-                          leds.setHSV(i, 360, 1, .1);
-                          leds.setHSV(i-1, 360, 1, .1);
-                          leds.setHSV(i-2, 360, 1, .1);
-                          leds.setHSV(i-3, 360, 1, .1);
-                          leds.setHSV(i-4, 360, 1, .1);
-                          i-=5;
-                        }
-                        else 
-                        {
-                          leds.setHSV(i, 360, 1, .1);
-                          i-=1;
-                        }
-
-                        if (i < led_count) 
-                        {
-                          leds.setHSV(i+5, 360, 1, .5);
-                        }
-                        leds.flush();
-                        // Microseconds
-                        usleep(100000);
-
-                        if (i == 0)
-                        {
-                          leds.setHSV(i, 360, 1, .5);
-                          leds.setHSV(i+1, 360, 1, .5);
-                          leds.setHSV(i+2, 360, 1, .5);
-                          leds.setHSV(i+3, 360, 1, .5);
-                          leds.setHSV(i+4, 360, 1, .5);
-
-                          i-=1;
-
-                          leds.flush();
-                          // Microseconds
-                          usleep(100000);
-                        }
-                      }
-                    }
-                    break;
                   }
+                }
+              }
+              break;
+            }
+
+          // Right Turn Animation
+          case bwi_msgs::LEDAnimations::RIGHT_TURN: 
+            {
+              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
+              while(!as_.isPreemptRequested() && !timeout && ros::ok())
+              {
+                // Creates an animation of leds which travels right along the strip
+
+                int j = front_center_right_start+1;
+
+                for (int i = back_center_right_start-1; i < back_center_right_end+1;) 
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+
+                  if (i == back_center_right_start-1) 
+                  {
+                    leds.setHSV(i, 22, 1, .1);
+                    leds.setHSV(i+1, 22, 1, .1);
+
+                    leds.setHSV(j, 22, 1, .1);
+                    leds.setHSV(j-1, 22, 1, .1);
+
+                    i+=2;
+                    j-=2;
+                  }
+                  else 
+                  {
+                    leds.setHSV(i, 22, 1, .1);
+                    leds.setHSV(j, 22, 1, .1);
+                    i+=1;
+                    j-=1;
+                  }
+
+                  if (i > back_center_right_start-1) 
+                  {
+                    leds.setRGB(i-2, 0, 0, 0);
+                    leds.setRGB(j+2, 0, 0, 0);
+                  }
+
+                  leds.flush();
+                  // Microseconds
+                  usleep(100000);
+
+                  if (i == back_center_right_end+1)
+                  {
+                    leds.setRGB(i, 0, 0, 0);
+                    leds.setRGB(i-1, 0, 0, 0);
+
+                    leds.setRGB(j, 0, 0, 0);
+                    leds.setRGB(j+1, 0, 0, 0);
+
+                    i+=1;
+                    j-=1;
+
+                    leds.flush();
+                    // Microseconds
+                    usleep(100000);
+                  }
+                }
+              }
+              break;
+            }
+
+          // Reverse Animtion
+          case bwi_msgs::LEDAnimations::REVERSE: 
+            {
+              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
+              while(!as_.isPreemptRequested() && !timeout && ros::ok())
+              {
+                // Creates a pulsing animation
+
+                // Increase brightness
+                for (float b = 0.0; b < 0.5; b += 0.02) 
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+
+                  int j = back_left_beam_start;
+                  int k = back_center_end;
+
+                  for (int i = back_right_beam_end; i >= back_right_beam_start; i--) 
+                  {
+                    leds.setHSV(i, 360, 1, b);
+                    leds.setHSV(j, 360, 1, b);
+
+                    if (k >= back_center_start)
+                    {
+                      leds.setHSV(k, 360, 1, b);
+                      k--;
+                    }
+
+                    j--;
+                  }
+
+                  leds.flush();
+                  // Microseconds
+                  usleep(22500);
+                }
+                // Microseconds
+                usleep(500000);
+
+                // Decreases Brightness
+                for (float b = 0.5; b >= 0.0; b -= 0.02) 
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+
+                  int j = back_left_beam_start;
+                  int k = back_center_end;
+
+                  for (int i = back_right_beam_end; i >= back_right_beam_start; i--) 
+                  {
+                    leds.setHSV(i, 360, 1, b);
+                    leds.setHSV(j, 360, 1, b);
+
+                    if (k >= back_center_start)
+                    {
+                      leds.setHSV(k, 360, 1, b);
+                      k--;
+                    }
+
+                    j--;
+                  }
+
+                  leds.flush();
+                  // Microseconds
+                  usleep(22500);
+                }
+                // Microseconds
+                usleep(500000);
+              }
+              break;
+            }
+
+          // Blocked Animation
+          case bwi_msgs::LEDAnimations::BLOCKED: 
+            {
+              // Turns on strip 
+              for (int i = led_count; i >= 0; i--) 
+              {
+                leds.setHSV(i, 360, 1, .5);
+              }
+              leds.flush();
+              // Microseconds
+              usleep(100000);
+
+              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
+              while(!as_.isPreemptRequested() && !timeout && ros::ok())
+              {
+                // Creates an animation of leds which travels along a lighted strip
+
+                for (int i = led_count; i >= 0;) 
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+
+                  if (i == led_count) 
+                  {
+                    leds.setHSV(i, 360, 1, .1);
+                    leds.setHSV(i-1, 360, 1, .1);
+                    leds.setHSV(i-2, 360, 1, .1);
+                    leds.setHSV(i-3, 360, 1, .1);
+                    leds.setHSV(i-4, 360, 1, .1);
+                    i-=5;
+                  }
+                  else 
+                  {
+                    leds.setHSV(i, 360, 1, .1);
+                    i-=1;
+                  }
+
+                  if (i < led_count) 
+                  {
+                    leds.setHSV(i+5, 360, 1, .5);
+                  }
+                  leds.flush();
+                  // Microseconds
+                  usleep(100000);
+
+                  if (i == 0)
+                  {
+                    leds.setHSV(i, 360, 1, .5);
+                    leds.setHSV(i+1, 360, 1, .5);
+                    leds.setHSV(i+2, 360, 1, .5);
+                    leds.setHSV(i+3, 360, 1, .5);
+                    leds.setHSV(i+4, 360, 1, .5);
+
+                    i-=1;
+
+                    leds.flush();
+                    // Microseconds
+                    usleep(100000);
+                  }
+                }
+              }
+              break;
+            }
           // Up
-          case 5: {
-                    // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
-                    while(!as_.isPreemptRequested() && !timeout && ros::ok())
-                    {
-                      // Creates an animation of leds which travels up along the strip
+          case bwi_msgs::LEDAnimations::UP: 
+            {
+              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
+              while(!as_.isPreemptRequested() && !timeout && ros::ok())
+              {
+                // Creates an animation of leds which travels up along the strip
 
-                      int l = front_left_beam_start;
-                      int k = front_right_beam_start;
-                      int j = back_left_beam_start;
+                int l = front_left_beam_start;
+                int k = front_right_beam_start;
+                int j = back_left_beam_start;
 
-                      for (int i = back_right_beam_start; i <= back_right_beam_end;)
-                      {
-                        // Terminate goal if preempted, timeout is reached, or ros fails
-                        if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+                for (int i = back_right_beam_start; i <= back_right_beam_end;)
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
 
-                        if (i == back_right_beam_start)
-                        {
-                          leds.setHSV(i, 240, 1, .1);
-                          leds.setHSV(i+1, 240, 1, .1);
-                          leds.setHSV(i+2, 240, 1, .1);
-                          leds.setHSV(i+3, 240, 1, .1);
+                  if (i == back_right_beam_start)
+                  {
+                    leds.setHSV(i, 240, 1, .1);
+                    leds.setHSV(i+1, 240, 1, .1);
+                    leds.setHSV(i+2, 240, 1, .1);
+                    leds.setHSV(i+3, 240, 1, .1);
 
-                          leds.setHSV(l, 240, 1, .1);
-                          leds.setHSV(l+1, 240, 1, .1);
-                          leds.setHSV(l+2, 240, 1, .1);
-                          leds.setHSV(l+3, 240, 1, .1);
+                    leds.setHSV(l, 240, 1, .1);
+                    leds.setHSV(l+1, 240, 1, .1);
+                    leds.setHSV(l+2, 240, 1, .1);
+                    leds.setHSV(l+3, 240, 1, .1);
 
-                          leds.setHSV(k, 240, 1, .1);
-                          leds.setHSV(k-1, 240, 1, .1);
-                          leds.setHSV(k-2, 240, 1, .1);
-                          leds.setHSV(k-3, 240, 1, .1);
+                    leds.setHSV(k, 240, 1, .1);
+                    leds.setHSV(k-1, 240, 1, .1);
+                    leds.setHSV(k-2, 240, 1, .1);
+                    leds.setHSV(k-3, 240, 1, .1);
 
-                          leds.setHSV(j, 240, 1, .1);
-                          leds.setHSV(j-1, 240, 1, .1);
-                          leds.setHSV(j-2, 240, 1, .1);
-                          leds.setHSV(j-3, 240, 1, .1);
+                    leds.setHSV(j, 240, 1, .1);
+                    leds.setHSV(j-1, 240, 1, .1);
+                    leds.setHSV(j-2, 240, 1, .1);
+                    leds.setHSV(j-3, 240, 1, .1);
 
-                          i+=4;
-                          l+=4;
-                          k-=4;
-                          j-=4;
-                        }
-                        else
-                        {
-                          leds.setHSV(i, 240, 1, .1);
-                          leds.setHSV(l, 240, 1, .1);
-                          leds.setHSV(k, 240, 1, .1);
-                          leds.setHSV(j, 240, 1, .1);
-                          i+=1;
-                          l+=1;
-                          k-=1;
-                          j-=1;
-                        }
-
-                        if (i > back_right_beam_start)
-                        {
-                          leds.setRGB(i-4, 0, 0, 0);
-                          leds.setRGB(l-4, 0, 0, 0);
-                          leds.setRGB(k+4, 0, 0, 0);
-                          leds.setRGB(j+4, 0, 0, 0);
-                        }
-
-                        leds.flush();
-                        // Microseconds
-                        usleep(100000);
-
-                        if (i == back_right_beam_end)
-                        {
-                          leds.setRGB(i, 0, 0, 0);
-                          leds.setRGB(i-1, 0, 0, 0);
-                          leds.setRGB(i-2, 0, 0, 0);
-                          leds.setRGB(i-3, 0, 0, 0);
-
-                          leds.setRGB(l, 0, 0, 0);
-                          leds.setRGB(l-1, 0, 0, 0);
-                          leds.setRGB(l-2, 0, 0, 0);
-                          leds.setRGB(l-3, 0, 0, 0);
-
-                          leds.setRGB(k, 0, 0, 0);
-                          leds.setRGB(k+1, 0, 0, 0);
-                          leds.setRGB(k+2, 0, 0, 0);
-                          leds.setRGB(k+3, 0, 0, 0);
-
-                          leds.setRGB(j, 0, 0, 0);
-                          leds.setRGB(j+1, 0, 0, 0);
-                          leds.setRGB(j+2, 0, 0, 0);
-                          leds.setRGB(j+3, 0, 0, 0);
-
-                          i+=1;
-                          l+=1;
-                          k-=1;
-                          j-=1;
-
-                          leds.flush();
-                          // Microseconds
-                          usleep(100000);
-                        }
-                      }
-                    }
-                    break;
+                    i+=4;
+                    l+=4;
+                    k-=4;
+                    j-=4;
                   }
+                  else
+                  {
+                    leds.setHSV(i, 240, 1, .1);
+                    leds.setHSV(l, 240, 1, .1);
+                    leds.setHSV(k, 240, 1, .1);
+                    leds.setHSV(j, 240, 1, .1);
+                    i+=1;
+                    l+=1;
+                    k-=1;
+                    j-=1;
+                  }
+
+                  if (i > back_right_beam_start)
+                  {
+                    leds.setRGB(i-4, 0, 0, 0);
+                    leds.setRGB(l-4, 0, 0, 0);
+                    leds.setRGB(k+4, 0, 0, 0);
+                    leds.setRGB(j+4, 0, 0, 0);
+                  }
+
+                  leds.flush();
+                  // Microseconds
+                  usleep(100000);
+
+                  if (i == back_right_beam_end)
+                  {
+                    leds.setRGB(i, 0, 0, 0);
+                    leds.setRGB(i-1, 0, 0, 0);
+                    leds.setRGB(i-2, 0, 0, 0);
+                    leds.setRGB(i-3, 0, 0, 0);
+
+                    leds.setRGB(l, 0, 0, 0);
+                    leds.setRGB(l-1, 0, 0, 0);
+                    leds.setRGB(l-2, 0, 0, 0);
+                    leds.setRGB(l-3, 0, 0, 0);
+
+                    leds.setRGB(k, 0, 0, 0);
+                    leds.setRGB(k+1, 0, 0, 0);
+                    leds.setRGB(k+2, 0, 0, 0);
+                    leds.setRGB(k+3, 0, 0, 0);
+
+                    leds.setRGB(j, 0, 0, 0);
+                    leds.setRGB(j+1, 0, 0, 0);
+                    leds.setRGB(j+2, 0, 0, 0);
+                    leds.setRGB(j+3, 0, 0, 0);
+
+                    i+=1;
+                    l+=1;
+                    k-=1;
+                    j-=1;
+
+                    leds.flush();
+                    // Microseconds
+                    usleep(100000);
+                  }
+                }
+              }
+              break;
+            }
           // Down
-          case 6: {
-                    // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
-                    while(!as_.isPreemptRequested() && !timeout && ros::ok())
-                    {
-                      // Creates an animation of leds which travels down along the strip
+          case bwi_msgs::LEDAnimations::DOWN: 
+            {
+              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
+              while(!as_.isPreemptRequested() && !timeout && ros::ok())
+              {
+                // Creates an animation of leds which travels down along the strip
 
-                      int l = front_left_beam_end;
-                      int k = front_right_beam_end;
-                      int j = back_left_beam_end;
+                int l = front_left_beam_end;
+                int k = front_right_beam_end;
+                int j = back_left_beam_end;
 
-                      for (int i = back_right_beam_end; i >= back_right_beam_start;)
-                      {
-                        // Terminate goal if preempted, timeout is reached, or ros fails
-                        if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+                for (int i = back_right_beam_end; i >= back_right_beam_start;)
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
 
-                        if (i == back_right_beam_end)
-                        {
-                          leds.setHSV(i, 240, 1, .1);
-                          leds.setHSV(i-1, 240, 1, .1);
-                          leds.setHSV(i-2, 240, 1, .1);
-                          leds.setHSV(i-3, 240, 1, .1);
+                  if (i == back_right_beam_end)
+                  {
+                    leds.setHSV(i, 240, 1, .1);
+                    leds.setHSV(i-1, 240, 1, .1);
+                    leds.setHSV(i-2, 240, 1, .1);
+                    leds.setHSV(i-3, 240, 1, .1);
 
-                          leds.setHSV(l, 240, 1, .1);
-                          leds.setHSV(l-1, 240, 1, .1);
-                          leds.setHSV(l-2, 240, 1, .1);
-                          leds.setHSV(l-3, 240, 1, .1);
+                    leds.setHSV(l, 240, 1, .1);
+                    leds.setHSV(l-1, 240, 1, .1);
+                    leds.setHSV(l-2, 240, 1, .1);
+                    leds.setHSV(l-3, 240, 1, .1);
 
-                          leds.setHSV(k, 240, 1, .1);
-                          leds.setHSV(k+1, 240, 1, .1);
-                          leds.setHSV(k+2, 240, 1, .1);
-                          leds.setHSV(k+3, 240, 1, .1);
+                    leds.setHSV(k, 240, 1, .1);
+                    leds.setHSV(k+1, 240, 1, .1);
+                    leds.setHSV(k+2, 240, 1, .1);
+                    leds.setHSV(k+3, 240, 1, .1);
 
-                          leds.setHSV(j, 240, 1, .1);
-                          leds.setHSV(j+1, 240, 1, .1);
-                          leds.setHSV(j+2, 240, 1, .1);
-                          leds.setHSV(j+3, 240, 1, .1);
+                    leds.setHSV(j, 240, 1, .1);
+                    leds.setHSV(j+1, 240, 1, .1);
+                    leds.setHSV(j+2, 240, 1, .1);
+                    leds.setHSV(j+3, 240, 1, .1);
 
-                          i-=4;
-                          l-=4;
-                          k+=4;
-                          j+=4;
+                    i-=4;
+                    l-=4;
+                    k+=4;
+                    j+=4;
 
-                        }
-                        else
-                        {
-                          leds.setHSV(i, 240, 1, .1);
-                          leds.setHSV(l, 240, 1, .1);
-                          leds.setHSV(k, 240, 1, .1);
-                          leds.setHSV(j, 240, 1, .1);
-                          i-=1;
-                          l-=1;
-                          k+=1;
-                          j+=1;
-                        }
-
-                        if (i < back_right_beam_end)
-                        {
-                          leds.setRGB(i+4, 0, 0, 0);
-                          leds.setRGB(l+4, 0, 0, 0);
-                          leds.setRGB(k-4, 0, 0, 0);
-                          leds.setRGB(j-4, 0, 0, 0);
-                        }
-
-                        leds.flush();
-                        // Microseconds
-                        usleep(100000);
-
-                        if (i == back_right_beam_start)
-                        {
-                          leds.setRGB(i, 0, 0, 0);
-                          leds.setRGB(i+1, 0, 0, 0);
-                          leds.setRGB(i+2, 0, 0, 0);
-                          leds.setRGB(i+3, 0, 0, 0);
-
-                          leds.setRGB(l, 0, 0, 0);
-                          leds.setRGB(l+1, 0, 0, 0);
-                          leds.setRGB(l+2, 0, 0, 0);
-                          leds.setRGB(l+3, 0, 0, 0);
-
-                          leds.setRGB(k, 0, 0, 0);
-                          leds.setRGB(k-1, 0, 0, 0);
-                          leds.setRGB(k-2, 0, 0, 0);
-                          leds.setRGB(k-3, 0, 0, 0);
-
-                          leds.setRGB(j, 0, 0, 0);
-                          leds.setRGB(j-1, 0, 0, 0);
-                          leds.setRGB(j-2, 0, 0, 0);
-                          leds.setRGB(j-3, 0, 0, 0);
-
-                          i-=1;
-                          l-=1;
-                          k+=1;
-                          j+=1;
-
-                          leds.flush();
-                          // Microseconds
-                          usleep(100000);
-                        }
-                      }
-                    }
-                    break;
                   }
+                  else
+                  {
+                    leds.setHSV(i, 240, 1, .1);
+                    leds.setHSV(l, 240, 1, .1);
+                    leds.setHSV(k, 240, 1, .1);
+                    leds.setHSV(j, 240, 1, .1);
+                    i-=1;
+                    l-=1;
+                    k+=1;
+                    j+=1;
+                  }
+
+                  if (i < back_right_beam_end)
+                  {
+                    leds.setRGB(i+4, 0, 0, 0);
+                    leds.setRGB(l+4, 0, 0, 0);
+                    leds.setRGB(k-4, 0, 0, 0);
+                    leds.setRGB(j-4, 0, 0, 0);
+                  }
+
+                  leds.flush();
+                  // Microseconds
+                  usleep(100000);
+
+                  if (i == back_right_beam_start)
+                  {
+                    leds.setRGB(i, 0, 0, 0);
+                    leds.setRGB(i+1, 0, 0, 0);
+                    leds.setRGB(i+2, 0, 0, 0);
+                    leds.setRGB(i+3, 0, 0, 0);
+
+                    leds.setRGB(l, 0, 0, 0);
+                    leds.setRGB(l+1, 0, 0, 0);
+                    leds.setRGB(l+2, 0, 0, 0);
+                    leds.setRGB(l+3, 0, 0, 0);
+
+                    leds.setRGB(k, 0, 0, 0);
+                    leds.setRGB(k-1, 0, 0, 0);
+                    leds.setRGB(k-2, 0, 0, 0);
+                    leds.setRGB(k-3, 0, 0, 0);
+
+                    leds.setRGB(j, 0, 0, 0);
+                    leds.setRGB(j-1, 0, 0, 0);
+                    leds.setRGB(j-2, 0, 0, 0);
+                    leds.setRGB(j-3, 0, 0, 0);
+
+                    i-=1;
+                    l-=1;
+                    k+=1;
+                    j+=1;
+
+                    leds.flush();
+                    // Microseconds
+                    usleep(100000);
+                  }
+                }
+              }
+              break;
+            }
         }
 
         // Successful Execution Logic
@@ -692,6 +725,7 @@ public:
           timeout_timer.stop();
           leds.clear();
           ROS_INFO("Cleared LED Strip");
+          result_.result = bwi_msgs::LEDActionResult::SUCCESS;
           check_camera_status();
           timeout = false;
         }
@@ -699,25 +733,16 @@ public:
     }
     catch(const serial::SerialException &e)
     {
+      result_.result = bwi_msgs::LEDActionResult::FAILURE;
+      result_.status = "Action failed due failure with serial communication to LED microcontroller";
       ROS_ERROR("Action execution failed, unable to write to microcontroller,");
-      ROS_ERROR("Ensure led microcontroller is connected.");
-      ROS_ERROR("Attempting to reconnect to led microcontroller.");
-
       timeout_timer.stop();
-
-      leds.connect(serial_port, 115200);
-      // Need to sleep at least 2 seconds to wait for connection to be established
-      sleep(3);
-      leds.setLEDCount(led_count);
-
-      ROS_INFO("Reconnected to LED strip, ready to control LED strip with %d leds.", led_count);
-
+      connected = false;
       as_.setPreempted();
-      leds.clear();
-      ROS_INFO("Cleared LED Strip");
-      check_camera_status();
       success = false;
       timeout = false;
+      ROS_ERROR("Ensure LED microcontroller is connected.");
+      ROS_ERROR("Attempting to reconnect to LED microcontroller.");
     }
   }
 };
@@ -727,142 +752,167 @@ public:
 *                Service Callbacks                     *
 *                                                      *
 ********************************************************/
-bool clear_strip(segbot_led::led_clear::Request  &req,
-                 segbot_led::led_clear::Response &res)
+bool clear_strip(bwi_msgs::LEDClear::Request  &req,
+                 bwi_msgs::LEDClear::Response &res)
 {
   try
   {
     leds.clear();
     ROS_INFO("Cleared LED Strip");
     check_camera_status();
+    res.success = true;
     return true;
   }
   catch(const serial::SerialException &e)
   {
-    service_reconnect();
+    res.success = false;
+    res.status = "Failure with serial communication to LED microcontroller";
+    ROS_ERROR("Service execution failed, unable to write to microcontroller,");
+    ROS_ERROR("Ensure LED microcontroller is connected.");
+    ROS_ERROR("Attempting to reconnect to LED microcontroller.");
+    connected = false;
   }
 }
 
-bool test_strip(segbot_led::test_strip::Request  &req,
-                segbot_led::test_strip::Response &res)
+bool test_strip(bwi_msgs::LEDTestStrip::Request  &req,
+                bwi_msgs::LEDTestStrip::Response &res)
 {
   try
   {
-    ROS_INFO("Testing LED Strip, will take about 30 seconds to complete.");
-
-    leds.clear();
-    sleep(1);
-
-    for (int i=0; i < 360; i+=15) 
+    switch(req.type.test_type)
     {
-      for (int l=0; l < led_count; l++) 
-      {
-        leds.setHSV(l, i, 1, .1);
-      }
-      leds.flush();
-      sleep(1);
+      // Set Every Fifth LED
+      case bwi_msgs::LEDTestType::SET_EVERY_FIFTH:   
+        {
+          leds.clear();
+          sleep(1);
+
+          for (int l=5; l < led_count; l+=5) 
+          {
+            if (l%10 == 0)
+            {
+              leds.setHSV(l, 120, 1, .1);
+            }
+            else 
+            {
+              leds.setHSV(l, 250, 1, .1);
+            }
+          }
+          leds.flush();
+          sleep(1);
+
+          ROS_INFO("Set every fifth LED on strip");
+          res.success = true;
+          return true;
+        }
+      // Set First Five LEDs
+      case bwi_msgs::LEDTestType::SET_FIRST_FIVE:   
+        {
+          leds.clear();
+          sleep(1);
+
+          leds.setHSV(0, 240, 1, .1);
+          leds.setHSV(1, 120, 1, .1);
+          leds.setHSV(2, 240, 1, .1);
+          leds.setHSV(3, 120, 1, .1);
+          leds.setHSV(4, 240, 1, .1);
+
+          leds.flush();
+          sleep(1);
+
+          ROS_INFO("Set first five LEDs on strip");
+          res.success = true;
+          return true;
+        }
+      // Test LEDs on Strip
+      case bwi_msgs::LEDTestType::TEST_STRIP:   
+        {
+          ROS_INFO("Testing LED Strip, will take about 30 seconds to complete.");
+
+          leds.clear();
+          sleep(1);
+
+          for (int i=0; i < 360; i+=15) 
+          {
+            for (int l=0; l < led_count; l++) 
+            {
+              leds.setHSV(l, i, 1, .1);
+            }
+            leds.flush();
+            sleep(1);
+          }
+
+          leds.clear();
+          ROS_INFO("Cleared LED Strip");
+          ROS_INFO("Tested Colors on LED strip");
+          res.success = true;
+          return true;
+        }
+      default:  
+        {
+          res.success = false;
+          std::ostringstream stringStream;
+          stringStream << "Unknown type requested: " << req.type.test_type;
+          res.success = false;
+          res.status = stringStream.str();
+          return false;
+        }
     }
-
-    leds.clear();
-    ROS_INFO("Cleared LED Strip");
-    ROS_INFO("Tested Colors on LED strip");
-
-    return true;
   }
   catch(const serial::SerialException &e)
   {
-    service_reconnect();
+    res.success = false;
+    res.status = "Failure with serial communication to LED microcontroller";
+    ROS_ERROR("Service execution failed, unable to write to microcontroller,");
+    ROS_ERROR("Ensure LED microcontroller is connected.");
+    ROS_ERROR("Attempting to reconnect to LED microcontroller.");
+    connected = false;
   }
 }
 
-bool set_first_five(segbot_led::set_first_five::Request  &req,
-                    segbot_led::set_first_five::Response &res)
+bool set_camera(bwi_msgs::LEDSetCamera::Request  &req,
+                bwi_msgs::LEDSetCamera::Response &res)
 {
   try
   {
-    leds.clear();
-    sleep(1);
-
-    leds.setHSV(0, 240, 1, .1);
-    leds.setHSV(1, 120, 1, .1);
-    leds.setHSV(2, 240, 1, .1);
-    leds.setHSV(3, 120, 1, .1);
-    leds.setHSV(4, 240, 1, .1);
-
-    leds.flush();
-    sleep(1);
-
-    ROS_INFO("Set first five LEDs on strip");
-
-    return true;
-  }
-  catch(const serial::SerialException &e)
-  {
-    service_reconnect();
-  }
-}
-
-bool set_every_fifth(segbot_led::set_every_fifth::Request  &req,
-                     segbot_led::set_every_fifth::Response &res)
-{
-  try
-  {
-    leds.clear();
-    sleep(1);
-
-    for (int l=5; l < led_count; l+=5) 
+    switch(req.type.camera_status)
     {
-      if (l%10 == 0)
-      {
-        leds.setHSV(l, 120, 1, .1);
-      }
-      else 
-      {
-        leds.setHSV(l, 250, 1, .1);
-      }
+      // Camera On
+      case bwi_msgs::LEDCameraStatus::CAMERA_ON:   
+        {
+          camera_on = true;
+          check_camera_status();
+          res.success = true;
+          return true;
+        }
+      // Camera Off
+      case bwi_msgs::LEDCameraStatus::CAMERA_OFF:   
+        {
+          camera_on = false;
+          leds.clear();
+          ROS_INFO("Set camera indicator off and cleared LED strip");
+          res.success = true;
+          return true;
+        }
+      default:  
+        {
+          res.success = false;
+          std::ostringstream stringStream;
+          stringStream << "Unknown type requested: " << req.type.camera_status;
+          res.success = false;
+          res.status = stringStream.str();
+          return false;
+        }
     }
-    leds.flush();
-    sleep(1);
-
-    ROS_INFO("Set every fifth LED on strip");
-
-    return true;
   }
   catch(const serial::SerialException &e)
   {
-    service_reconnect();
-  }
-}
-
-bool set_camera_on(segbot_led::set_camera_on::Request  &req,
-                   segbot_led::set_camera_on::Response &res)
-{
-  try
-  {
-    camera_on = true;
-    check_camera_status();
-
-    return true;
-  }
-  catch(const serial::SerialException &e)
-  {
-    service_reconnect();
-  }
-}
-
-bool set_camera_off(segbot_led::set_camera_off::Request  &req,
-                    segbot_led::set_camera_off::Response &res)
-{
-  try
-  {
-    camera_on = false;
-    leds.clear();
-    ROS_INFO("Set camera indicator off and cleared LED strip");
-    return true;
-  }
-  catch(const serial::SerialException &e)
-  {
-    service_reconnect();
+    res.success = false;
+    res.status = "Failure with serial communication to LED microcontroller";
+    ROS_ERROR("Service execution failed, unable to write to microcontroller,");
+    ROS_ERROR("Ensure LED microcontroller is connected.");
+    ROS_ERROR("Attempting to reconnect to LED microcontroller.");
+    connected = false;
   }
 }
 
@@ -916,29 +966,26 @@ int main(int argc, char **argv)
   privateNode.param<int>("back_right_beam_end",back_right_beam_end,13);
 
   // Initial connection to microcontroller
-  leds.connect(serial_port, 115200);
-  // Need to sleep at least 2 seconds to wait for connection to be established
-  sleep(3);
-  leds.setLEDCount(led_count);
-
-  leds.clear();
-  sleep(1);
 
   // Service Server advertisers
-  ros::ServiceServer clear_service = n.advertiseService(ros::this_node::getName() + "/led_clear", clear_strip);
-  ros::ServiceServer test_strip_service = n.advertiseService(ros::this_node::getName() + "/test_strip", test_strip);
-  ros::ServiceServer set_first_five_service = n.advertiseService(ros::this_node::getName() + "/set_first_five", set_first_five);
-  ros::ServiceServer set_every_fifth_service = n.advertiseService(ros::this_node::getName() + "/set_every_fifth", set_every_fifth);
-  ros::ServiceServer set_camera_on_service = n.advertiseService(ros::this_node::getName() + "/set_camera_on", set_camera_on);
-  ros::ServiceServer set_camera_off_service = n.advertiseService(ros::this_node::getName() + "/set_camera_off", set_camera_off);
+  ros::ServiceServer clear_service = n.advertiseService("led_clear", clear_strip);
+  ros::ServiceServer test_strip_service = n.advertiseService("led_test", test_strip);
+  ros::ServiceServer set_camera_service = n.advertiseService("led_set_camera", set_camera);
 
   // Action Server advertisers
-  LEDAction led_control_server(ros::this_node::getName());
+  LEDControlAction led_control_server(ros::this_node::getName());
 
-  std::cout << ros::this_node::getName() << endl;
+  ros::Rate r(10); // 10 hz
 
-  ROS_INFO("Ready to control LED strip with %d leds.", led_count);
-  ros::spin();
+  while(!ros::ok())
+  {
+      if(!connected) 
+      {
+        connect(serial_port, 115200);
+      }
+      ros::spinOnce();
+      r.sleep();
+  }
 
   return 0;
 }

@@ -1,7 +1,7 @@
 <launch>
   <node name="led_control_server" pkg="segbot_led" type="led_control_server">
     <param name="led_count" value="120" />
-    <param name="serial_port" value="/dev/metromini" />
+    <param name="serial_port" value="/dev/arduino" />
 
     <param name="camera_indicator_start" value="29" />
     <param name="camera_indicator_end" value="30" />
