@@ -190,13 +190,15 @@ public:
 
   void executeCB(const bwi_msgs::LEDControlGoalConstPtr &goal)
   {
-    ROS_INFO_STREAM(action_name_ << " : Executing LED Action: " << goal->type.led_animations);
+    ROS_INFO_STREAM(action_name_ << " : Executing LED Action: " << goal->type);
 
     leds.clear();
     // Microseconds
     usleep(100000);
 
     timeout_timer.stop();
+
+    ros::Time start = ros::Time::now();
 
     if (goal->timeout > ros::Duration(0)) 
     {
@@ -215,12 +217,14 @@ public:
         if (as_.isPreemptRequested())
         {
           ROS_INFO("%s: Preempted", action_name_.c_str());
-          as_.setPreempted();
+          result_.result = bwi_msgs::LEDActionResult::PREEMPTED;
+          std::ostringstream stringStream;
+          stringStream << "Action Preempted. " << goal->type;
+          result_.status = stringStream.str();
+          as_.setPreempted(result_);
           timeout_timer.stop();
           leds.clear();
           ROS_INFO("Cleared LED Strip");
-          result_.result = bwi_msgs::LEDActionResult::PREEMPTED;
-          result_.status = "Action Preempted";
           success = false;
           timeout = false;
           check_camera_status();
@@ -231,12 +235,14 @@ public:
         if (!ros::ok())
         {
           ROS_INFO("%s: Preempted due to ROS failure", action_name_.c_str());
-          as_.setPreempted();
+          result_.result = bwi_msgs::LEDActionResult::SHUTDOWN;
+          std::ostringstream stringStream;
+          stringStream << "Action terminated due to ROS Shutdown. " << goal->type;
+          result_.status = stringStream.str();
+          as_.setPreempted(result_);
           timeout_timer.stop();
           leds.clear();
           ROS_INFO("Cleared LED Strip");
-          result_.result = bwi_msgs::LEDActionResult::SHUTDOWN;
-          result_.status = "Action terminated due to ROS Shutdown";
           check_camera_status();
           success = false;
           timeout = false;
@@ -253,6 +259,10 @@ public:
               while(!as_.isPreemptRequested() && !timeout && ros::ok())
               {
                 // Creates an animation of leds which travels left along the strip
+
+                ros::Duration time_running = ros::Time::now() - start;
+                feedback_.time_running = time_running;
+                as_.publishFeedback(feedback_);
 
                 int j = back_center_left_start+1;
 
@@ -318,6 +328,10 @@ public:
               {
                 // Creates an animation of leds which travels right along the strip
 
+                ros::Duration time_running = ros::Time::now() - start;
+                feedback_.time_running = time_running;
+                as_.publishFeedback(feedback_);
+
                 int j = front_center_right_start+1;
 
                 for (int i = back_center_right_start-1; i < back_center_right_end+1;) 
@@ -381,6 +395,10 @@ public:
               while(!as_.isPreemptRequested() && !timeout && ros::ok())
               {
                 // Creates a pulsing animation
+
+                ros::Duration time_running = ros::Time::now() - start;
+                feedback_.time_running = time_running;
+                as_.publishFeedback(feedback_);
 
                 // Increase brightness
                 for (float b = 0.0; b < 0.5; b += 0.02) 
@@ -462,6 +480,10 @@ public:
               {
                 // Creates an animation of leds which travels along a lighted strip
 
+                ros::Duration time_running = ros::Time::now() - start;
+                feedback_.time_running = time_running;
+                as_.publishFeedback(feedback_);
+
                 for (int i = led_count; i >= 0;) 
                 {
                   // Terminate goal if preempted, timeout is reached, or ros fails
@@ -515,6 +537,10 @@ public:
               while(!as_.isPreemptRequested() && !timeout && ros::ok())
               {
                 // Creates an animation of leds which travels up along the strip
+
+                ros::Duration time_running = ros::Time::now() - start;
+                feedback_.time_running = time_running;
+                as_.publishFeedback(feedback_);
 
                 int l = front_left_beam_start;
                 int k = front_right_beam_start;
@@ -619,6 +645,10 @@ public:
               {
                 // Creates an animation of leds which travels down along the strip
 
+                ros::Duration time_running = ros::Time::now() - start;
+                feedback_.time_running = time_running;
+                as_.publishFeedback(feedback_);
+
                 int l = front_left_beam_end;
                 int k = front_right_beam_end;
                 int j = back_left_beam_end;
@@ -721,11 +751,14 @@ public:
         if(success || timeout)
         {
           ROS_INFO("%s: Succeeded", action_name_.c_str());
-          as_.setSucceeded();
+          result_.result = bwi_msgs::LEDActionResult::SUCCESS;
+          std::ostringstream stringStream;
+          stringStream << "Action completed successfully. " << goal->type;
+          result_.status = stringStream.str();
+          as_.setSucceeded(result_);
           timeout_timer.stop();
           leds.clear();
           ROS_INFO("Cleared LED Strip");
-          result_.result = bwi_msgs::LEDActionResult::SUCCESS;
           check_camera_status();
           timeout = false;
         }
@@ -734,11 +767,13 @@ public:
     catch(const serial::SerialException &e)
     {
       result_.result = bwi_msgs::LEDActionResult::FAILURE;
-      result_.status = "Action failed due failure with serial communication to LED microcontroller";
+      std::ostringstream stringStream;
+      stringStream << "Action, " << goal->type << ", failed due failure with serial communication to LED microcontroller.";
+      result_.status = stringStream.str();
       ROS_ERROR("Action execution failed, unable to write to microcontroller,");
       timeout_timer.stop();
       connected = false;
-      as_.setPreempted();
+      as_.setPreempted(result_);
       success = false;
       timeout = false;
       ROS_ERROR("Ensure LED microcontroller is connected.");
@@ -977,7 +1012,7 @@ int main(int argc, char **argv)
 
   ros::Rate r(10); // 10 hz
 
-  while(!ros::ok())
+  while(ros::ok())
   {
       if(!connected) 
       {
