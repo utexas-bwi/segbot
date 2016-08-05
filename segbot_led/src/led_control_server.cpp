@@ -253,9 +253,9 @@ public:
         switch(goal->type.led_animations)
         {
           // Left Turn Animation
-          case bwi_msgs::LEDAnimations::LEFT_TURN: 
+          case bwi_msgs::LEDAnimations::LEFT_TURN:
             {
-              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
+              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
               while(!as_.isPreemptRequested() && !timeout && ros::ok())
               {
                 // Creates an animation of leds which travels left along the strip
@@ -266,7 +266,7 @@ public:
 
                 int j = back_center_left_start+1;
 
-                for (int i = front_center_left_start-1; i < front_center_left_end+1;) 
+                for (int i = front_center_left_start-1; i < front_center_left_end+1;)
                 {
                   // Terminate goal if preempted, timeout is reached, or ros fails
                   if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
@@ -321,9 +321,9 @@ public:
             }
 
           // Right Turn Animation
-          case bwi_msgs::LEDAnimations::RIGHT_TURN: 
+          case bwi_msgs::LEDAnimations::RIGHT_TURN:
             {
-              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
+              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
               while(!as_.isPreemptRequested() && !timeout && ros::ok())
               {
                 // Creates an animation of leds which travels right along the strip
@@ -334,7 +334,7 @@ public:
 
                 int j = front_center_right_start+1;
 
-                for (int i = back_center_right_start-1; i < back_center_right_end+1;) 
+                for (int i = back_center_right_start-1; i < back_center_right_end+1;)
                 {
                   // Terminate goal if preempted, timeout is reached, or ros fails
                   if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
@@ -387,6 +387,82 @@ public:
               }
               break;
             }
+
+          // Blinking Versions of Turn Signals
+
+          // // Left Turn Animation
+          // case bwi_msgs::LEDAnimations::LEFT_TURN:
+          //   {
+          //     // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
+          //     while(!as_.isPreemptRequested() && !timeout && ros::ok())
+          //     {
+          //       // Creates an animation of leds which travels left along the strip
+
+          //       ros::Duration time_running = ros::Time::now() - start;
+          //       feedback_.time_running = time_running;
+          //       as_.publishFeedback(feedback_);
+
+          //       int j = back_center_left_start;
+
+          //       for (int i = front_center_left_start; i <= front_center_left_end;)
+          //       {
+          //         // Terminate goal if preempted, timeout is reached, or ros fails
+          //         if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+
+          //         leds.setHSV(i, 22, 1, .1);
+          //         leds.setHSV(j, 22, 1, .1);
+
+          //         i++;
+          //         j--;
+          //       }
+
+          //       leds.flush();
+          //       // Microseconds
+          //       usleep(400000);
+
+          //       leds.clear();
+          //       // Microseconds
+          //       usleep(100000);
+          //     }
+          //     break;
+          //   }
+
+          // // Right Turn Animation
+          // case bwi_msgs::LEDAnimations::RIGHT_TURN:
+          //   {
+          //     // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
+          //     while(!as_.isPreemptRequested() && !timeout && ros::ok())
+          //     {
+          //       // Creates an animation of leds which travels right along the strip
+
+          //       ros::Duration time_running = ros::Time::now() - start;
+          //       feedback_.time_running = time_running;
+          //       as_.publishFeedback(feedback_);
+
+          //       int j = front_center_right_start;
+
+          //       for (int i = back_center_right_start; i <= back_center_right_end;)
+          //       {
+          //         // Terminate goal if preempted, timeout is reached, or ros fails
+          //         if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+
+          //         leds.setHSV(i, 22, 1, .1);
+          //         leds.setHSV(j, 22, 1, .1);
+
+          //         i++;
+          //         j--;
+          //       }
+
+          //       leds.flush();
+          //       // Microseconds
+          //       usleep(400000);
+
+          //       leds.clear();
+          //       // Microseconds
+          //       usleep(100000);
+          //     }
+          //     break;
+          //   }
 
           // Reverse Animtion
           case bwi_msgs::LEDAnimations::REVERSE: 
@@ -958,17 +1034,17 @@ int main(int argc, char **argv)
   privateNode.param<int>("back_center_end",back_center_end,94);
 
   // For center segments, start is in the center and end is the left/right most led of the segment
-  privateNode.param<int>("front_center_left_start",front_center_left_start,29);
-  privateNode.param<int>("front_center_left_end",front_center_left_end,34);
+  privateNode.param<int>("front_center_left_start",front_center_left_start,30);
+  privateNode.param<int>("front_center_left_end",front_center_left_end,39);
 
-  privateNode.param<int>("front_center_right_start",front_center_right_start,30);
-  privateNode.param<int>("front_center_right_end",front_center_right_end,25);
+  privateNode.param<int>("front_center_right_start",front_center_right_start,29);
+  privateNode.param<int>("front_center_right_end",front_center_right_end,20);
 
-  privateNode.param<int>("back_center_left_start",back_center_left_start,90);
-  privateNode.param<int>("back_center_left_end",back_center_left_end,85);
+  privateNode.param<int>("back_center_left_start",back_center_left_start,89);
+  privateNode.param<int>("back_center_left_end",back_center_left_end,80);
 
-  privateNode.param<int>("back_center_right_start",back_center_right_start,89);
-  privateNode.param<int>("back_center_right_end",back_center_right_end,94);
+  privateNode.param<int>("back_center_right_start",back_center_right_start,90);
+  privateNode.param<int>("back_center_right_end",back_center_right_end,99);
 
   // For beam segments, start is bottom most led and end is top most led of the segment
   privateNode.param<int>("front_left_beam_start",front_left_beam_start,60);
