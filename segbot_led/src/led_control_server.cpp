@@ -466,67 +466,50 @@ public:
           // Blocked Animation
           case bwi_msgs::LEDAnimations::BLOCKED: 
             {
-              // Turns on strip 
-              for (int i = led_count; i >= 0; i--) 
-              {
-                leds.setHSV(i, 360, 1, .5);
-              }
-              leds.flush();
-              // Microseconds
-              usleep(100000);
-
               // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK 
               while(!as_.isPreemptRequested() && !timeout && ros::ok())
               {
-                // Creates an animation of leds which travels along a lighted strip
+                // Creates a pulsing animation
 
                 ros::Duration time_running = ros::Time::now() - start;
                 feedback_.time_running = time_running;
                 as_.publishFeedback(feedback_);
 
-                for (int i = led_count; i >= 0;) 
+                // Increase brightness
+                for (float b = 0.0; b < 0.5; b += 0.02) 
                 {
                   // Terminate goal if preempted, timeout is reached, or ros fails
                   if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
 
-                  if (i == led_count) 
+                  for (int i = led_count; i >= 0; i--) 
                   {
-                    leds.setHSV(i, 360, 1, .1);
-                    leds.setHSV(i-1, 360, 1, .1);
-                    leds.setHSV(i-2, 360, 1, .1);
-                    leds.setHSV(i-3, 360, 1, .1);
-                    leds.setHSV(i-4, 360, 1, .1);
-                    i-=5;
-                  }
-                  else 
-                  {
-                    leds.setHSV(i, 360, 1, .1);
-                    i-=1;
+                    leds.setHSV(i, 360, 1, b);
                   }
 
-                  if (i < led_count) 
-                  {
-                    leds.setHSV(i+5, 360, 1, .5);
-                  }
                   leds.flush();
                   // Microseconds
-                  usleep(100000);
-
-                  if (i == 0)
-                  {
-                    leds.setHSV(i, 360, 1, .5);
-                    leds.setHSV(i+1, 360, 1, .5);
-                    leds.setHSV(i+2, 360, 1, .5);
-                    leds.setHSV(i+3, 360, 1, .5);
-                    leds.setHSV(i+4, 360, 1, .5);
-
-                    i-=1;
-
-                    leds.flush();
-                    // Microseconds
-                    usleep(100000);
-                  }
+                  usleep(75000);
                 }
+                // Microseconds
+                usleep(500000);
+
+                // Decreases Brightness
+                for (float b = 0.5; b >= 0.0; b -= 0.02) 
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+
+                  for (int i = led_count; i >= 0; i--) 
+                  {
+                    leds.setHSV(i, 360, 1, b);
+                  }
+
+                  leds.flush();
+                  // Microseconds
+                  usleep(75000);
+                }
+                // Microseconds
+                usleep(500000);
               }
               break;
             }
