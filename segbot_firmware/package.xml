@@ -1,6 +1,6 @@
 <package>
   <name>segbot_firmware</name>
-  <version>0.3.3</version>
+  <version>0.3.4</version>
   <description>
     Arduino firmware for BWI segbot sensor array.
   </description>
