@@ -2,8 +2,8 @@
 Changelog for package segbot_simulation_apps
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.4 (2016-08-08)
+------------------
 * added some code to remove redundant ros timers from the timeout queue. fixed incorrect footprint clearing.
 * updated simulated calls that open the doors to automatically close those doors.
 * finished + tested compilation of robot teleportation script.

@@ -2,8 +2,8 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.4 (2016-08-08)
+------------------
 * roslaunch check updates
 * add missing xacro dependency
 * comment out roslaunch checks for references to unreleased Segway packages (`#70 <https://github.com/utexas-bwi/segbot/issues/70>`_)

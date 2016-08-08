@@ -2,8 +2,8 @@
 Changelog for package segbot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.4 (2016-08-08)
+------------------
 * segbot: update metapackage description
 * Contributors: Jack O'Quin
 

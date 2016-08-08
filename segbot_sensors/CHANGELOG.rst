@@ -2,8 +2,8 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.4 (2016-08-08)
+------------------
 * unit test fixes (`#65 <https://github.com/utexas-bwi/segbot/issues/65>`_)
 * fix roslint errors
 * add missing dependency (`#62 <https://github.com/utexas-bwi/segbot/issues/62>`_)

@@ -2,8 +2,8 @@
 Changelog for package segbot_logical_translator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.4 (2016-08-08)
+------------------
 * Updated approachObject observations to update facing and beside fluents.
 * segbot_logical_translator: fix broken add_dependency() (`#61 <https://github.com/utexas-bwi/segbot/issues/61>`_)
 * improved door sensing behavior. switched from navfn to global_planner
