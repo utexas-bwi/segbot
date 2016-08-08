@@ -2,6 +2,33 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* unit test fixes (`#65 <https://github.com/utexas-bwi/segbot/issues/65>`_)
+* fix roslint errors
+* add missing dependency (`#62 <https://github.com/utexas-bwi/segbot/issues/62>`_)
+* modifications to the battery estimator to accomodate values greater
+  than that of which the model was fitted from
+* updated the battery_diagnostics node to use a battery model if one
+  exists on the segbot. If so, battery estimation times are added to
+  diagnostics, otherwise its business as usual.
+* modified naming system for diagnostic messages. Added python
+  dependencies required by the battery_profiler.py
+* segbot_v3: add robot monitor for diagnostics
+* added additional flexability to the battery_diagnostics sendmail
+  node that will now allow parameters to be set in the launch file to
+  reflect local segbot differences (different threshold levels,
+  etc). Appropriate values have been added for the segbot_v3 in its
+  launchfile. The segbot_v3 controller now republishes battery
+  information onto the topic assumed by the battery diagnostics.
+* updated for hokuyo on segbot v3
+* changed filter in velodyne launch script.
+* added an outlier removal filter for the velodyne.
+* added statistical outlier filter.
+* switch from pointcloud to laserscan in navigation for the velodyne. Introduce the scan shadows filter.
+* added velodyne launch files for version 3
+* Contributors: Jack O'Quin, Maxwell Svetlik, Piyush Khandelwal
+
 0.3.3 (2015-08-05)
 ------------------
 * partial fix to `#48 <https://github.com/utexas-bwi/segbot/issues/48>`_.

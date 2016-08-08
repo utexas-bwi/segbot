@@ -2,6 +2,15 @@
 Changelog for package segbot_simulation_apps
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* added some code to remove redundant ros timers from the timeout queue. fixed incorrect footprint clearing.
+* updated simulated calls that open the doors to automatically close those doors.
+* finished + tested compilation of robot teleportation script.
+* separated some common functionality in door handler so that it can be used by robot teleporter.
+* added some stuff for the robot teleporter
+* Contributors: Piyush Khandelwal
+
 0.3.3 (2015-08-05)
 ------------------
 * merge segbot_simulator packages into segbot (`#46 <https://github.com/utexas-bwi/segbot/issues/46>`_)

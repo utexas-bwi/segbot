@@ -2,6 +2,17 @@
 Changelog for package segbot_logical_translator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Updated approachObject observations to update facing and beside fluents.
+* segbot_logical_translator: fix broken add_dependency() (`#61 <https://github.com/utexas-bwi/segbot/issues/61>`_)
+* improved door sensing behavior. switched from navfn to global_planner
+* refined door open check behavior to also disable static costmap.
+* changed gothrough action to disable static map while executing navigation.
+* bug fixes to new floor location resolution functionality.
+* added functionality for resolving a change floor request, allowing robot teleportation.
+* Contributors: FernandezR, Jack O'Quin, Piyush Khandelwal
+
 0.3.3 (2015-08-05)
 ------------------
 * merge segbot_apps packages into segbot (`#46 <https://github.com/utexas-bwi/segbot/issues/46>`_)

@@ -2,6 +2,9 @@
 Changelog for package segbot_gui
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.3.3 (2015-08-05)
 ------------------
 * merge segbot_apps packages into segbot (`#46 <https://github.com/utexas-bwi/segbot/issues/46>`_)

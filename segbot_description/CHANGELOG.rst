@@ -2,6 +2,20 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* fixed hokuyo location in segbot v2 and segbot v3.
+* updated for hokuyo on segbot v3
+* some more updates to segbot_v3.
+* added a mount for the velodyne, along with necessary dependencies.
+* fixed segbot v3 urdf file.
+* fixed the basic segbot v3 description, which is now ready for supplanting the chassis. fixed the segbot v3 controller.
+* removed redundant arm urdf file from segbot_description.
+* chasis for the arm version of the robot
+* updated and added segbot_v2.arm. fixed some issues with previous commit. closes `#34 <https://github.com/utexas-bwi/segbot/issues/34>`_.
+* updated segbot_v2 to use independent sensor plate mount. see `#34 <https://github.com/utexas-bwi/segbot/issues/34>`_
+* Contributors: Jivko Sinapov, Piyush Khandelwal
+
 0.3.3 (2015-08-05)
 ------------------
 * fixed long standing issue of robot not rotating in place correctly using gazebo_ros_planar_move.

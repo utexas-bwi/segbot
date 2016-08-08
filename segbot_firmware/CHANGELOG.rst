@@ -2,6 +2,9 @@
 Changelog for package segbot_firmware
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.3.3 (2015-08-05)
 ------------------
 

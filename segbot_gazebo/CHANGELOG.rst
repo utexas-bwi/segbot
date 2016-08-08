@@ -2,6 +2,13 @@
 Changelog for package segbot_gazebo
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* improved door sensing behavior. switched from navfn to global_planner
+* updated parameters, and separated v2 and v3 navigation configuration parameters.
+* initial testing on simulation complete. will test now on real robot.
+* Contributors: Piyush Khandelwal
+
 0.3.3 (2015-08-05)
 ------------------
 * merge segbot_simulator packages into segbot (`#46 <https://github.com/utexas-bwi/segbot/issues/46>`_)

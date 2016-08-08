@@ -2,6 +2,26 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* roslaunch check updates
+* add missing xacro dependency
+* comment out roslaunch checks for references to unreleased Segway packages (`#70 <https://github.com/utexas-bwi/segbot/issues/70>`_)
+* remove dependencies on unreleased Segway packages (`#70 <https://github.com/utexas-bwi/segbot/issues/70>`_)
+* unit test fixes (`#65 <https://github.com/utexas-bwi/segbot/issues/65>`_)
+* added additional flexability to the battery_diagnostics sendmail
+  node that will now allow parameters to be set in the launch file to
+  reflect local segbot differences (different threshold levels,
+  etc). Appropriate values have been added for the segbot_v3 in its
+  launchfile. The segbot_v3 controller now republishes battery
+  information onto the topic assumed by the battery diagnostics.
+* segbot_v3: add robot monitor for diagnostics
+  information onto the topic assumed by the battery diagnostics.
+* updated for hokuyo on segbot v3
+* fixed some problems in the velodyne processing chain
+* added segbot v3 support
+* Contributors: Jack O'Quin, Piyush Khandelwal, maxsvetlik
+
 0.3.3 (2015-08-05)
 ------------------
 * segbot_bringup: launch stop controller with segway base (`#41 <https://github.com/utexas-bwi/segbot/issues/41>`_)

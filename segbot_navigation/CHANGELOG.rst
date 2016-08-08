@@ -2,6 +2,20 @@
 Changelog for package segbot_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Added gmapping launch files for version 3 BWI Bot and added mapping instructions.
+* Resolving hardcoded directory in include
+  A recent commit changed most of the rosparam .yaml files to be found based on the robot version (segbotv2 or v3).
+  One file, eband_planner_params.yaml had the old directory structure hardcoded in, preventing successful startup when running the bwi launch files on a segbot_v2.
+* improved door sensing behavior. switched from navfn to global_planner
+* updated parameters, and separated v2 and v3 navigation configuration parameters.
+* fixed robot footprint.
+* updated for hokuyo on segbot v3
+* switch from pointcloud to laserscan in navigation for the
+  velodyne. Introduce the scan shadows filter.
+* Contributors: FernandezR, Piyush Khandelwal, maxsvetlik
+
 0.3.3 (2015-08-05)
 ------------------
 * merge segbot_apps packages into segbot (`#46 <https://github.com/utexas-bwi/segbot/issues/46>`_)
