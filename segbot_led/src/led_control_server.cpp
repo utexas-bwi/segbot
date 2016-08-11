@@ -390,79 +390,79 @@ public:
 
           // Blinking Versions of Turn Signals
 
-          // // Left Turn Animation
-          // case bwi_msgs::LEDAnimations::LEFT_TURN:
-          //   {
-          //     // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
-          //     while(!as_.isPreemptRequested() && !timeout && ros::ok())
-          //     {
-          //       // Creates an animation of leds which travels left along the strip
+/*          // Left Turn Animation
+          case bwi_msgs::LEDAnimations::LEFT_TURN:
+            {
+              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
+              while(!as_.isPreemptRequested() && !timeout && ros::ok())
+              {
+                // Creates an animation of leds which travels left along the strip
 
-          //       ros::Duration time_running = ros::Time::now() - start;
-          //       feedback_.time_running = time_running;
-          //       as_.publishFeedback(feedback_);
+                ros::Duration time_running = ros::Time::now() - start;
+                feedback_.time_running = time_running;
+                as_.publishFeedback(feedback_);
 
-          //       int j = back_center_left_start;
+                int j = back_center_left_start;
 
-          //       for (int i = front_center_left_start; i <= front_center_left_end;)
-          //       {
-          //         // Terminate goal if preempted, timeout is reached, or ros fails
-          //         if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+                for (int i = front_center_left_start; i <= front_center_left_end;)
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
 
-          //         leds.setHSV(i, 22, 1, .1);
-          //         leds.setHSV(j, 22, 1, .1);
+                  leds.setHSV(i, 22, 1, .1);
+                  leds.setHSV(j, 22, 1, .1);
 
-          //         i++;
-          //         j--;
-          //       }
+                  i++;
+                  j--;
+                }
 
-          //       leds.flush();
-          //       // Microseconds
-          //       usleep(400000);
+                leds.flush();
+                // Microseconds
+                usleep(400000);
 
-          //       leds.clear();
-          //       // Microseconds
-          //       usleep(100000);
-          //     }
-          //     break;
-          //   }
+                leds.clear();
+                // Microseconds
+                usleep(100000);
+              }
+              break;
+            }
 
-          // // Right Turn Animation
-          // case bwi_msgs::LEDAnimations::RIGHT_TURN:
-          //   {
-          //     // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
-          //     while(!as_.isPreemptRequested() && !timeout && ros::ok())
-          //     {
-          //       // Creates an animation of leds which travels right along the strip
+          // Right Turn Animation
+          case bwi_msgs::LEDAnimations::RIGHT_TURN:
+            {
+              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
+              while(!as_.isPreemptRequested() && !timeout && ros::ok())
+              {
+                // Creates an animation of leds which travels right along the strip
 
-          //       ros::Duration time_running = ros::Time::now() - start;
-          //       feedback_.time_running = time_running;
-          //       as_.publishFeedback(feedback_);
+                ros::Duration time_running = ros::Time::now() - start;
+                feedback_.time_running = time_running;
+                as_.publishFeedback(feedback_);
 
-          //       int j = front_center_right_start;
+                int j = front_center_right_start;
 
-          //       for (int i = back_center_right_start; i <= back_center_right_end;)
-          //       {
-          //         // Terminate goal if preempted, timeout is reached, or ros fails
-          //         if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+                for (int i = back_center_right_start; i <= back_center_right_end;)
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
 
-          //         leds.setHSV(i, 22, 1, .1);
-          //         leds.setHSV(j, 22, 1, .1);
+                  leds.setHSV(i, 22, 1, .1);
+                  leds.setHSV(j, 22, 1, .1);
 
-          //         i++;
-          //         j--;
-          //       }
+                  i++;
+                  j--;
+                }
 
-          //       leds.flush();
-          //       // Microseconds
-          //       usleep(400000);
+                leds.flush();
+                // Microseconds
+                usleep(400000);
 
-          //       leds.clear();
-          //       // Microseconds
-          //       usleep(100000);
-          //     }
-          //     break;
-          //   }
+                leds.clear();
+                // Microseconds
+                usleep(100000);
+              }
+              break;
+            }*/
 
           // Reverse Animtion
           case bwi_msgs::LEDAnimations::REVERSE: 
@@ -552,7 +552,7 @@ public:
                 as_.publishFeedback(feedback_);
 
                 // Increase brightness
-                for (float b = 0.0; b < 0.5; b += 0.02) 
+                for (float b = 0.0; b <= 0.5; b += 0.02) 
                 {
                   // Terminate goal if preempted, timeout is reached, or ros fails
                   if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
@@ -564,10 +564,10 @@ public:
 
                   leds.flush();
                   // Microseconds
-                  usleep(75000);
+                  if (b != 0.5) { usleep(60000); }
                 }
                 // Microseconds
-                usleep(500000);
+                usleep(45000);
 
                 // Decreases Brightness
                 for (float b = 0.5; b >= 0.0; b -= 0.02) 
@@ -582,10 +582,10 @@ public:
 
                   leds.flush();
                   // Microseconds
-                  usleep(75000);
+                  if (b != 0.0) { usleep(60000); }
                 }
                 // Microseconds
-                usleep(500000);
+                usleep(45000);
               }
               break;
             }
@@ -1035,16 +1035,16 @@ int main(int argc, char **argv)
 
   // For center segments, start is in the center and end is the left/right most led of the segment
   privateNode.param<int>("front_center_left_start",front_center_left_start,30);
-  privateNode.param<int>("front_center_left_end",front_center_left_end,39);
+  privateNode.param<int>("front_center_left_end",front_center_left_end,34);
 
   privateNode.param<int>("front_center_right_start",front_center_right_start,29);
-  privateNode.param<int>("front_center_right_end",front_center_right_end,20);
+  privateNode.param<int>("front_center_right_end",front_center_right_end,15);
 
   privateNode.param<int>("back_center_left_start",back_center_left_start,89);
-  privateNode.param<int>("back_center_left_end",back_center_left_end,80);
+  privateNode.param<int>("back_center_left_end",back_center_left_end,75);
 
   privateNode.param<int>("back_center_right_start",back_center_right_start,90);
-  privateNode.param<int>("back_center_right_end",back_center_right_end,99);
+  privateNode.param<int>("back_center_right_end",back_center_right_end,94);
 
   // For beam segments, start is bottom most led and end is top most led of the segment
   privateNode.param<int>("front_left_beam_start",front_left_beam_start,60);

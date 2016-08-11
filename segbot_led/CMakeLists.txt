@@ -27,3 +27,7 @@ target_link_libraries(led_control_server ${catkin_LIBRARIES})
 install(TARGETS
           led_control_server
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+install(DIRECTORY 
+          launch/ 
+    DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
