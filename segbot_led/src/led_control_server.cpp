@@ -572,7 +572,7 @@ public:
                 // Decreases Brightness
                 for (float b = 0.5; b >= 0.0; b -= 0.02) 
                 {
-                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  // Ter50minate goal if preempted, timeout is reached, or ros fails
                   if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
 
                   for (int i = led_count; i >= 0; i--) 
