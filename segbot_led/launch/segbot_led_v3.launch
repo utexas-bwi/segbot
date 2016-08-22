@@ -10,6 +10,7 @@
     <param name="back_center_end" value="94" />
 
     <!-- For center segments, start is in the center and end is the left/right most led of the segment -->
+    <!-- Point of reference is from facing the segment -->
     <param name="front_center_left_start" value="30" />
     <param name="front_center_left_end" value="34" />
 
@@ -23,6 +24,7 @@
     <param name="back_center_right_end" value="94" />
 
     <!-- For beam segments, start is bottom most led and end is top most led of the segment -->
+    <!-- Point of reference is from facing the segment -->
     <param name="front_left_beam_start" value="60" />
     <param name="front_left_beam_end" value="73" />
 
@@ -34,6 +36,16 @@
 
     <param name="back_right_beam_start" value="0" />
     <param name="back_right_beam_end" value="13" />
+
+    <!-- For Circular segments, start is left most led of the "U" shaped segment and end is right most led of the "U" shaped segment -->
+    <!-- Point of reference is from facing the segment -->
+    <param name="circular_u_start" value="75" />
+    <param name="circular_u_end" value="105" />
+
+    <!-- For top segment, start is left most led and end is right most led of the segment -->
+    <!-- Point of reference is from facing the segment -->
+    <param name="top_of_u_start" value="25" />
+    <param name="top_of_u_end" value="34" />
 
   </node>
 </launch>
