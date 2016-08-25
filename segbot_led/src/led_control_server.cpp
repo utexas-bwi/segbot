@@ -1261,7 +1261,7 @@ public:
                 as_.publishFeedback(feedback_);
 
                 // Increase brightness
-                for (float b = 0.0; b <= 0.4; b += 0.02)
+                for (float b = 0.0; b <= 0.3; b += 0.02)
                 {
                   // Terminate goal if preempted, timeout is reached, or ros fails
                   if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
@@ -1273,13 +1273,13 @@ public:
 
                   leds.flush();
                   // Microseconds
-                  if (b != 0.5) { usleep(60000); }
+                  if (b != 0.3) { usleep(70000); }
                 }
                 // Microseconds
-                usleep(45000);
+                usleep(75000);
 
                 // Decreases Brightness
-                for (float b = 0.4; b >= 0.0; b -= 0.02)
+                for (float b = 0.3; b >= 0.0; b -= 0.02)
                 {
                   // Terminate goal if preempted, timeout is reached, or ros fails
                   if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
@@ -1291,10 +1291,10 @@ public:
 
                   leds.flush();
                   // Microseconds
-                  if (b != 0.0) { usleep(60000); }
+                  if (b != 0.0) { usleep(70000); }
                 }
                 // Microseconds
-                usleep(45000);
+                usleep(75000);
               }
               break;
             }
