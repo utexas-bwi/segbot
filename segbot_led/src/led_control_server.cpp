@@ -258,7 +258,7 @@ public:
         switch(goal->type.led_animations)
         {
           // Left Turn Sequential Animation
-          case bwi_msgs::LEDAnimations::LEFT_TURN:
+/*          case bwi_msgs::LEDAnimations::LEFT_TURN:
             {
               // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
               while(!as_.isPreemptRequested() && !timeout && ros::ok())
@@ -391,7 +391,7 @@ public:
                 }
               }
               break;
-            }
+            }*/
 
           // Blinking Versions of Turn Signals
 
@@ -691,7 +691,7 @@ public:
 
           // Circular Versions of Turn Signals [Four Sets]
 
-/*          // Left Turn Circular Animation [Four  Sets]
+          // Left Turn Circular Animation [Four  Sets]
           case bwi_msgs::LEDAnimations::LEFT_TURN:
             {
               // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
@@ -905,7 +905,7 @@ public:
                 }
               }
               break;
-            }*/
+            }
 
           // Reverse Animtion
           case bwi_msgs::LEDAnimations::REVERSE:
@@ -1244,6 +1244,57 @@ public:
                     usleep(100000);
                   }
                 }
+              }
+              break;
+            }
+
+          // Need Assistance Animation
+          case bwi_msgs::LEDAnimations::NEED_ASSIST:
+            {
+              // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
+              while(!as_.isPreemptRequested() && !timeout && ros::ok())
+              {
+                // Creates a pulsing animation
+
+                ros::Duration time_running = ros::Time::now() - start;
+                feedback_.time_running = time_running;
+                as_.publishFeedback(feedback_);
+
+                // Increase brightness
+                for (float b = 0.0; b <= 0.4; b += 0.02)
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+
+                  for (int i = led_count; i >= 0; i--)
+                  {
+                    leds.setHSV(i, 240, 1, b);
+                  }
+
+                  leds.flush();
+                  // Microseconds
+                  if (b != 0.5) { usleep(60000); }
+                }
+                // Microseconds
+                usleep(45000);
+
+                // Decreases Brightness
+                for (float b = 0.4; b >= 0.0; b -= 0.02)
+                {
+                  // Terminate goal if preempted, timeout is reached, or ros fails
+                  if(as_.isPreemptRequested() || timeout || !ros::ok()) { break; }
+
+                  for (int i = led_count; i >= 0; i--)
+                  {
+                    leds.setHSV(i, 240, 1, b);
+                  }
+
+                  leds.flush();
+                  // Microseconds
+                  if (b != 0.0) { usleep(60000); }
+                }
+                // Microseconds
+                usleep(45000);
               }
               break;
             }
