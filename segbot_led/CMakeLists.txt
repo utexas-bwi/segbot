@@ -24,8 +24,13 @@ add_executable(led_control_server src/led_control_server.cpp)
 add_dependencies(led_control_server ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
 target_link_libraries(led_control_server ${catkin_LIBRARIES})
 
+add_executable(test_led_control_server test/test.cpp)
+add_dependencies(test_led_control_server ${catkin_EXPORTED_TARGETS} ${${PROJECT_NAME}_EXPORTED_TARGETS})
+target_link_libraries(test_led_control_server ${catkin_LIBRARIES})
+
 install(TARGETS
           led_control_server
+          test_led_control_server
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(DIRECTORY
