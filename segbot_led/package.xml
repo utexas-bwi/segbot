@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>segbot_led</name>
-  <version>0.3.4</version>
+  <version>0.3.5</version>
   <description>
     LED package that provides drivers for communicating with Polulu WS2812B-Based LED Strips
     utilizing an Arduino microcontroller. Also action and service calls for standard applications.

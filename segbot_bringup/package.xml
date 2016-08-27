@@ -1,6 +1,6 @@
 <package format="2">
   <name>segbot_bringup</name>
-  <version>0.3.4</version>
+  <version>0.3.5</version>
   <description>
     Contains launch files and runtime scripts necessary for running
     segbots in simulation and in the real world.
