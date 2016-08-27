@@ -2,6 +2,9 @@
 Changelog for package segbot
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.5 (2016-08-27)
+------------------
+
 0.3.4 (2016-08-08)
 ------------------
 * segbot: update metapackage description

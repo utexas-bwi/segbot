@@ -2,6 +2,12 @@
 Changelog for package segbot_bringup
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.5 (2016-08-27)
+------------------
+* Added xtion and led strip to segbot_v3 launch file in segbot_bringup
+  (`#75 <https://github.com/utexas-bwi/segbot/issues/75>`_)
+* Contributors: Rolando Fernandez
+
 0.3.4 (2016-08-08)
 ------------------
 * roslaunch check updates

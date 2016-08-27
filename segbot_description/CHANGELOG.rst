@@ -2,6 +2,9 @@
 Changelog for package segbot_description
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.5 (2016-08-27)
+------------------
+
 0.3.4 (2016-08-08)
 ------------------
 * fixed hokuyo location in segbot v2 and segbot v3.

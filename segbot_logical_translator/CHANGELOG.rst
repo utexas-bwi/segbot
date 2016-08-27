@@ -2,6 +2,9 @@
 Changelog for package segbot_logical_translator
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.5 (2016-08-27)
+------------------
+
 0.3.4 (2016-08-08)
 ------------------
 * Updated approachObject observations to update facing and beside fluents.

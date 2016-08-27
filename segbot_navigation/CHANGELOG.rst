@@ -2,6 +2,9 @@
 Changelog for package segbot_navigation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.5 (2016-08-27)
+------------------
+
 0.3.4 (2016-08-08)
 ------------------
 * Added gmapping launch files for version 3 BWI Bot and added mapping instructions.

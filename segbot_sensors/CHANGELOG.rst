@@ -2,6 +2,9 @@
 Changelog for package segbot_sensors
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.5 (2016-08-27)
+------------------
+
 0.3.4 (2016-08-08)
 ------------------
 * unit test fixes (`#65 <https://github.com/utexas-bwi/segbot/issues/65>`_)

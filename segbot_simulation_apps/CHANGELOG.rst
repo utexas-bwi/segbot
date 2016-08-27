@@ -2,6 +2,9 @@
 Changelog for package segbot_simulation_apps
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.5 (2016-08-27)
+------------------
+
 0.3.4 (2016-08-08)
 ------------------
 * added some code to remove redundant ros timers from the timeout queue. fixed incorrect footprint clearing.

@@ -2,6 +2,15 @@
 Changelog for package segbot_led
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.5 (2016-08-27)
+------------------
+* Added need assistance animation and made circular 4-set animation default turn animation
+* Added additonal circular variations to turn signals
+* Updated led segments and blocked animation.  (`#73
+  <https://github.com/utexas-bwi/segbot/issues/73>`_)
+* Added install target for launch directory.
+* Contributors: FernandezR, Rolando Fernandez
+
 0.3.4 (2016-08-08)
 ------------------
 * Added variations for turn signals and adjusted led segments
