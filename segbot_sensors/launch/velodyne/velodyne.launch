@@ -11,6 +11,7 @@
   <include file="$(find velodyne_driver)/launch/nodelet_manager.launch">
     <arg name="model" value="VLP16" />
     <arg name="frame_id" value="$(arg tf_prefix)/velodyne" />
+    <arg name="manager" value="velodyne_nodelet_manager" />
   </include>
 
   <!-- start cloud nodelet -->
