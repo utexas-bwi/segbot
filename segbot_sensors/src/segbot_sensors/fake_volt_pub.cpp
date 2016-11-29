@@ -1,17 +1,17 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-#include "smart_battery_msgs/SmartBatteryStatus.h"
+#include "sensor_msgs/BatteryState.h"
 #include <sstream>
 
 int main(int argc, char **argv){
   ros::init(argc, argv, "talker");
   ros::NodeHandle n;
-  ros::Publisher chatter_pub = n.advertise<smart_battery_msgs::SmartBatteryStatus>("/battery0", 1);
+  ros::Publisher chatter_pub = n.advertise<sensor_msgs::BatteryState>("/battery0", 1);
   ros::Rate loop_rate(10);
 
   int count = 0;
   while (ros::ok()){
-    smart_battery_msgs::SmartBatteryStatus stat;
+    sensor_msgs::BatteryState stat;
     stat.voltage = 10.9;
     chatter_pub.publish(stat);
     ros::spinOnce();

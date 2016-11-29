@@ -29,7 +29,7 @@
   <!-- segway_v3 packages commented out until released publicly -->
   <!-- <exec_depend>segway_msgs</exec_depend> -->
   <!-- <exec_depend>segway_ros</exec_depend> -->
-  <exec_depend>smart_battery_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>stop_base</exec_depend>
   <exec_depend>tf</exec_depend>
   <exec_depend>xacro</exec_depend>
