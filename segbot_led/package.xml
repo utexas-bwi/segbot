@@ -16,14 +16,11 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>bwi_msgs</build_depend>
-
   <depend>actionlib</depend>
   <depend>actionlib_msgs</depend>
+  <depend>bwi_msgs</depend>
   <depend>roscpp</depend>
   <depend>serial</depend>
   <depend>std_msgs</depend>
-
-  <exec_depend>bwi_msgs</exec_depend>
 
 </package>

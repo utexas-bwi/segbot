@@ -1,4 +1,4 @@
-<package>
+<package format="2">
   <name>segbot_navigation</name>
   <version>0.3.5</version>
   <description>
@@ -19,28 +19,22 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <build_depend>bwi_interruptable_action_server</build_depend>
-  <build_depend>geometry_msgs</build_depend>
-  <build_depend>move_base_msgs</build_depend>
-  <build_depend>nav_msgs</build_depend>
-  <build_depend>std_srvs</build_depend>
+  <depend>bwi_interruptable_action_server</depend>
+  <depend>geometry_msgs</depend>
+  <depend>move_base_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>std_srvs</depend>
 
-  <run_depend>bwi_interruptable_action_server</run_depend>
-  <run_depend>geometry_msgs</run_depend>
-  <run_depend>move_base_msgs</run_depend>
-  <run_depend>nav_msgs</run_depend>
-  <run_depend>std_srvs</run_depend>
-
-  <run_depend>amcl</run_depend>
-  <run_depend>eband_local_planner</run_depend>
-  <run_depend>gmapping</run_depend>
-  <run_depend>map_server</run_depend>
-  <run_depend version_gte="1.11.15">move_base</run_depend>
-  <run_depend>global_planner</run_depend>
-  <run_depend>rviz</run_depend>
-  <run_depend>segbot_bringup</run_depend>
+  <exec_depend>amcl</exec_depend>
+  <exec_depend>eband_local_planner</exec_depend>
+  <exec_depend>gmapping</exec_depend>
+  <exec_depend>map_server</exec_depend>
+  <exec_depend version_gte="1.11.15">move_base</exec_depend>
+  <exec_depend>global_planner</exec_depend>
+  <exec_depend>rviz</exec_depend>
+  <exec_depend>segbot_bringup</exec_depend>
 
   <!-- test dependencies -->
-  <build_depend>roslaunch</build_depend>
+  <test_depend>roslaunch</test_depend>
 
 </package>
