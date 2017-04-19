@@ -41,7 +41,7 @@
     <arg name="name" value="nav_hokuyo" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="publish_tf" value="true" /> <!-- already published by urdf -->
-    <arg name="topic" value="nav_hokuyo/scan" />
+    <arg name="topic" value="hokuyo/scan" />
   </include>
 
 roslaunch openni2_launch openni2.launch camera:=nav_kinect depth_registration:=true
