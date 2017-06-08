@@ -26,7 +26,7 @@ void newGoalCallback(const InterruptableActionServer<move_base_msgs::MoveBaseAct
     nav_msgs::GetPlan srv;
     srv.request.start = current_location_;
     srv.request.goal = new_goal->target_pose;
-    srv.request.tolerance = 0.2f;
+    srv.request.tolerance = 0.0f;
     bool plan_found = false;
     if (make_plan_service_->call(srv)) {
       plan_found = srv.response.plan.poses.size() != 0;
