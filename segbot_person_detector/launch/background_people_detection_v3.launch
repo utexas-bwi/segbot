@@ -1,0 +1,16 @@
+<launch>
+
+<node pkg="pcl_perception" type="background_person_detector" name="background_person_detector" output="log">
+
+        <param name="ground_plane_file" value="ground_plane_v3.txt" />
+	<param name="visualize" value="true" />
+	<param name="rate" value="4.0" />
+	<param name="rgbd_topic" value = "nav_kinect/depth_registered/points"/>
+	<param name="classifier_location" value = "$(find pcl_perception)/data/classifier.yaml"/>
+	
+	<!-- when publishing the detected poses, which frame id should they be in -->
+	<param name="out_frame_id" value = "/map"/>
+
+</node>
+
+</launch>
