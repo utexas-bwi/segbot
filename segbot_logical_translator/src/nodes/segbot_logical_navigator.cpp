@@ -324,11 +324,6 @@ void SegbotLogicalNavigator::senseState(std::vector<PlannerAtom>& observations, 
 
   for (size_t door = 0; door < num_doors; ++door) {
 
-    if ((doors_[door].approach_names[0] != getLocationString(location_idx)) &&
-        (doors_[door].approach_names[1] != getLocationString(location_idx))) {
-      // We can't sense the current door since we're not in a location that this door connects.
-      continue;
-    }
 
     PlannerAtom beside_door;
     beside_door.value.push_back(getDoorString(door));
