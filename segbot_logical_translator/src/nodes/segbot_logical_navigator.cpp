@@ -584,6 +584,8 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
                                          const std::string& facing_door,
                                          std::vector<PlannerAtom>& observations,
                                          std::string& error_message) {
+	//Just making sure it gets called correctly
+	ROS_INFO_STREAM("SegbotLogicalNavigator: changefloor called");
 
   error_message = "";
   observations.clear();
