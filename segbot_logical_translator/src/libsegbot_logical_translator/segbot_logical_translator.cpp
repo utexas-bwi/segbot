@@ -190,14 +190,15 @@ namespace segbot_logical_translator {
           if (distance < 2 * min_distance) {
             //return true;
             counter++;
+						ROS_INFO_STREAM("SegbotLogicalTranslator: door open, counter is " << counter);
           } else {
             //return false; // returned path probably through some other door
-            ROS_INFO_STREAM("SegbotLogicalTranslator: sensedoor: Returned path is too long.");
+            ROS_INFO_STREAM("SegbotLogicalTranslator: isDoorOpen: Returned path is too long.");
             counter = 0;
           }
         } else {
           //return false; // this is ok. it means the door is closed
-          ROS_INFO_STREAM("SegbotLogicalTranslator: sensedoor: Could not find path.");
+          ROS_INFO_STREAM("SegbotLogicalTranslator: isDoorOpen: Could not find path, door is likely closed.");
           counter = 0;
         }
       } else {
