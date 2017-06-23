@@ -50,7 +50,7 @@
 
 #include <segbot_logical_translator/segbot_logical_translator.h>
 
-#define SCALAR 1.5
+#define SCALAR 1.1
 
 namespace segbot_logical_translator {
 
