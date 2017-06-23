@@ -50,6 +50,8 @@
 
 #include <segbot_logical_translator/segbot_logical_translator.h>
 
+#define SCALAR 1.5
+
 namespace segbot_logical_translator {
 
   SegbotLogicalTranslator::SegbotLogicalTranslator() : 
@@ -187,7 +189,9 @@ namespace segbot_logical_translator {
                              pow(current_pt.y - old_pt.y, 2));
             old_pt = current_pt;
           }
-          if (distance < 2 * min_distance) {
+					ROS_INFO_STREAM("SegbotLogicalTranslator: plan distance to go through door is: " << distance);
+					ROS_INFO_STREAM("Comparing this plan to distance threshhold of " << SCALAR * min_distance);
+          if (distance <  SCALAR *  min_distance) {
             //return true;
             counter++;
 						ROS_INFO_STREAM("SegbotLogicalTranslator: door open, counter is " << counter);
