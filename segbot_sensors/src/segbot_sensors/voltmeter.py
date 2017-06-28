@@ -34,7 +34,7 @@
 """
 This module handles voltage messages from the Arduino Mega 2560
 mounted on BWI segbots, publishing them as ROS
-smart_battery_msgs/SmartBatteryStatus messages.
+sensor_msgs/BatteryState messages.
 """
 
 # enable some python3 compatibility options:
@@ -43,7 +43,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import re
 
 import rospy
-from smart_battery_msgs.msg import SmartBatteryStatus
+from sensor_msgs.msg import BatteryState
 from geometry_msgs.msg import Vector3
 
 
@@ -56,15 +56,16 @@ class VoltmeterMessages(object):
         """ Extracts voltage reading from the Arduino serial message.
         :returns: voltage data string reported, may be empty.
         """
-        self.pub = rospy.Publisher('battery0', SmartBatteryStatus,
+        self.pub = rospy.Publisher('battery0', BatteryState,
                                    queue_size=1)
         # initialize constant fields in battery message
-        self.battery = SmartBatteryStatus(
-            rate=float('nan'),
+        self.battery = BatteryState(
+            current=float('nan'),
             charge=float('nan'),
             capacity=float('nan'),
             design_capacity=float('nan'),
-            charge_state=SmartBatteryStatus.DISCHARGING,
+            percentage=float('nan'),
+            power_supply_status=BatteryState.POWER_SUPPLY_STATUS_DISCHARGING,
             present=1)
 
     def publish(self, serial_msg):
