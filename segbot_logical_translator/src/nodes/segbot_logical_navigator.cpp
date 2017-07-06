@@ -515,7 +515,7 @@ bool SegbotLogicalNavigator::resolveChangeFloorRequest(const std::string& new_ro
 
   // Make sure we can change floors and all arguments are correct.
   if (!change_level_client_available_) {
-		//Make an attempt to connect to see if the client is available again
+		//Make an attempt to connect to see if the client has been made avaliable since instantiation before giving up
 		change_level_client_available_ = ros::service::waitForService("level_mux/change_current_level",ros::Duration(0.5));
 		if(change_level_client_available_){
 			change_level_client_ = nh_->serviceClient<multi_level_map_msgs::ChangeCurrentLevel>("level_mux/change_current_level");
@@ -525,8 +525,6 @@ bool SegbotLogicalNavigator::resolveChangeFloorRequest(const std::string& new_ro
     return false;
 		}
   }
-//removing the else statement, as its not really necessary
-// else {
     bool new_room_found = false;
     typedef std::pair<std::string, std::vector<std::string> > Level2LocNamesPair;
     BOOST_FOREACH(const Level2LocNamesPair& level_to_loc, level_to_loc_names_map_) {
@@ -541,7 +539,6 @@ bool SegbotLogicalNavigator::resolveChangeFloorRequest(const std::string& new_ro
       error_message = "Location " + new_room + " has not been defined on any floor!";
       return false;
     }
-//  }
 
   if (current_level_id_ == floor_name) {
     error_message = "The robot is already on " + floor_name + " (in which " + new_room + " exists)!";
