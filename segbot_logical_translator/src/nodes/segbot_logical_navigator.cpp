@@ -149,6 +149,7 @@ class SegbotLogicalNavigator : public segbot_logical_translator::SegbotLogicalTr
     int global_costmap_width_;
 
     bool robot_controller_available_;
+		bwi_msgs::LogicalNavigationFeedback feedback_;
 
 };
 
@@ -281,6 +282,9 @@ void SegbotLogicalNavigator::publishNavigationMap(bool publish_map_with_doors, b
 
 void SegbotLogicalNavigator::senseState(std::vector<PlannerAtom>& observations, size_t door_idx) {
 
+	feedback_.name = "senseState";
+	execute_action_server_->publishFeedback(feedback_);
+
   PlannerAtom at;
   at.name = "at";
   size_t location_idx = getLocationIdx(bwi::Point2f(robot_x_, robot_y_));
@@ -411,7 +415,10 @@ bool SegbotLogicalNavigator::approachDoor(const std::string& door_name,
     std::string& error_message, bool gothrough) {
   error_message = "";
 
-  size_t door_idx = getDoorIdx(door_name);
+ 	feedback_.name = "approachdoor";
+	execute_action_server_->publishFeedback(feedback_);
+
+ size_t door_idx = getDoorIdx(door_name);
   if (door_idx == NO_DOOR_IDX) {
     // Interface failure
     error_message = "Could not resolve argument: " + door_name;
@@ -466,6 +473,10 @@ bool SegbotLogicalNavigator::approachDoor(const std::string& door_name,
 bool SegbotLogicalNavigator::approachObject(const std::string& object_name,
     std::vector<PlannerAtom>& observations,
     std::string& error_message) {
+
+	feedback_.name = "approachObject";
+	execute_action_server_->publishFeedback(feedback_);
+
 
   error_message = "";
   observations.clear();
@@ -594,6 +605,9 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
 	//Just making sure it gets called correctly
 	ROS_INFO_STREAM("SegbotLogicalNavigator: changefloor called");
 
+ 	feedback_.name = "changefloor";
+	execute_action_server_->publishFeedback(feedback_);
+
   error_message = "";
   observations.clear();
 
@@ -634,7 +648,11 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
 bool SegbotLogicalNavigator::senseDoor(const std::string& door_name,
     std::vector<PlannerAtom>& observations,
     std::string& error_message) {
-  error_message = "";
+
+	feedback_.name = "sensedoor";
+	execute_action_server_->publishFeedback(feedback_);
+
+	error_message = "";
   size_t door_idx =
     bwi_planning_common::resolveDoor(door_name, doors_);
   if (door_idx == bwi_planning_common::NO_DOOR_IDX) {
@@ -656,6 +674,9 @@ void SegbotLogicalNavigator::execute(const bwi_msgs::LogicalNavigationGoalConstP
 
   bwi_msgs::LogicalNavigationResult res;
   res.observations.clear();
+	
+	feedback_.name = goal->command.name;
+	execute_action_server_->publishFeedback(feedback_);
 
   if (goal->command.name == "approach") {
     res.success = approachDoor(goal->command.value[0], res.observations, res.status, false);
