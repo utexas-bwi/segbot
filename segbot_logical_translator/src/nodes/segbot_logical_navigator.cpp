@@ -361,9 +361,9 @@ void SegbotLogicalNavigator::senseState(std::vector<PlannerAtom>& observations, 
     }
   }
 
-	feedback_.action = bwi_msgs::LogicalNavigationFeedback::SENSE_STATE;
-	feedback_.data = "";
-	execute_action_server_->publishFeedback(feedback_);
+//	feedback_.action = bwi_msgs::LogicalNavigationFeedback::SENSE_STATE;
+//	feedback_.data = "";
+//	execute_action_server_->publishFeedback(feedback_);
 
 }
 
@@ -464,9 +464,9 @@ bool SegbotLogicalNavigator::approachDoor(const std::string& door_name,
       // published.
       publishNavigationMap(false, true);
       senseState(observations, door_idx);
-			feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_DOOR;
-			feedback_.data = door_name;
-			execute_action_server_->publishFeedback(feedback_);
+//			feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_DOOR;
+//			feedback_.data = door_name;
+//			execute_action_server_->publishFeedback(feedback_);
       return success;
     } else {
       // Planning failure
@@ -474,9 +474,9 @@ bool SegbotLogicalNavigator::approachDoor(const std::string& door_name,
         enableStaticCostmap(true);
       }
       error_message = "Cannot interact with " + door_name + " from here.";
-    	feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_DOOR;
-			feedback_.data = door_name;
-			execute_action_server_->publishFeedback(feedback_);
+//    	feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_DOOR;
+//			feedback_.data = door_name;
+//			execute_action_server_->publishFeedback(feedback_);
 		  return false;
     }
   }
@@ -524,16 +524,16 @@ bool SegbotLogicalNavigator::approachObject(const std::string& object_name,
     }
     observations.push_back(facing);
     observations.push_back(beside);
-  	feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_OBJECT;
-		feedback_.data = object_name;
-		execute_action_server_->publishFeedback(feedback_);
+//  	feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_OBJECT;
+//		feedback_.data = object_name;
+//		execute_action_server_->publishFeedback(feedback_);
   	return success;
   }
 
   error_message = object_name + " does not exist.";
- 	feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_OBJECT;
-	feedback_.data = object_name;
-	execute_action_server_->publishFeedback(feedback_);
+// 	feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_OBJECT;
+//	feedback_.data = object_name;
+//	execute_action_server_->publishFeedback(feedback_);
   return false;
 }
 
@@ -640,9 +640,9 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
                                   srv.request.initial_pose, 
                                   error_message))) {
 		ROS_ERROR_STREAM("SegbotLogicalTranslator::resolveChangeFloorRequest failed. Error message: " << error_message);
-  	feedback_.action = bwi_msgs::LogicalNavigationFeedback::CHANGE_FLOOR;
-		feedback_.data = new_room;
-		execute_action_server_->publishFeedback(feedback_);
+//  	feedback_.action = bwi_msgs::LogicalNavigationFeedback::CHANGE_FLOOR;
+//		feedback_.data = new_room;
+//		execute_action_server_->publishFeedback(feedback_);
   	return false;
   }
 
@@ -650,9 +650,9 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
     if (!srv.response.success) {
       error_message = srv.response.error_message;
 			ROS_ERROR_STREAM("SegbotLogicalTranslator::changeFloor service call failed. Error message: " << error_message);
- 			feedback_.action = bwi_msgs::LogicalNavigationFeedback::CHANGE_FLOOR;
-			feedback_.data = new_room;
-			execute_action_server_->publishFeedback(feedback_);
+// 			feedback_.action = bwi_msgs::LogicalNavigationFeedback::CHANGE_FLOOR;
+//			feedback_.data = new_room;
+//			execute_action_server_->publishFeedback(feedback_);
      	return false;
     }
 
@@ -664,15 +664,15 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
 		}
     // Publish the observable fluents
     senseState(observations);
- 		feedback_.action = bwi_msgs::LogicalNavigationFeedback::CHANGE_FLOOR;
-		feedback_.data = new_room;
-		execute_action_server_->publishFeedback(feedback_);
+// 		feedback_.action = bwi_msgs::LogicalNavigationFeedback::CHANGE_FLOOR;
+//		feedback_.data = new_room;
+//		execute_action_server_->publishFeedback(feedback_);
    	return true;
   } else {
     error_message = "ChangeCurrentLevel service call failed for unknown reason.";
-   	feedback_.action = bwi_msgs::LogicalNavigationFeedback::CHANGE_FLOOR;
-		feedback_.data = new_room;
-		execute_action_server_->publishFeedback(feedback_);
+//   	feedback_.action = bwi_msgs::LogicalNavigationFeedback::CHANGE_FLOOR;
+//		feedback_.data = new_room;
+//		execute_action_server_->publishFeedback(feedback_);
 		return false;
   }
 }
@@ -685,9 +685,9 @@ bool SegbotLogicalNavigator::senseDoor(const std::string& door_name,
     bwi_planning_common::resolveDoor(door_name, doors_);
   if (door_idx == bwi_planning_common::NO_DOOR_IDX) {
     error_message = "Door " + door_name + " does not exist!";
-   	feedback_.action = bwi_msgs::LogicalNavigationFeedback::SENSE_DOOR;
-		feedback_.data = door_name;
-		execute_action_server_->publishFeedback(feedback_);
+//   	feedback_.action = bwi_msgs::LogicalNavigationFeedback::SENSE_DOOR;
+//		feedback_.data = door_name;
+//		execute_action_server_->publishFeedback(feedback_);
 		return false;
   }
   bool door_open = isDoorOpen(door_idx);
@@ -698,9 +698,9 @@ bool SegbotLogicalNavigator::senseDoor(const std::string& door_name,
   }
   open.value.push_back(door_name);
   observations.push_back(open);
-  feedback_.action = bwi_msgs::LogicalNavigationFeedback::SENSE_DOOR;
-	feedback_.data = door_name;
-	execute_action_server_->publishFeedback(feedback_);
+//  feedback_.action = bwi_msgs::LogicalNavigationFeedback::SENSE_DOOR;
+//	feedback_.data = door_name;
+//	execute_action_server_->publishFeedback(feedback_);
  	return true;
 }
 
@@ -712,26 +712,32 @@ void SegbotLogicalNavigator::execute(const bwi_msgs::LogicalNavigationGoalConstP
   if (goal->command.name == "approach") {
     res.success = approachDoor(goal->command.value[0], res.observations, res.status, false);
 		feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_DOOR;
+		feedback_.data = goal->command.value[0];
   } else if (goal->command.name == "gothrough") {
     res.success = approachDoor(goal->command.value[0], res.observations,
         res.status, true);
 		feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_DOOR;
+		feedback_.data = goal->command.value[0];
   } else if (goal->command.name == "sensedoor") {
     res.success = senseDoor(goal->command.value[0], res.observations,
         res.status);
 		feedback_.action = bwi_msgs::LogicalNavigationFeedback::SENSE_DOOR;
-  } else if (goal->command.name == "goto") {
+ 		feedback_.data = goal->command.value[0];
+ } else if (goal->command.name == "goto") {
     res.success = approachObject(goal->command.value[0], res.observations,
         res.status);
 		feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_OBJECT;
-  } else if (goal->command.name == "changefloor") {
+  	feedback_.data = goal->command.value[0];
+} else if (goal->command.name == "changefloor") {
     res.success = changeFloor(goal->command.value[0], goal->command.value[1], res.observations, res.status);
 		feedback_.action = bwi_msgs::LogicalNavigationFeedback::CHANGE_FLOOR;
-  } else {
+ 		feedback_.data = goal->command.value[0];
+ } else {
     res.success = true;
     res.status = "";
     senseState(res.observations);
 		feedback_.action = bwi_msgs::LogicalNavigationFeedback::SENSE_STATE;
+		feedback_.data = "";
   }
 
   if (res.success) {
@@ -742,7 +748,6 @@ void SegbotLogicalNavigator::execute(const bwi_msgs::LogicalNavigationGoalConstP
     execute_action_server_->setAborted(res);
   }
 
-	feedback_.data = "sent by execute function";
 	execute_action_server_->publishFeedback(feedback_);
 }
 
