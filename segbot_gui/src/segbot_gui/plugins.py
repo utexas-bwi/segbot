@@ -7,7 +7,7 @@ from functools import partial
 from qt_gui.plugin import Plugin
 from python_qt_binding.QtGui import QFont, QHBoxLayout, QLabel, QLineEdit, \
                                     QPushButton, QTextBrowser, QVBoxLayout, \
-                                    QWidget
+                                    QWidget, QComboBox
 from python_qt_binding.QtCore import SIGNAL
 
 class QuestionDialogPlugin(Plugin):
@@ -91,7 +91,16 @@ class QuestionDialogPlugin(Plugin):
             self.text_input = QLineEdit(self._widget)
             self.text_input.editingFinished.connect(self.handle_text)
             self._button_layout.addWidget(self.text_input)
-
+        elif req.type == QuestionDialogRequest.LIST_QUESTION:
+            combo = QComboBox()
+            for index, options in enumerate(req.options):
+                combo.addItem(options)
+            self._button_layout.addWidget(combo)
+            button = QPushButton("Select", self._widget)
+            button.clicked.connect(partial(self.handle_list, combo))
+            self._button_layout.addWidget(button)
+            self.buttons.append(button)    
+    
     def timeout(self):
         self._text_browser.setText("Oh no! The request timed out.")
         self.clean()
@@ -113,6 +122,11 @@ class QuestionDialogPlugin(Plugin):
         self.response = QuestionDialogResponse(
             QuestionDialogRequest.TEXT_RESPONSE,
             self.text_input.text())
+        self.clean()
+        self.response_ready = True
+
+    def handle_list(self, combo):
+        self.response = QuestionDialogResponse(combo.currentIndex(), str(combo.currentText()))
         self.clean()
         self.response_ready = True
 
