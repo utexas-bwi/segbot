@@ -11,7 +11,7 @@ from nav_msgs.msg import Odometry
 from segway_msgs.msg import ConfigCmd
 from segway_msgs.msg import Status
 from segway_msgs.msg import AuxPower
-from smart_battery_msgs.msg import SmartBatteryStatus
+from sensor_msgs.msg import BatteryState
 
 class Controller():
 

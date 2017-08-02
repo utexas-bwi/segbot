@@ -13,7 +13,7 @@
 #include "diagnostic_msgs/DiagnosticStatus.h"
 #include "diagnostic_msgs/DiagnosticArray.h"
 #include "diagnostic_msgs/KeyValue.h"
-#include "smart_battery_msgs/SmartBatteryStatus.h"
+#include "sensor_msgs/BatteryState.h"
 #include <ros/package.h>
 #include <vector>
 #include <cmath>
@@ -27,7 +27,7 @@
 float voltage;
 double alpha;
 
-void voltageCallback(const smart_battery_msgs::SmartBatteryStatus::ConstPtr& msg) {
+void voltageCallback(const sensor_msgs::BatteryState::ConstPtr& msg) {
   voltage = alpha * msg->voltage + (1.0 - alpha) * voltage;
 }
 
