@@ -15,7 +15,6 @@ find_package(catkin REQUIRED
     roscpp
     roslint
     sensor_msgs
-    smart_battery_msgs
     std_msgs
     tf)
 
@@ -35,7 +34,6 @@ catkin_package(
     nodelet
     pcl_ros
     sensor_msgs
-    smart_battery_msgs
     std_msgs
     tf
   INCLUDE_DIRS
