@@ -17,7 +17,7 @@ data from various attached sensors into ROS messages.
 Published topics
 ''''''''''''''''
 
-``battery0`` (`sensor_msgs/BatteryState`_)
+``battery0`` (`smart_battery_msgs/SmartBatteryStatus`_)
     Main segbot battery voltage measurements.
 
 ``imu0`` (`sensor_msgs/Imu`_)
@@ -79,5 +79,5 @@ To run both the ``arduino_driver`` and this node::
    http://docs.ros.org/api/sensor_msgs/html/msg/PointCloud2.html
 .. _`sensor_msgs/Range`:
    http://docs.ros.org/api/sensor_msgs/html/msg/Range.html
-.. _`sensor_msgs/BatteryState`:
-   http://docs.ros.org/api/sensor_msgs/html/msg/BatteryState.html
+.. _`smart_battery_msgs/SmartBatteryStatus`:
+   http://docs.ros.org/api/smart_battery_msgs/html/msg/SmartBatteryStatus.html
