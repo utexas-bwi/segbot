@@ -11,7 +11,7 @@ from nav_msgs.msg import Odometry
 from segway_msgs.msg import ConfigCmd
 from segway_msgs.msg import Status
 from segway_msgs.msg import AuxPower
-from smart_battery_msgs.msg import SmartBatteryStatus
+from sensor_msgs.msg import BatteryState
 
 class Controller():
 
@@ -20,7 +20,7 @@ class Controller():
         self.cmd_pub = rospy.Publisher('/segway/cmd_vel', Twist, queue_size=10)
         self.odom_pub = rospy.Publisher('odom', Odometry, queue_size=10)
         self.cfg_pub = rospy.Publisher('/segway/gp_command', ConfigCmd, queue_size=10)
-	self.bat_pub = rospy.Publisher('/battery0', SmartBatteryStatus, queue_size=10)
+	self.bat_pub = rospy.Publisher('/battery0', BatteryState, queue_size=10)
 
         self.cmd_sub = rospy.Subscriber('cmd_vel', Twist, self.cmd_callback)
         self.odom_sub = rospy.Subscriber('/segway/feedback/wheel_odometry', Odometry, self.odom_callback)
@@ -101,10 +101,18 @@ class Controller():
         self.stop_timer = rospy.Timer(rospy.Duration(0.5), self.timer_callback)
 
     def battery_callback(self, msg):
-	bat_msg = SmartBatteryStatus()
+	bat_msg = BatteryState()
 	bat_msg.voltage = msg.aux_voltage_V[0]
+        bat_msg.current = float('NaN')
+        bat_msg.charge = float('NaN')
+        bat_msg.capacity = float('NaN')
+        bat_msg.design_capacity = float('NaN')
+        bat_msg.percentage = float('NaN')
+        bat_msg.power_supply_status = BatteryState.POWER_SUPPLY_STATUS_DISCHARGING
+        bat_msg.present = 1
 	bat_msg.header = msg.header
 	self.bat_pub.publish(bat_msg)
+
     def sigint_handler(self, signal, frame):
         self.terminate = True
 
