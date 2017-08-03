@@ -247,6 +247,7 @@ void SegbotLogicalNavigator::multimapHandler(const multi_level_map_msgs::MultiLe
 
   // Start the change level service client.
   if (!change_level_client_available_) {
+		ROS_WARN("SegbotLogicalTranslator::multimapHandler: level_mux/change_current_level service is not yet available");
     change_level_client_available_ = ros::service::waitForService("level_mux/change_current_level", ros::Duration(5.0));
     if (change_level_client_available_) {
       change_level_client_ = nh_->serviceClient<multi_level_map_msgs::ChangeCurrentLevel>("level_mux/change_current_level");
@@ -514,9 +515,16 @@ bool SegbotLogicalNavigator::resolveChangeFloorRequest(const std::string& new_ro
 
   // Make sure we can change floors and all arguments are correct.
   if (!change_level_client_available_) {
+		//Make an attempt to connect to see if the client has been made avaliable since instantiation before giving up
+		change_level_client_available_ = ros::service::waitForService("level_mux/change_current_level",ros::Duration(0.5));
+		if(change_level_client_available_){
+			change_level_client_ = nh_->serviceClient<multi_level_map_msgs::ChangeCurrentLevel>("level_mux/change_current_level");
+		}
+		else {
     error_message = "SegbotLogicalNavigator has not received the multimap. Cannot change floors!";
     return false;
-  } else {
+		}
+  }
     bool new_room_found = false;
     typedef std::pair<std::string, std::vector<std::string> > Level2LocNamesPair;
     BOOST_FOREACH(const Level2LocNamesPair& level_to_loc, level_to_loc_names_map_) {
@@ -531,7 +539,6 @@ bool SegbotLogicalNavigator::resolveChangeFloorRequest(const std::string& new_ro
       error_message = "Location " + new_room + " has not been defined on any floor!";
       return false;
     }
-  }
 
   if (current_level_id_ == floor_name) {
     error_message = "The robot is already on " + floor_name + " (in which " + new_room + " exists)!";
@@ -584,6 +591,8 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
                                          const std::string& facing_door,
                                          std::vector<PlannerAtom>& observations,
                                          std::string& error_message) {
+	//Just making sure it gets called correctly
+	ROS_INFO_STREAM("SegbotLogicalNavigator: changefloor called");
 
   error_message = "";
   observations.clear();
@@ -596,19 +605,23 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
                                   srv.request.new_level_id, 
                                   srv.request.initial_pose, 
                                   error_message))) {
+		ROS_ERROR_STREAM("SegbotLogicalTranslator::resolveChangeFloorRequest failed. Error message: " << error_message);
     return false;
   }
 
   if (change_level_client_.call(srv)) {
     if (!srv.response.success) {
       error_message = srv.response.error_message;
+			ROS_ERROR_STREAM("SegbotLogicalTranslator::changeFloor service call failed. Error message: " << error_message);
       return false;
     }
 
     // Yea! the call succeeded! Wait for current_level_id_ to be changed once everything gets updated.
     ros::Rate r(1);
-    while (current_level_id_ != srv.request.new_level_id) r.sleep();
-
+    while (current_level_id_ != srv.request.new_level_id){
+			ROS_INFO_STREAM("SegbotLogicalTranslator::changeFloor: Waiting for changes to be updated...");
+			r.sleep();
+		}
     // Publish the observable fluents
     senseState(observations);
     return true;
