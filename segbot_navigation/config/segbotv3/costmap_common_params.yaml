@@ -2,7 +2,6 @@ robot_base_frame: base_footprint
 update_frequency:
 publish_frequency: 1.0
 inflation_radius: 1.0
-obstacle_layer/footprint_clearing_enabled: false
 
 # publish_voxel_map: true
 #
