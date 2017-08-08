@@ -35,6 +35,7 @@ void newGoalCallback(const InterruptableActionServer<move_base_msgs::MoveBaseAct
       ROS_INFO_STREAM("New goal received, but unable to find plan to goal. Clearing costmaps before sending goal to nav stack.");
       std_srvs::Empty srv;
       if (!clear_costmap_service_->call(srv)) {
+          // this sometimes crashes move_base
         ROS_ERROR_STREAM("Unable to clear costmaps!");
       } else {
         // Sleep for three seconds to allow costmaps to be cleared and reset properly.
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
   clear_costmap_service_->waitForExistence();
 
   make_plan_service_.reset(new ros::ServiceClient);
-  *make_plan_service_ = nh.serviceClient<nav_msgs::GetPlan>("move_base/GlobalPlanner/make_plan");
+  *make_plan_service_ = nh.serviceClient<nav_msgs::GetPlan>("move_base/NavfnROS/make_plan");
   make_plan_service_->waitForExistence();
 
   ROS_INFO_STREAM("move_base_interruptable :   Navigation services found!");
