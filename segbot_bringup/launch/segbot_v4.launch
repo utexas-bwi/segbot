@@ -44,8 +44,6 @@
     <arg name="topic" value="hokuyo/scan" />
   </include>
 
-roslaunch openni2_launch openni2.launch camera:=nav_kinect depth_registration:=true
-
   <!-- Xtion Camere Openni -->
   <!--
   <include file="$(find openni2_launch)/launch/openni2.launch">
