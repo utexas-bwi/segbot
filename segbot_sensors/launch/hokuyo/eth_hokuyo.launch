@@ -13,7 +13,7 @@
     </include>
   </group>
 
-  <!-- run the hokuyo driver with the laser link as the frame id -->
+  <!-- run the URG driver with the laser link as the frame id -->
   <node name="$(arg name)_node" pkg="urg_node" type="urg_node">
     <param name="ip_address" value="192.168.0.10" />
     <param name="frame_id" value="$(arg tf_prefix)/$(arg name)_laser_link" />
