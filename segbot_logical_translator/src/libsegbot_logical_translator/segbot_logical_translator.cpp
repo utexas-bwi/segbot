@@ -167,7 +167,7 @@ namespace segbot_logical_translator {
 
     if (!make_plan_client_initialized_) {
       ROS_INFO_STREAM("SegbotLogicalTranslator: Waiting for make_plan service..");
-      make_plan_client_ = nh_->serviceClient<nav_msgs::GetPlan>("move_base/NavfnROS/make_plan");
+      make_plan_client_ = nh_->serviceClient<nav_msgs::GetPlan>("move_base/GlobalPlanner/make_plan");
       make_plan_client_.waitForExistence();
       ROS_INFO_STREAM("SegbotLogicalTranslator: make_plan service found!");
       make_plan_client_initialized_ = true;
