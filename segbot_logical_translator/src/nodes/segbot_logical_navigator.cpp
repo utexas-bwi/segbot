@@ -149,6 +149,7 @@ class SegbotLogicalNavigator : public segbot_logical_translator::SegbotLogicalTr
     int global_costmap_width_;
 
     bool robot_controller_available_;
+		bwi_msgs::LogicalNavigationFeedback feedback_;
 
 };
 
@@ -281,6 +282,10 @@ void SegbotLogicalNavigator::publishNavigationMap(bool publish_map_with_doors, b
 
 void SegbotLogicalNavigator::senseState(std::vector<PlannerAtom>& observations, size_t door_idx) {
 
+  feedback_.action = bwi_msgs::LogicalNavigationFeedback::SENSE_STATE;
+  feedback_.data = "";
+  execute_action_server_->publishFeedback(feedback_);
+
   PlannerAtom at;
   at.name = "at";
   size_t location_idx = getLocationIdx(bwi::Point2f(robot_x_, robot_y_));
@@ -355,6 +360,8 @@ void SegbotLogicalNavigator::senseState(std::vector<PlannerAtom>& observations, 
       observations.push_back(door_open);
     }
   }
+
+
 }
 
 bool SegbotLogicalNavigator::executeNavigationGoal(
@@ -411,13 +418,16 @@ bool SegbotLogicalNavigator::approachDoor(const std::string& door_name,
     std::string& error_message, bool gothrough) {
   error_message = "";
 
+  feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_DOOR;
+  feedback_.data = door_name;
+  execute_action_server_->publishFeedback(feedback_);
+
   size_t door_idx = getDoorIdx(door_name);
   if (door_idx == NO_DOOR_IDX) {
     // Interface failure
     error_message = "Could not resolve argument: " + door_name;
     return false;
   } else {
-
 
     bwi::Point2f approach_pt;
     float approach_yaw = 0;
@@ -450,7 +460,6 @@ bool SegbotLogicalNavigator::approachDoor(const std::string& door_name,
       // published.
       publishNavigationMap(false, true);
       senseState(observations, door_idx);
-
       return success;
     } else {
       // Planning failure
@@ -458,7 +467,7 @@ bool SegbotLogicalNavigator::approachDoor(const std::string& door_name,
         enableStaticCostmap(true);
       }
       error_message = "Cannot interact with " + door_name + " from here.";
-      return false;
+		  return false;
     }
   }
 }
@@ -467,8 +476,13 @@ bool SegbotLogicalNavigator::approachObject(const std::string& object_name,
     std::vector<PlannerAtom>& observations,
     std::string& error_message) {
 
+  feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_OBJECT;
+  feedback_.data = object_name;
+  execute_action_server_->publishFeedback(feedback_);
+
   error_message = "";
   observations.clear();
+
 
   if (object_approach_map_.find(object_name) != object_approach_map_.end()) {
 
@@ -500,7 +514,7 @@ bool SegbotLogicalNavigator::approachObject(const std::string& object_name,
     }
     observations.push_back(facing);
     observations.push_back(beside);
-    return success;
+  	return success;
   }
 
   error_message = object_name + " does not exist.";
@@ -515,30 +529,30 @@ bool SegbotLogicalNavigator::resolveChangeFloorRequest(const std::string& new_ro
 
   // Make sure we can change floors and all arguments are correct.
   if (!change_level_client_available_) {
-		//Make an attempt to connect to see if the client has been made avaliable since instantiation before giving up
-		change_level_client_available_ = ros::service::waitForService("level_mux/change_current_level",ros::Duration(0.5));
-		if(change_level_client_available_){
-			change_level_client_ = nh_->serviceClient<multi_level_map_msgs::ChangeCurrentLevel>("level_mux/change_current_level");
-		}
-		else {
-    error_message = "SegbotLogicalNavigator has not received the multimap. Cannot change floors!";
-    return false;
-		}
-  }
-    bool new_room_found = false;
-    typedef std::pair<std::string, std::vector<std::string> > Level2LocNamesPair;
-    BOOST_FOREACH(const Level2LocNamesPair& level_to_loc, level_to_loc_names_map_) {
-      if (std::find(level_to_loc.second.begin(), level_to_loc.second.end(), new_room) != level_to_loc.second.end()) {
-        new_room_found = true;
-        floor_name = level_to_loc.first;
-        break;
-      }
-    }
-
-    if (!new_room_found) {
-      error_message = "Location " + new_room + " has not been defined on any floor!";
+    //Make an attempt to connect to see if the client has been made avaliable since instantiation before giving up
+	change_level_client_available_ = ros::service::waitForService("level_mux/change_current_level",ros::Duration(0.5));
+	if(change_level_client_available_){
+	  change_level_client_ = nh_->serviceClient<multi_level_map_msgs::ChangeCurrentLevel>("level_mux/change_current_level");
+	}
+	else {
+      error_message = "SegbotLogicalNavigator has not received the multimap. Cannot change floors!";
       return false;
+	}
+  }
+  bool new_room_found = false;
+  typedef std::pair<std::string, std::vector<std::string> > Level2LocNamesPair;
+  BOOST_FOREACH(const Level2LocNamesPair& level_to_loc, level_to_loc_names_map_) {
+    if (std::find(level_to_loc.second.begin(), level_to_loc.second.end(), new_room) != level_to_loc.second.end()) {
+      new_room_found = true;
+      floor_name = level_to_loc.first;
+      break;
     }
+  }
+
+  if (!new_room_found) {
+    error_message = "Location " + new_room + " has not been defined on any floor!";
+    return false;
+  }
 
   if (current_level_id_ == floor_name) {
     error_message = "The robot is already on " + floor_name + " (in which " + new_room + " exists)!";
@@ -591,8 +605,10 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
                                          const std::string& facing_door,
                                          std::vector<PlannerAtom>& observations,
                                          std::string& error_message) {
-	//Just making sure it gets called correctly
-	ROS_INFO_STREAM("SegbotLogicalNavigator: changefloor called");
+  
+  feedback_.action = bwi_msgs::LogicalNavigationFeedback::CHANGE_FLOOR;
+  feedback_.data = new_room;
+  execute_action_server_->publishFeedback(feedback_);
 
   error_message = "";
   observations.clear();
@@ -606,28 +622,28 @@ bool SegbotLogicalNavigator::changeFloor(const std::string& new_room,
                                   srv.request.initial_pose, 
                                   error_message))) {
 		ROS_ERROR_STREAM("SegbotLogicalTranslator::resolveChangeFloorRequest failed. Error message: " << error_message);
-    return false;
+  	return false;
   }
 
   if (change_level_client_.call(srv)) {
     if (!srv.response.success) {
       error_message = srv.response.error_message;
-			ROS_ERROR_STREAM("SegbotLogicalTranslator::changeFloor service call failed. Error message: " << error_message);
+	  ROS_ERROR_STREAM("SegbotLogicalTranslator::changeFloor service call failed. Error message: " << error_message);
       return false;
     }
 
     // Yea! the call succeeded! Wait for current_level_id_ to be changed once everything gets updated.
     ros::Rate r(1);
     while (current_level_id_ != srv.request.new_level_id){
-			ROS_INFO_STREAM("SegbotLogicalTranslator::changeFloor: Waiting for changes to be updated...");
-			r.sleep();
-		}
+	  ROS_INFO_STREAM("SegbotLogicalTranslator::changeFloor: Waiting for changes to be updated...");
+	  r.sleep();
+	}
     // Publish the observable fluents
     senseState(observations);
-    return true;
+   	return true;
   } else {
     error_message = "ChangeCurrentLevel service call failed for unknown reason.";
-    return false;
+	return false;
   }
 }
 
@@ -639,7 +655,7 @@ bool SegbotLogicalNavigator::senseDoor(const std::string& door_name,
     bwi_planning_common::resolveDoor(door_name, doors_);
   if (door_idx == bwi_planning_common::NO_DOOR_IDX) {
     error_message = "Door " + door_name + " does not exist!";
-    return false;
+		return false;
   }
   bool door_open = isDoorOpen(door_idx);
   PlannerAtom open;
@@ -649,7 +665,7 @@ bool SegbotLogicalNavigator::senseDoor(const std::string& door_name,
   }
   open.value.push_back(door_name);
   observations.push_back(open);
-  return true;
+ 	return true;
 }
 
 void SegbotLogicalNavigator::execute(const bwi_msgs::LogicalNavigationGoalConstPtr& goal) {
@@ -659,21 +675,33 @@ void SegbotLogicalNavigator::execute(const bwi_msgs::LogicalNavigationGoalConstP
 
   if (goal->command.name == "approach") {
     res.success = approachDoor(goal->command.value[0], res.observations, res.status, false);
+	feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_DOOR;
+	feedback_.data = goal->command.value[0];
   } else if (goal->command.name == "gothrough") {
     res.success = approachDoor(goal->command.value[0], res.observations,
         res.status, true);
+	feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_DOOR;
+	feedback_.data = goal->command.value[0];
   } else if (goal->command.name == "sensedoor") {
     res.success = senseDoor(goal->command.value[0], res.observations,
         res.status);
-  } else if (goal->command.name == "goto") {
+	feedback_.action = bwi_msgs::LogicalNavigationFeedback::SENSE_DOOR;
+ 	feedback_.data = goal->command.value[0];
+ } else if (goal->command.name == "goto") {
     res.success = approachObject(goal->command.value[0], res.observations,
         res.status);
-  } else if (goal->command.name == "changefloor") {
+	feedback_.action = bwi_msgs::LogicalNavigationFeedback::APPROACH_OBJECT;
+  	feedback_.data = goal->command.value[0];
+} else if (goal->command.name == "changefloor") {
     res.success = changeFloor(goal->command.value[0], goal->command.value[1], res.observations, res.status);
-  } else {
+	feedback_.action = bwi_msgs::LogicalNavigationFeedback::CHANGE_FLOOR;
+ 	feedback_.data = goal->command.value[0];
+ } else {
     res.success = true;
     res.status = "";
     senseState(res.observations);
+	feedback_.action = bwi_msgs::LogicalNavigationFeedback::SENSE_STATE;
+	feedback_.data = "";
   }
 
   if (res.success) {
@@ -683,7 +711,9 @@ void SegbotLogicalNavigator::execute(const bwi_msgs::LogicalNavigationGoalConstP
   } else {
     execute_action_server_->setAborted(res);
   }
-
+  
+  //At the end of execution, give feedback on the result of the action that was run
+  execute_action_server_->publishFeedback(feedback_);
 }
 
 bool SegbotLogicalNavigator::changeFloorResolutionHandler(bwi_msgs::ResolveChangeFloor::Request  &req,
