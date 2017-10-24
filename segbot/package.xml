@@ -1,4 +1,4 @@
-<package>
+<package format="2">
   <name>segbot</name>
   <version>0.3.5</version>
   <description>
@@ -19,15 +19,15 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <run_depend>segbot_bringup</run_depend>
-  <run_depend>segbot_description</run_depend>
-  <run_depend>segbot_firmware</run_depend>
-  <run_depend>segbot_gazebo</run_depend>
-  <run_depend>segbot_gui</run_depend>
-  <run_depend>segbot_logical_translator</run_depend>
-  <run_depend>segbot_navigation</run_depend>
-  <run_depend>segbot_sensors</run_depend>
-  <run_depend>segbot_simulation_apps</run_depend>
+  <exec_depend>segbot_bringup</exec_depend>
+  <exec_depend>segbot_description</exec_depend>
+  <exec_depend>segbot_firmware</exec_depend>
+  <exec_depend>segbot_gazebo</exec_depend>
+  <exec_depend>segbot_led</exec_depend>
+  <exec_depend>segbot_logical_translator</exec_depend>
+  <exec_depend>segbot_navigation</exec_depend>
+  <exec_depend>segbot_sensors</exec_depend>
+  <exec_depend>segbot_simulation_apps</exec_depend>
 
   <export>
     <metapackage/>
