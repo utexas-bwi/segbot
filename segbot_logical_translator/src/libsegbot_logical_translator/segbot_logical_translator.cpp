@@ -60,7 +60,7 @@ namespace segbot_logical_translator {
       initialized_(false) {
 
     nh_.reset(new ros::NodeHandle);
-    ros::param::param<std::string>("~global_frame_id", global_frame_id_, "level_mux/map");
+    ros::param::param<std::string>("~global_frame_id", global_frame_id_, "level_mux_map");
   }
 
   bool SegbotLogicalTranslator::initialize() {
