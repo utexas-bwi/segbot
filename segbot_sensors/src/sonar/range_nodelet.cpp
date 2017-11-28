@@ -69,6 +69,5 @@ namespace segbot_sensors
 // Register this plugin with pluginlib.  Names must match
 // segbot_sensors_plugins.xml.
 //
-// parameters are: package, class name, class type, base class type
-PLUGINLIB_DECLARE_CLASS(segbot_sensors, RangeNodelet,
-                        segbot_sensors::RangeNodelet, nodelet::Nodelet);
+// parameters are: class type, base class type
+PLUGINLIB_EXPORT_CLASS(segbot_sensors::RangeNodelet, nodelet::Nodelet)
