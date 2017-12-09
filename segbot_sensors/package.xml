@@ -38,7 +38,6 @@
   <exec_depend>diagnostic_aggregator</exec_depend>
   <exec_depend>filters</exec_depend>
   <exec_depend>freenect_launch</exec_depend>
-  <exec_depend>hokuyo_node</exec_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>openni_launch</exec_depend>
   <exec_depend>python-serial</exec_depend>
