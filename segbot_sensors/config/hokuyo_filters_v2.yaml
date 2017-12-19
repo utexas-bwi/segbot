@@ -1,9 +1,9 @@
 scan_filter_chain:
-- name: angle_range_filter
-  type: segbot_sensors/AngleRangeFilter
-  params:
-    angle_min: -1.4
-    angle_max: 1.4
+# - name: angle_range_filter
+#   type: segbot_sensors/AngleRangeFilter
+#   params:
+#     angle_min: -1.4
+#     angle_max: 1.4
 - name: shadows
   type: ScanShadowsFilter
   params:
