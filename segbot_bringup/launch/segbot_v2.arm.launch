@@ -6,7 +6,6 @@
   <arg name="device_id" default="#1" />
   <arg name="rviz" default="true" />
   <arg name="gui" default="true" />
-
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- launch the segway base -->
@@ -16,6 +15,7 @@
   </include>
 
   <!-- launch the kinect sensor in laserscan configuration -->
+
   <include file="$(find segbot_sensors)/launch/kinect/kinect.launch">
     <arg name="name" value="nav_kinect" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
@@ -29,20 +29,38 @@
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="publish_tf" value="false" /> <!-- already published by urdf -->
   </include>
-
+ 
   <!-- COMMON aux information -->
-  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v2.launch.xml">
-    <arg name="tf_prefix" default="$(arg tf_prefix)" />
+  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v2.arm.launch.xml">
+    <arg name="tf_prefix" default="$(arg tf_prefix)" /> 
     <arg name="use_registered_topic" default="true" />
   </include>
-
+  
   <!-- Arduino -->
   <include file="$(find segbot_sensors)/launch/arduino/arduino.launch">
     <arg name="port" value="/dev/arduino" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
+  
+  <!-- the ARM -->
+  <include file="$(find kinova_bringup)/launch/kinova_robot.launch">
+      <arg name="kinova_robotType" value="m1n6s200" />
+      <arg name="load_robot_description" value="false" />
+  </include>
 
-  <!-- Diagnostics and battery monitor -->
-  <include file="$(find segbot_sensors)/launch/diagnostic/diagnostics.launch"/>
+  <!-- launch Trajectory controllers -->
+
+  <include file="$(find kinova_control)/launch/kinova_control.launch">
+    <arg name="kinova_robotType" value="m1n6s200" />
+    <arg name="publish_robot_state" value="false" />
+  </include>
+
+  <!-- launch MoveIt! -->
+  <include file="$(find m1n6s200_segbot_moveit_config)/launch/m1n6s200_segbot_moveit_bringup.launch"/>
+ 
+ 
+  <include file="$(find moveit_utils)/launch/moveit_utils.launch" />
+   <!-- Diagnostics and battery monitor -->
+  <include file="$(find segbot_sensors)/launch/diagnostic/diagnostics.launch" if="$(arg gui)"/>
 
 </launch>
