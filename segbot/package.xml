@@ -24,7 +24,6 @@
   <exec_depend>segbot_firmware</exec_depend>
   <exec_depend>segbot_gazebo</exec_depend>
   <exec_depend>segbot_led</exec_depend>
-  <exec_depend>segbot_logical_translator</exec_depend>
   <exec_depend>segbot_navigation</exec_depend>
   <exec_depend>segbot_sensors</exec_depend>
   <exec_depend>segbot_simulation_apps</exec_depend>
