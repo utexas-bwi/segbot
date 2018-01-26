@@ -15,14 +15,14 @@
   <build_depend>kinova_msgs</build_depend>
   <build_depend>bwi_moveit_utils</build_depend>
   <build_depend>moveit_msgs</build_depend>
-  <build_depend>segbot_arm_perception</build_depend>
+  <build_depend>bwi_perception</build_depend>
   <build_depend>segbot_arm_manipulation</build_depend>
   
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>kinova_msgs</run_depend>
-  <run_depend>segbot_arm_perception</run_depend>
+  <run_depend>bwi_perception</run_depend>
   <run_depend>segbot_arm_manipulation</run_depend>
 
   <export></export>

@@ -7,7 +7,7 @@ from catkin_pkg.python_setup import generate_distutils_setup
 setup_args = generate_distutils_setup(
     packages=['segbot_arm_manipulation'],
     package_dir={'': 'src'}
-    #requires=['std_msgs', 'rospy', 'jaco_msgs', 'geometry_msgs', 'segbot_arm_manipulation', 'sensor_msgs','segbot_arm_perception']
+    #requires=['std_msgs', 'rospy', 'jaco_msgs', 'geometry_msgs', 'segbot_arm_manipulation', 'sensor_msgs','bwi_perception']
     )
 
 setup(**setup_args)

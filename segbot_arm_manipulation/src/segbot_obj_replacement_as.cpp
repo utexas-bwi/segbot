@@ -38,7 +38,7 @@
 #include "segbot_arm_manipulation/ObjReplacementAction.h"
 
 //srv for talking to table_object_detection_node.cpp
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 
 #include <segbot_arm_manipulation/arm_utils.h>
 #include <segbot_arm_manipulation/grasp_utils.h>
@@ -236,7 +236,7 @@ public:
 	 * cloud is organized and dense*/
 	void executeCB(const segbot_arm_manipulation::ObjReplacementGoalConstPtr &goal){
 		//step1: get the table scene, check validity
-		segbot_arm_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(nh_);
+		bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(nh_);
 		
 		if (!table_scene.is_plane_found){
 			ROS_ERROR("[segbot_arm_replacement_as] a table must be present");

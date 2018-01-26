@@ -23,7 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
         std_msgs
         sensor_msgs
         sound_play
-        segbot_arm_perception
+        bwi_perception
         tf_conversions
         )
 

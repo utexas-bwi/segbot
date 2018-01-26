@@ -16,8 +16,8 @@
 #include <geometry_msgs/WrenchStamped.h>
 
 //for table scene and color histogram
-#include "segbot_arm_perception/TabletopPerception.h"
-#include <segbot_arm_perception/segbot_arm_perception.h>
+#include "bwi_perception/TabletopPerception.h"
+#include <bwi_perception/bwi_perception.h>
 
 //actions
 #include <actionlib/server/simple_action_server.h>
@@ -169,7 +169,7 @@ public:
 	
 	std::vector<double> get_color_hist(PointCloudT desired_cloud, int dim){ 
 		//get a color histogram and save it as a one dimensional vector for comparison
-		std::vector<std::vector<std::vector<uint> > > hist3= segbot_arm_perception::computeRGBColorHistogram(desired_cloud, dim);
+		std::vector<std::vector<std::vector<uint> > > hist3= bwi_perception::computeRGBColorHistogram(desired_cloud, dim);
 		int i_offset = dim * dim;
         int j_offset = dim;
         std::vector<double> hist3_double_vector (dim * dim * dim, 0);
@@ -259,7 +259,7 @@ public:
 	
 	bool not_on_table(Eigen::Vector4f center_vector, std::vector<double> orig_colorhist){
 		//check table for new objects
-		segbot_arm_perception::TabletopPerception::Response new_scene = segbot_arm_manipulation::getTabletopScene(nh_);
+		bwi_perception::TabletopPerception::Response new_scene = segbot_arm_manipulation::getTabletopScene(nh_);
 		
 		double tolerance = 0.1; 
 		

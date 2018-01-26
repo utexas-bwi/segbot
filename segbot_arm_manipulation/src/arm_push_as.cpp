@@ -27,7 +27,7 @@
 
 
 //srv for talking to table_object_detection_node.cpp
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 
 #include <moveit_msgs/DisplayRobotState.h>
 // Kinematics

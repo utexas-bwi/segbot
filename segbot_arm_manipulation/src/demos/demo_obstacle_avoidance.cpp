@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 #include <signal.h>
 #include <sensor_msgs/JointState.h>
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 #include <segbot_arm_manipulation/arm_utils.h>
 #include <geometry_msgs/PoseStamped.h>
 
@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
 		pressEnter("Place an obstacle and press 'Enter'");
 		
 		//Step 4: call tabletop perception service to detect the object and table
-		segbot_arm_perception::TabletopPerception::Response tabletop_response = segbot_arm_manipulation::getTabletopScene(n);
+		bwi_perception::TabletopPerception::Response tabletop_response = segbot_arm_manipulation::getTabletopScene(n);
 		
 		//check if plane was not found
 		/*if (tabletop_response.is_plane_found == false){

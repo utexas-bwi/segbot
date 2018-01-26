@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
   moveit_ros_planning_interface
   moveit_msgs
   segbot_arm_manipulation
-  segbot_arm_perception
+  bwi_perception
 )
 
 find_package(PCL 1.7 REQUIRED)
@@ -28,7 +28,7 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 catkin_package(
-  DEPENDS segbot_arm_perception
+  DEPENDS bwi_perception
 )
 
 include_directories(

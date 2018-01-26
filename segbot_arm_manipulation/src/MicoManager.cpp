@@ -1,7 +1,7 @@
 #include "kinova_msgs/ArmJointAnglesAction.h"
 #include <moveit_msgs/GetPositionIK.h>
 
-#include "segbot_arm_perception/SetObstacles.h"
+#include "bwi_perception/SetObstacles.h"
 #include <segbot_arm_manipulation/arm_utils.h>
 
 #include <segbot_arm_manipulation/MicoManager.h>

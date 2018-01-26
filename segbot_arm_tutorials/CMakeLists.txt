@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
     pcl_conversions
     roscpp
     rospy
-    segbot_arm_perception
+    bwi_perception
     segbot_arm_manipulation
     std_msgs
 )

@@ -5,7 +5,7 @@
 #include <sensor_msgs/JointState.h>
 
 //srv for talking to table_object_detection_node.cpp
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 
 //srvs for ispy
 #include "segbot_arm_manipulation/iSpyTouch.h"
@@ -138,7 +138,7 @@ int main(int argc, char **argv) {
 	while (ros::ok()){
 	
 		//get the table scene
-		segbot_arm_perception::TabletopPerception::Response table_scene;
+		bwi_perception::TabletopPerception::Response table_scene;
 		bool perception_success = false;
 		
 		
@@ -152,10 +152,10 @@ int main(int argc, char **argv) {
 			ROS_INFO("...done!");
 			std::cout << result << "\n";
 			
-			ros::ServiceClient client_tabletop_perception = n.serviceClient<segbot_arm_perception::TabletopPerception>("tabletop_object_detection_service");
+			ros::ServiceClient client_tabletop_perception = n.serviceClient<bwi_perception::TabletopPerception>("tabletop_object_detection_service");
 				
 				
-			segbot_arm_perception::TabletopPerception srv_perception; 
+			bwi_perception::TabletopPerception srv_perception;
 				
 			//to make sure we only see objects on the table in front of us
 			srv_perception.request.apply_x_box_filter = true;

@@ -9,7 +9,7 @@ import std_msgs.msg
 from kinova_msgs.msg import *
 from sensor_msgs.msg import *
 from segbot_arm_manipulation.msg import *
-from segbot_arm_perception.srv import *
+from bwi_perception.srv import *
 
 heard_state = False
 current_state = None 

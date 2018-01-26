@@ -22,7 +22,7 @@
 #include <tf/transform_broadcaster.h>
 
 //srv for talking to table_object_detection_node.cpp
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 
 // PCL specific includes
 //#include <pcl/conversions.h>
@@ -195,8 +195,8 @@ public:
 				
 			
 			
-			ros::ServiceClient client_tabletop_perception = nh_.serviceClient<segbot_arm_perception::TabletopPerception>("tabletop_object_detection_service");
-			segbot_arm_perception::TabletopPerception srv; //the srv request is just empty
+			ros::ServiceClient client_tabletop_perception = nh_.serviceClient<bwi_perception::TabletopPerception>("tabletop_object_detection_service");
+			bwi_perception::TabletopPerception srv; //the srv request is just empty
 			
 			srv.request.override_filter_z = true;
 			srv.request.filter_z_value = FILTER_Z_VALUE;

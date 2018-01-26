@@ -17,8 +17,8 @@
 #include <geometry_msgs/WrenchStamped.h>
 
 //get table scene and color histogram
-#include "segbot_arm_perception/TabletopPerception.h"
-#include <segbot_arm_perception/segbot_arm_perception.h>
+#include "bwi_perception/TabletopPerception.h"
+#include <bwi_perception/bwi_perception.h>
 
 //actions
 #include <actionlib/server/simple_action_server.h>

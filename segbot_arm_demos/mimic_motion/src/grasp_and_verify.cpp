@@ -34,7 +34,7 @@
 #include "agile_grasp/Grasps.h"
 
 //srv for talking to table_object_detection_node.cpp
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 
 // PCL specific includes
 //#include <pcl/conversions.h>
@@ -89,7 +89,7 @@
 #include <segbot_arm_manipulation/arm_utils.h>
 
 //for feature extraction
-#include <segbot_arm_perception/FeatureExtraction.h>
+#include <bwi_perception/FeatureExtraction.h>
 
 
 //Math and definitions
@@ -520,7 +520,7 @@ void lift(ros::NodeHandle n, double x){
 }
 
 std::vector<double> get_color_hist(sensor_msgs::PointCloud2 desired_cloud){ 
-	segbot_arm_perception::FeatureExtraction srv; 
+	bwi_perception::FeatureExtraction srv;
 	srv.request.params_int.push_back(8);
 	srv.request.cloud = desired_cloud; 
 	if(colorhist_client.call(srv)){
@@ -583,7 +583,7 @@ double correlation_coeff(std::vector<double> orig_colorhist, std::vector<double>
 
 bool not_on_table(ros::NodeHandle n, Eigen::Vector4f center_vector, std::vector<double> orig_colorhist){
 	//recheck table
-	segbot_arm_perception::TabletopPerception::Response new_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response new_scene = segbot_arm_manipulation::getTabletopScene(n);
 	std::vector<PointCloudT::Ptr > new_objects;
 	
 	//get new objects
@@ -675,7 +675,7 @@ bool verify_pickup(ros::NodeHandle n, sensor_msgs::PointCloud2 ros_cloud, std::v
 	  * subscribed to pointcloud_feature_server service 
 	  * 
 	  * #include <pcl/common/centroid.h>
-	  * #include <segbot_arm_perception/FeatureExtraction.h>
+	  * #include <bwi_perception/FeatureExtraction.h>
 	  * added global orig_colorhist
 	  * 
 	  * added opencv for histogram comparison 
@@ -736,7 +736,7 @@ int main(int argc, char **argv) {
 	cloud_grasp_pub = n.advertise<sensor_msgs::PointCloud2>("agile_grasp_demo/cloud", 10);
 	
 	//pointcloud_feature_service service client
-	colorhist_client = n.serviceClient<segbot_arm_perception::FeatureExtraction>("/segbot_arm_perception/color_histogram_service");
+	colorhist_client = n.serviceClient<bwi_perception::FeatureExtraction>("/bwi_perception/color_histogram_service");
 	
 	ROS_INFO("finished making service clients....");
 	
@@ -764,7 +764,7 @@ int main(int argc, char **argv) {
 
 	segbot_arm_manipulation::openHand();
 	
-	segbot_arm_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
 	ROS_INFO_STREAM("Detecting objects on table...");
 	
 	//step 2: extract the data from the response

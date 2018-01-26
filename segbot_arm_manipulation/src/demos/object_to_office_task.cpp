@@ -6,7 +6,7 @@
 #include <sensor_msgs/JointState.h>
 
 //srv for talking to table_object_detection_node.cpp
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 
 //action for grasping
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
@@ -15,7 +15,7 @@
 #include <segbot_arm_manipulation/arm_utils.h>
 #include <segbot_arm_manipulation/arm_positions_db.h>
 
-#include <segbot_arm_perception/segbot_arm_perception.h>
+#include <bwi_perception/bwi_perception.h>
 
 //includes related to bwi_common
 #include <move_base_msgs/MoveBaseAction.h>
@@ -207,7 +207,7 @@ int main(int argc, char **argv) {
 	
 	
 	//Step 7: get the table scene and select object to grasp
-	segbot_arm_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
 		
 	if ((int)table_scene.cloud_clusters.size() == 0){
 		ROS_WARN("No objects found on table. The end...");

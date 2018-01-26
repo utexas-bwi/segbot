@@ -5,7 +5,7 @@
 #include <sensor_msgs/JointState.h>
 
 //srv for talking to table_object_detection_node.cpp
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 
 //actions
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
 	while (ros::ok()){
 	
 		//get the table scene
-		segbot_arm_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+		bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
 		
 		if ((int)table_scene.cloud_clusters.size() == 0){
 			ROS_WARN("No objects found on table. The end...");

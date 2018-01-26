@@ -1,7 +1,7 @@
 <launch>
 	
 	<!-- launch tabletop detection service -->
-	<node name="table_object_detection_node" pkg="segbot_arm_perception" type="table_object_detection_node" output="screen">
+	<node name="table_object_detection_node" pkg="bwi_perception" type="table_object_detection_node" output="screen">
 	</node>
 	
 	<!-- launch tabletop detection service -->

@@ -6,7 +6,7 @@
 #include <sensor_msgs/JointState.h>
 
 //srv for talking to table_object_detection_node.cpp
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 
 //action for grasping
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
@@ -16,7 +16,7 @@
 #include <segbot_arm_manipulation/arm_utils.h>
 #include <segbot_arm_manipulation/arm_positions_db.h>
 
-#include <segbot_arm_perception/segbot_arm_perception.h>
+#include <bwi_perception/bwi_perception.h>
 
 #include "bwi_kr_execution/ExecutePlanAction.h"
 
@@ -92,7 +92,7 @@ void go_to_place(std::string table){
 	}
 }
 
-int find_largest_obj(segbot_arm_perception::TabletopPerception::Response table_scene){
+int find_largest_obj(bwi_perception::TabletopPerception::Response table_scene){
 	int largest_pc_index = -1;
 	int largest_num_points = -1;
 	for (unsigned int i = 0; i < table_scene.cloud_clusters.size(); i++){
@@ -129,7 +129,7 @@ void call_approach(std::string command){
 	}
 }
 
-void grasp_largest_object(ros::NodeHandle n, segbot_arm_perception::TabletopPerception::Response table_scene, int largest_pc_index){
+void grasp_largest_object(ros::NodeHandle n, bwi_perception::TabletopPerception::Response table_scene, int largest_pc_index){
 
 	
 	actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopGraspAction> ac_grasp("segbot_tabletop_grasp_as",true);
@@ -153,7 +153,7 @@ void grasp_largest_object(ros::NodeHandle n, segbot_arm_perception::TabletopPerc
 	ROS_INFO("Grasp action Finished...");
 }
 
-void lift_object(ros::NodeHandle n, segbot_arm_perception::TabletopPerception::Response table_scene, int largest_pc_index){
+void lift_object(ros::NodeHandle n, bwi_perception::TabletopPerception::Response table_scene, int largest_pc_index){
 	actionlib::SimpleActionClient<segbot_arm_manipulation::LiftVerifyAction> lift_ac("arm_lift_verify_as", true);
 	lift_ac.waitForServer();
 	ROS_INFO("lift and verify action server made...");
@@ -216,7 +216,7 @@ int main(int argc, char **argv) {
 	segbot_arm_manipulation::homeArm(n);
 	segbot_arm_manipulation::arm_side_view(n);
 	
-	segbot_arm_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
 	if (!table_scene.is_plane_found){
 		ROS_WARN("No plane found. Exiting...");
 		exit(1);

@@ -26,7 +26,7 @@
   <depend>roscpp</depend>
   <depend>rospy</depend>
   <depend>segbot_arm_manipulation</depend>
-  <depend>segbot_arm_perception</depend>
+  <depend>bwi_perception</depend>
   <depend>std_msgs</depend>
   <depend>message_generation</depend>
   <depend>move_base_msgs</depend>

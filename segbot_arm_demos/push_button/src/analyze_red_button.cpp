@@ -75,7 +75,7 @@ main (int argc, char** argv)
 
     // Fill in the cloud data
     pcl::PCDReader reader;
-    std::string pathName = "/nishome/bwi/catkin_ws/src/segbot_arm/segbot_arm_perception/pcd/red_button_0.pcd";
+    std::string pathName = "/nishome/bwi/catkin_ws/src/segbot_arm/bwi_perception/pcd/red_button_0.pcd";
     reader.read (pathName, *cloud_blob2);
 
     std::cerr << "Start printing points..." << std::endl;

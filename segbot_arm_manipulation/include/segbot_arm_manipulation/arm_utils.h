@@ -27,8 +27,8 @@
 
 #include <sensor_msgs/PointCloud2.h>
 
-#include "segbot_arm_perception/SetObstacles.h"
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/SetObstacles.h"
+#include "bwi_perception/TabletopPerception.h"
 
 #include <moveit_msgs/CollisionObject.h>
 #include <pcl_ros/impl/transforms.hpp>
@@ -147,12 +147,12 @@ namespace segbot_arm_manipulation {
             ROS_INFO("Cannot contact homing service. Is it running?");
     }
 
-    segbot_arm_perception::TabletopPerception::Response getTabletopScene(ros::NodeHandle n) {
+    bwi_perception::TabletopPerception::Response getTabletopScene(ros::NodeHandle n) {
 
-        ros::ServiceClient client_tabletop_perception = n.serviceClient<segbot_arm_perception::TabletopPerception>(
+        ros::ServiceClient client_tabletop_perception = n.serviceClient<bwi_perception::TabletopPerception>(
                 "tabletop_object_detection_service");
 
-        segbot_arm_perception::TabletopPerception srv;
+        bwi_perception::TabletopPerception srv;
         if (client_tabletop_perception.call(srv)) {
             return srv.response;
         } else {
@@ -181,10 +181,10 @@ namespace segbot_arm_manipulation {
     };
 
     bool setArmObstacles(ros::NodeHandle n, std::vector<sensor_msgs::PointCloud2> clouds) {
-        ros::ServiceClient client_set_obstalces = n.serviceClient<segbot_arm_perception::SetObstacles>(
-                "segbot_arm_perception/set_obstacles");
+        ros::ServiceClient client_set_obstalces = n.serviceClient<bwi_perception::SetObstacles>(
+                "bwi_perception/set_obstacles");
 
-        segbot_arm_perception::SetObstacles srv_obstacles;
+        bwi_perception::SetObstacles srv_obstacles;
         for (unsigned int i = 0; i < clouds.size(); i++) {
             srv_obstacles.request.clouds.push_back(clouds.at(i));
         }
@@ -193,7 +193,7 @@ namespace segbot_arm_manipulation {
             ROS_INFO("[demo_obstacle_avoidance.cpp] Obstacles set");
             return true;
         } else {
-            ROS_ERROR("Failed to call service segbot_arm_perception/set_obstacles");
+            ROS_ERROR("Failed to call service bwi_perception/set_obstacles");
             return false;
         }
     }

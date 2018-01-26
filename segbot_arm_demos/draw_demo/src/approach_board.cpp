@@ -3,7 +3,7 @@
 #include <string>
 #include <ros/ros.h>
 #include <ros/package.h>
-#include "segbot_arm_perception/PlanarSegmentation.h"
+#include "bwi_perception/PlanarSegmentation.h"
 #include <sensor_msgs/PointCloud2.h>
 
 #include <tf/transform_listener.h>
@@ -87,7 +87,7 @@ int main (int argc, char** argv)
 	ros::NodeHandle n;
 	
 	//segmented cloud service client
-	ros::ServiceClient ps_client = n.serviceClient<segbot_arm_perception::PlanarSegmentation>("PlanarSegmentation");
+	ros::ServiceClient ps_client = n.serviceClient<bwi_perception::PlanarSegmentation>("PlanarSegmentation");
 	//pose pub
 	ros::Publisher pose_pub = n.advertise<geometry_msgs::PoseStamped>("approach_board/pose", 10);
 	//create subscriber to tool position topic
@@ -98,7 +98,7 @@ int main (int argc, char** argv)
 	tf::TransformListener listener;
 	signal(SIGINT, sig_handler);
 	
-	segbot_arm_perception::PlanarSegmentation srv;
+	bwi_perception::PlanarSegmentation srv;
 	srv.request.excludePlane = false;
 	srv.request.numberOfPlanes = 3;
 	char input;
@@ -110,7 +110,7 @@ int main (int argc, char** argv)
 			if(ps_client.call(srv)){
 				ros::spinOnce();
 				
-				segbot_arm_perception::PlanarSegmentation::Response res = srv.response; //assume (naively) that the largest plane is the one desired
+				bwi_perception::PlanarSegmentation::Response res = srv.response; //assume (naively) that the largest plane is the one desired
 				
 				if(res.clouds.size() > 0){
 					//conversion of pointcloud

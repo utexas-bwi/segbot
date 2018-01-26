@@ -20,8 +20,8 @@
 #include <visualization_msgs/Marker.h>
 
 //get table scene and color histogram
-#include "segbot_arm_perception/TabletopPerception.h"
-#include <segbot_arm_perception/segbot_arm_perception.h>
+#include "bwi_perception/TabletopPerception.h"
+#include <bwi_perception/bwi_perception.h>
 
 //actions
 #include <actionlib/server/simple_action_server.h>
@@ -99,7 +99,7 @@ void listenForArmData(){
 }
 
 //finds the object on the table
-int largest_obj(segbot_arm_perception::TabletopPerception::Response table_scene){
+int largest_obj(bwi_perception::TabletopPerception::Response table_scene){
 	int largest_pc_index = -1;
 	int largest_num_points = -1;
 	for (unsigned int i = 0; i < table_scene.cloud_clusters.size(); i++){
@@ -112,7 +112,7 @@ int largest_obj(segbot_arm_perception::TabletopPerception::Response table_scene)
 }
 
 //ask user to input the index of desired object or selects the largest object on the table
-int chose_object(std::string message, segbot_arm_perception::TabletopPerception::Response table_scene){
+int chose_object(std::string message, bwi_perception::TabletopPerception::Response table_scene){
 	std::cout << message;
 	char size = (char) table_scene.cloud_clusters.size();
 	while (true){
@@ -129,7 +129,7 @@ int chose_object(std::string message, segbot_arm_perception::TabletopPerception:
 
 
 //display a number in rviz for the index of every point cloud available
-void show_indicies(segbot_arm_perception::TabletopPerception::Response table_scene){
+void show_indicies(bwi_perception::TabletopPerception::Response table_scene){
 	for(unsigned int i = 0; i < table_scene.cloud_clusters.size(); i++){
 		sensor_msgs::PointCloud2 tgt = table_scene.cloud_clusters[i];
 		
@@ -200,7 +200,7 @@ void pressEnter(std::string message){
 
 std::vector<double> get_color_hist(PointCloudT desired_cloud, int dim){ 
 	//get a color histogram and turn it into a one dimensional vector for comparison
-	std::vector<std::vector<std::vector<uint> > > hist3= segbot_arm_perception::computeRGBColorHistogram(desired_cloud, dim);
+	std::vector<std::vector<std::vector<uint> > > hist3= bwi_perception::computeRGBColorHistogram(desired_cloud, dim);
 	int i_offset = dim * dim;
 	int j_offset = dim;
 	std::vector<double> hist3_double_vector (dim * dim * dim, 0);
@@ -240,7 +240,7 @@ double correlation_coeff(std::vector<double> orig_colorhist, std::vector<double>
 }
 
 //method to refind the original target object on the table after previous actions have moved it
-int refind_obj(segbot_arm_perception::TabletopPerception::Response table_scene, sensor_msgs::PointCloud2 tgt){
+int refind_obj(bwi_perception::TabletopPerception::Response table_scene, sensor_msgs::PointCloud2 tgt){
 	PointCloudT pcl_tgt;
 	pcl::fromROSMsg(tgt, pcl_tgt);
 	std::vector<double> tgt_color_hist = get_color_hist(pcl_tgt, 8);
@@ -280,7 +280,7 @@ int main (int argc, char** argv){
 	pressEnter("Press enter to get table scene or q to quit");
 	
 	//get table scene and find all objects on table 
-	segbot_arm_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
 	
 	if ((int)table_scene.cloud_clusters.size() == 0){
 			ROS_WARN("No objects found on table. The end...");

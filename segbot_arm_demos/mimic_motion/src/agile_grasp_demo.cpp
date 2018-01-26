@@ -31,7 +31,7 @@
 #include "agile_grasp/Grasps.h"
 
 //srv for talking to table_object_detection_node.cpp
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 
 // PCL specific includes
 //#include <pcl/conversions.h>
@@ -572,7 +572,7 @@ int main(int argc, char **argv) {
 
 	segbot_arm_manipulation::openHand();
 	
-	segbot_arm_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
 	
 	
 	//step 2: extract the data from the response

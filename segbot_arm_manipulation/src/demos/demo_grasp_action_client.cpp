@@ -3,7 +3,7 @@
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <actionlib/client/simple_action_client.h>
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 #include <segbot_arm_manipulation/arm_utils.h>
 
@@ -158,7 +158,7 @@ int main(int argc, char **argv) {
 	
 	
 		//get the table scene
-		segbot_arm_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+		bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
 		
 		if ((int)table_scene.cloud_clusters.size() == 0){
 			ROS_WARN("No objects found on table. The end...");

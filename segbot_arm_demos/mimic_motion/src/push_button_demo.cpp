@@ -10,7 +10,7 @@
 #include <kinova_msgs/PoseVelocity.h>
 #include <std_msgs/Float32.h>
 
-#include "segbot_arm_perception/ButtonDetection.h"
+#include "bwi_perception/ButtonDetection.h"
 
 //actions
 #include <actionlib/client/simple_action_client.h>
@@ -226,8 +226,8 @@ void moveAboveButton(){
 
 void waitForButtonPose(ros::NodeHandle n){
 	//step 1: call the button detection service and get the response
-	ros::ServiceClient client = n.serviceClient<segbot_arm_perception::ButtonDetection>("segbot_arm_button_detector/detect");
-	segbot_arm_perception::ButtonDetection srv;
+	ros::ServiceClient client = n.serviceClient<bwi_perception::ButtonDetection>("segbot_arm_button_detector/detect");
+	bwi_perception::ButtonDetection srv;
 	
 	if(client.call(srv)) {
 		if(srv.response.button_found == false)

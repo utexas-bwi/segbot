@@ -16,7 +16,7 @@
 #include "kinova_msgs/ArmJointAnglesAction.h"
 
 //srv for talking to table_object_detection_node.cpp
-#include "segbot_arm_perception/TabletopPerception.h"
+#include "bwi_perception/TabletopPerception.h"
 #include "segbot_arm_manipulation/LiftVerifyAction.h"
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 
@@ -90,7 +90,7 @@ void listen_for_arm_data(float rate){
 	}
 }
 
-int find_largest_cloud(segbot_arm_perception::TabletopPerception::Response table_scene){
+int find_largest_cloud(bwi_perception::TabletopPerception::Response table_scene){
 	//ensure there are clouds found
 	if ((int)table_scene.cloud_clusters.size() == 0){
 			ROS_WARN("No objects found on table. The end...");
@@ -136,7 +136,7 @@ int main(int argc, char** argv){
 	/*Test the action*/
 	
 	//get table scene
-	segbot_arm_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(nh);
+	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(nh);
 				
 	int largest_index = find_largest_cloud(table_scene);
 				
