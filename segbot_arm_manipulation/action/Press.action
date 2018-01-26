@@ -1,0 +1,9 @@
+#goal definition
+sensor_msgs/PointCloud2 tgt_cloud
+float32[4] cloud_plane_coef
+---
+#result definition
+bool success
+---
+#feedback
+bool object_moved

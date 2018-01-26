@@ -1,0 +1,42 @@
+# some constants
+string GRASP="grasp"     # used for grasping
+string HANDOVER="handover"	# used for handing over an object based on haptic feedback
+string HANDOVER_FROM_HUMAN="handover_from_human"	# used when robot listens for haptics feedback and grabs object from human
+string REPLACEMENT="replacement" # used when robot places an object back on a table after picking it up 
+
+# constants for which grasps should be filtered
+string SIDEWAY_GRASP_FILTER="side"
+string TOPDOWN_GRASP_FILTER="top"
+
+
+# constants for which function should be optimized when selecting a grasp
+string RANDOM_SELECTION="random"
+string CLOSEST_ORIENTATION_SELECTION="closest_orientation"
+string CLOSEST_JOINTSPACE_SELECTION="closest_joint_space"
+
+
+
+# Goal
+string action_name
+sensor_msgs/PointCloud2 cloud_plane
+float32[4] cloud_plane_coef
+sensor_msgs/PointCloud2[] cloud_clusters
+int32 target_object_cluster_index
+
+# specific for "grasp" action
+string grasp_selection_method
+string grasp_filter_method
+
+# specific for "handover" action
+float32 timeout_seconds
+
+# specific for "replacement" action
+sensor_msgs/JointState grasped_joint_state
+
+---
+# Result
+bool success
+string error_msg
+---
+# Feedback
+bool status
