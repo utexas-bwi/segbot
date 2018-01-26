@@ -70,9 +70,9 @@
 #include <moveit_msgs/GetPositionFK.h>
 #include <moveit_msgs/GetPositionIK.h>
 
-#include <moveit_utils/AngularVelCtrl.h>
-#include <moveit_utils/MicoMoveitJointPose.h>
-#include <moveit_utils/MicoMoveitCartesianPose.h>
+#include <bwi_moveit_utils/AngularVelCtrl.h>
+#include <bwi_moveit_utils/MicoMoveitJointPose.h>
+#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
 
 //some message used for publishing or in the callbacks
 #include <geometry_msgs/TwistStamped.h>
@@ -363,8 +363,8 @@ void moveToJointState(const float* js){
 	
 	
 	
-	moveit_utils::MicoMoveitJointPose::Request req;
-	moveit_utils::MicoMoveitJointPose::Response res;
+	bwi_moveit_utils::MicoMoveitJointPose::Request req;
+	bwi_moveit_utils::MicoMoveitJointPose::Response res;
 	
 	for(int i = 0; i < 6; i++){
         switch(i) {
@@ -1039,7 +1039,7 @@ int main (int argc, char** argv)
 	//clients
 	client_start_change = n.serviceClient<std_srvs::Empty> ("/segbot_arm_table_change_detector/start");
 	client_stop_change = n.serviceClient<std_srvs::Empty> ("/segbot_arm_table_change_detector/stop");
-	client_joint_command = n.serviceClient<moveit_utils::MicoMoveitJointPose> ("/mico_jointpose_service");
+	client_joint_command = n.serviceClient<bwi_moveit_utils::MicoMoveitJointPose> ("/mico_jointpose_service");
 	
 	//store the home arm pose
 	listenForArmData(40.0,2.0);

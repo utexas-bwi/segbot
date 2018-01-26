@@ -10,8 +10,8 @@
 #include <kinova_msgs/SetFingersPositionAction.h>
 #include <kinova_msgs/ArmJointAnglesAction.h>
 #include <kinova_msgs/HomeArm.h>
-#include <moveit_utils/MicoNavSafety.h>
-#include <moveit_utils/MicoMoveitCartesianPose.h>
+#include <bwi_moveit_utils/MicoNavSafety.h>
+#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
 #include <moveit_msgs/GetPositionIK.h>
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>

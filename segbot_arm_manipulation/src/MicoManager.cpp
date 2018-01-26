@@ -26,10 +26,10 @@ MicoManager::MicoManager(ros::NodeHandle n) : pose_action(pose_action_topic, tru
     //finger positions
     finger_sub = n.subscribe(finger_position_topic, 1, &MicoManager::fingers_cb, this);
     home_client = n.serviceClient<kinova_msgs::HomeArm>(home_arm_service);
-    safety_client = n.serviceClient<moveit_utils::MicoNavSafety>("/mico_nav_safety");
-    pose_moveit_client = n.serviceClient<moveit_utils::MicoMoveitCartesianPose>("/mico_cartesianpose_service");
-    joint_angles_moveit_client = n.serviceClient<moveit_utils::MicoMoveitJointPose>("/mico_jointpose_service");
-    joint_pose_client_old = n.serviceClient<moveit_utils::AngularVelCtrl>("/angular_vel_control");
+    safety_client = n.serviceClient<bwi_moveit_utils::MicoNavSafety>("/mico_nav_safety");
+    pose_moveit_client = n.serviceClient<bwi_moveit_utils::MicoMoveitCartesianPose>("/mico_cartesianpose_service");
+    joint_angles_moveit_client = n.serviceClient<bwi_moveit_utils::MicoMoveitJointPose>("/mico_jointpose_service");
+    joint_pose_client_old = n.serviceClient<bwi_moveit_utils::AngularVelCtrl>("/angular_vel_control");
     ik_client = n.serviceClient<moveit_msgs::GetPositionIK>("/compute_ik");
     add_waypoint_client = n.serviceClient<kinova_msgs::AddPoseToCartesianTrajectory>("/m1n6s200_driver/in/add_pose_to_Cartesian_trajectory");
     clear_waypoints_client = n.serviceClient<kinova_msgs::ClearTrajectories>("/m1n6s200_driver/in/clear_trajectories");
@@ -158,8 +158,8 @@ bool MicoManager::move_to_joint_state_old(const sensor_msgs::JointState &target)
     }
 
 
-    moveit_utils::AngularVelCtrl::Request req;
-    moveit_utils::AngularVelCtrl::Response resp;
+    bwi_moveit_utils::AngularVelCtrl::Request req;
+    bwi_moveit_utils::AngularVelCtrl::Response resp;
 
     req.state = q_target;
 
@@ -191,7 +191,7 @@ bool MicoManager::move_fingers(int finger_value) {
 
 bool MicoManager::make_safe_for_travel() {
     safety_client.waitForExistence();
-    moveit_utils::MicoNavSafety srv_safety;
+    bwi_moveit_utils::MicoNavSafety srv_safety;
     srv_safety.request.getSafe = true;
 
     if (safety_client.call(srv_safety)) {
@@ -233,8 +233,8 @@ bool MicoManager::move_to_pose_moveit(const geometry_msgs::PoseStamped &target,
                                       const vector<sensor_msgs::PointCloud2> &obstacles,
                                       const moveit_msgs::Constraints &constraints
 ) {
-    moveit_utils::MicoMoveitCartesianPose::Request req;
-    moveit_utils::MicoMoveitCartesianPose::Response res;
+    bwi_moveit_utils::MicoMoveitCartesianPose::Request req;
+    bwi_moveit_utils::MicoMoveitCartesianPose::Response res;
 
     vector<moveit_msgs::CollisionObject> moveit_obstacles = segbot_arm_manipulation::get_collision_boxes(obstacles);
 
@@ -248,8 +248,8 @@ bool MicoManager::move_to_pose_moveit(const geometry_msgs::PoseStamped &target,
 bool MicoManager::move_to_joint_state_moveit(const kinova_msgs::JointAngles &target,
                                              const vector<sensor_msgs::PointCloud2> &obstacles,
                                              const moveit_msgs::Constraints &constraints) {
-    moveit_utils::MicoMoveitJointPose::Request req;
-    moveit_utils::MicoMoveitJointPose::Response res;
+    bwi_moveit_utils::MicoMoveitJointPose::Request req;
+    bwi_moveit_utils::MicoMoveitJointPose::Response res;
 
     vector<moveit_msgs::CollisionObject> moveit_obstacles = segbot_arm_manipulation::get_collision_boxes(obstacles);
 

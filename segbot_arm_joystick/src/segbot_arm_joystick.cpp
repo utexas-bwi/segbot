@@ -15,12 +15,10 @@
 //JACO messages and actions
 #include <kinova_msgs/FingerPosition.h>
 #include <kinova_msgs/HomeArm.h>
-
-//our own arm library 
-#include <segbot_arm_manipulation/arm_utils.h>
-
+ 
 #include <sensor_msgs/Joy.h>
 #include <bwi_services/SpeakMessage.h>
+#include <segbot_arm_manipulation/MicoManager.h>
 
 #include <iostream>
 using namespace std;
@@ -58,6 +56,7 @@ bool mode = ARM_MODE;
 
 bool base_allowed = true;
 
+MicoManager *mico;
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -271,7 +270,7 @@ void publishFingers(ros::Rate r) {
   if (fingers_closing_fully) {
     finger_1 = 7200;
     finger_2 = 7200;
-    segbot_arm_manipulation::moveFingers(finger_1, finger_2);
+    mico->move_fingers(finger_1, finger_2);
     fingers_closing_fully = false;
     return;
   }
@@ -279,7 +278,7 @@ void publishFingers(ros::Rate r) {
   if (fingers_opening_fully) {
     finger_1 = 100;
     finger_2 = 100;
-    segbot_arm_manipulation::moveFingers(finger_1, finger_2);
+    mico->move_fingers(finger_1, finger_2);
     fingers_opening_fully = false;
     return;
   }
@@ -289,7 +288,7 @@ void publishFingers(ros::Rate r) {
     if (finger_1 >= 700 && finger_2 >= 700) {
       finger_1 -= 600;
       finger_2 -= 600;
-      segbot_arm_manipulation::moveFingers(finger_1, finger_2);
+      mico->move_fingers(finger_1, finger_2);
     }
   
     ros::spinOnce();
@@ -305,7 +304,7 @@ void publishFingers(ros::Rate r) {
       ROS_INFO("Closing fingers\n");
       finger_1 += 600;
       finger_2 += 600;
-      segbot_arm_manipulation::moveFingers(finger_1, finger_2);
+      mico->move_fingers(finger_1, finger_2);
     }
   
     ros::spinOnce();
@@ -315,10 +314,10 @@ void publishFingers(ros::Rate r) {
 
 void homeArm(ros::NodeHandle n) {
   ROS_INFO("Homing arm\n");
-  segbot_arm_manipulation::homeArm(n);
+  mico->move_home();
   finger_1 = 7200;
   finger_2 = 7200;
-  segbot_arm_manipulation::moveFingers(finger_1, finger_2);
+  mico->move_fingers(finger_1, finger_2);
   homingArm = false;
 }
 
@@ -361,7 +360,7 @@ void switchMode(ros::ServiceClient speak_message_client, ros::NodeHandle n) {
 
   bwi_services::SpeakMessage speak_srv2;
   if (mode == ARM_MODE) {
-    bool safe = segbot_arm_manipulation::makeSafeForTravel(n);
+    bool safe = mico->make_safe_for_travel();
     if (!safe) {
       ROS_INFO("Could not switch to base mode. Arm not safe for travel.");
       mode_changed = false;
@@ -421,8 +420,9 @@ int main(int argc, char * *argv) {
   //register ctrl-c
   signal(SIGINT, sig_handler);
   
-  segbot_arm_manipulation::homeArm(n);
-  segbot_arm_manipulation::moveFingers(finger_1, finger_2); //inital position = 7200
+  mico = new MicoManager(n);
+  mico->move_home();
+  mico->move_fingers(finger_1, finger_2); //inital position = 7200
   
   //close fingers and "home" the arm
   pressEnter("Press [Enter] to start");

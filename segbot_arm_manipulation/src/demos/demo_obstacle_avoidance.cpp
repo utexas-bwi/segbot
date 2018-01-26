@@ -125,7 +125,7 @@ int main(int argc, char **argv) {
 		segbot_arm_manipulation::setArmObstacles(n,obstacle_clouds);
 		
 		//now, move the arm to the goal -- it should avoid the obstacles
-		moveit_utils::MicoMoveitCartesianPose::Response resp = segbot_arm_manipulation::moveToPoseMoveIt(n,goal_pose);
+		bwi_moveit_utils::MicoMoveitCartesianPose::Response resp = segbot_arm_manipulation::moveToPoseMoveIt(n,goal_pose);
 		
 		//Step 3: ask user to place an obstacle on the table between the two positions
 		pressEnter("Place or remove an obstacle and press 'Enter'");
@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
 		}
 		
 		//now, move the arm to the goal -- it should avoid the obstacles
-		moveit_utils::MicoMoveitCartesianPose::Response resp2 = segbot_arm_manipulation::moveToPoseMoveIt(n,start_pose);
+		bwi_moveit_utils::MicoMoveitCartesianPose::Response resp2 = segbot_arm_manipulation::moveToPoseMoveIt(n,start_pose);
 		
 	
 	

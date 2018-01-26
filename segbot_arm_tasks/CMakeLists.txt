@@ -7,8 +7,9 @@ project(segbot_arm_tasks)
 find_package(catkin REQUIRED COMPONENTS
     actionlib
     actionlib_msgs
-    bwi_msgs
     bwi_kr_execution
+    bwi_moveit_utils
+    bwi_msgs
     bwi_services
     kinova_msgs
     pcl_ros
@@ -20,7 +21,6 @@ find_package(catkin REQUIRED COMPONENTS
     std_msgs
     move_base_msgs
     moveit_ros_planning_interface
-    moveit_utils
     moveit_msgs
     nav_msgs
 

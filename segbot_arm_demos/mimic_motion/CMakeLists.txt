@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(mimic_motion)
 
 find_package(catkin REQUIRED COMPONENTS
+  bwi_moveit_utils
   roscpp
   rospy
   std_msgs
@@ -15,7 +16,6 @@ find_package(catkin REQUIRED COMPONENTS
   agile_grasp
   tf_conversions
   moveit_ros_planning_interface
-  moveit_utils
   moveit_msgs
   segbot_arm_manipulation
   segbot_arm_perception

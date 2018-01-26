@@ -6,7 +6,7 @@ find_package(catkin REQUIRED COMPONENTS
         image_transport
         kinova_msgs
         message_generation
-        moveit_utils
+        bwi_moveit_utils
         pcl_ros
         pcl_conversions
         roscpp

@@ -9,7 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
     kinova_msgs
     moveit_msgs
     moveit_ros_planning_interface
-    moveit_utils
+    bwi_moveit_utils
     moveit_msgs
     nav_msgs
     move_base_msgs

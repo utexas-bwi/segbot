@@ -19,10 +19,10 @@
 
 #include <moveit_msgs/GetPositionIK.h>
 
-#include <moveit_utils/AngularVelCtrl.h>
-#include <moveit_utils/MicoMoveitJointPose.h>
-#include <moveit_utils/MicoMoveitCartesianPose.h>
-#include <moveit_utils/MicoNavSafety.h>
+#include <bwi_moveit_utils/AngularVelCtrl.h>
+#include <bwi_moveit_utils/MicoMoveitJointPose.h>
+#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
+#include <bwi_moveit_utils/MicoNavSafety.h>
 
 
 #include <sensor_msgs/PointCloud2.h>
@@ -123,9 +123,9 @@ namespace segbot_arm_manipulation {
     }
 
     bool makeSafeForTravel(ros::NodeHandle n) {
-        ros::ServiceClient safety_client = n.serviceClient<moveit_utils::MicoNavSafety>("/mico_nav_safety");
+        ros::ServiceClient safety_client = n.serviceClient<bwi_moveit_utils::MicoNavSafety>("/mico_nav_safety");
         safety_client.waitForExistence();
-        moveit_utils::MicoNavSafety srv_safety;
+        bwi_moveit_utils::MicoNavSafety srv_safety;
         srv_safety.request.getSafe = true;
 
         if (safety_client.call(srv_safety)) {
@@ -198,14 +198,14 @@ namespace segbot_arm_manipulation {
         }
     }
 
-    moveit_utils::MicoMoveitCartesianPose::Response
+    bwi_moveit_utils::MicoMoveitCartesianPose::Response
     moveToPoseMoveIt(ros::NodeHandle n, geometry_msgs::PoseStamped p_target) {
-        moveit_utils::MicoMoveitCartesianPose::Request req;
-        moveit_utils::MicoMoveitCartesianPose::Response res;
+        bwi_moveit_utils::MicoMoveitCartesianPose::Request req;
+        bwi_moveit_utils::MicoMoveitCartesianPose::Response res;
 
         req.target = p_target;
 
-        ros::ServiceClient client = n.serviceClient<moveit_utils::MicoMoveitCartesianPose>(
+        ros::ServiceClient client = n.serviceClient<bwi_moveit_utils::MicoMoveitCartesianPose>(
                 "/mico_cartesianpose_service");
         if (client.call(req, res)) {
             ROS_INFO("MoveToPoseMoveIt Call successful. Response:");
@@ -297,10 +297,10 @@ namespace segbot_arm_manipulation {
         ROS_INFO_STREAM(q_target);
         pressEnter();*/
 
-        moveit_utils::AngularVelCtrl::Request req;
-        moveit_utils::AngularVelCtrl::Response resp;
+        bwi_moveit_utils::AngularVelCtrl::Request req;
+        bwi_moveit_utils::AngularVelCtrl::Response resp;
 
-        ros::ServiceClient ikine_client = n.serviceClient<moveit_utils::AngularVelCtrl>("/angular_vel_control");
+        ros::ServiceClient ikine_client = n.serviceClient<bwi_moveit_utils::AngularVelCtrl>("/angular_vel_control");
 
         req.state = q_target;
 

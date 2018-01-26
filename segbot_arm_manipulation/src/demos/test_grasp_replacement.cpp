@@ -25,9 +25,9 @@
 #include <moveit_msgs/GetPositionFK.h>
 #include <moveit_msgs/GetPositionIK.h>
 
-#include <moveit_utils/AngularVelCtrl.h>
-#include <moveit_utils/MicoMoveitJointPose.h>
-#include <moveit_utils/MicoMoveitCartesianPose.h>
+#include <bwi_moveit_utils/AngularVelCtrl.h>
+#include <bwi_moveit_utils/MicoMoveitJointPose.h>
+#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
 
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/PoseArray.h>

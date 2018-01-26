@@ -26,7 +26,7 @@
 #include "kinova_msgs/ArmPoseAction.h"
 
 //moveit interface service
-#include <moveit_utils/MicoMoveitCartesianPose.h>
+#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
 
 #define PI 3.14159265
 
@@ -74,7 +74,7 @@ void approach_jaco(kinova_msgs::ArmPoseGoal goalPose){
 	ac.waitForResult();
 }
 void approach(geometry_msgs::PoseStamped goal){
-	moveit_utils::MicoMoveitCartesianPose srv;
+	bwi_moveit_utils::MicoMoveitCartesianPose srv;
 	srv.request.target = goal;
 	if(client.call(srv))
 		ROS_INFO("Called IK interface service.");
@@ -93,7 +93,7 @@ int main (int argc, char** argv)
 	//create subscriber to tool position topic
 	ros::Subscriber sub_tool = n.subscribe("/m1n6s200_driver/out/tool_pose", 1, toolpos_cb);
 	
-	client = n.serviceClient<moveit_utils::MicoMoveitCartesianPose>("mico_cartesianpose_service");
+	client = n.serviceClient<bwi_moveit_utils::MicoMoveitCartesianPose>("mico_cartesianpose_service");
 	
 	tf::TransformListener listener;
 	signal(SIGINT, sig_handler);

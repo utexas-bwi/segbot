@@ -18,9 +18,9 @@
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 #include "segbot_arm_manipulation/ObjReplacementAction.h"
 
-#include <moveit_utils/AngularVelCtrl.h>
-#include <moveit_utils/MicoMoveitJointPose.h>
-#include <moveit_utils/MicoMoveitCartesianPose.h>
+#include <bwi_moveit_utils/AngularVelCtrl.h>
+#include <bwi_moveit_utils/MicoMoveitJointPose.h>
+#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
 
 #include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/PoseArray.h>

@@ -64,9 +64,9 @@
 #include <moveit_msgs/GetPositionFK.h>
 #include <moveit_msgs/GetPositionIK.h>
 
-#include <moveit_utils/AngularVelCtrl.h>
-#include <moveit_utils/MicoMoveitJointPose.h>
-#include <moveit_utils/MicoMoveitCartesianPose.h>
+#include <bwi_moveit_utils/AngularVelCtrl.h>
+#include <bwi_moveit_utils/MicoMoveitJointPose.h>
+#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
 
 #include <geometry_msgs/TwistStamped.h>
 
@@ -375,10 +375,10 @@ void moveToJointState(ros::NodeHandle n, sensor_msgs::JointState target){
 	ROS_INFO("Target joint state:");
 	ROS_INFO_STREAM(q_target);
 	
-	moveit_utils::AngularVelCtrl::Request	req;
-	moveit_utils::AngularVelCtrl::Response	resp;
+	bwi_moveit_utils::AngularVelCtrl::Request	req;
+	bwi_moveit_utils::AngularVelCtrl::Response	resp;
 	
-	ros::ServiceClient ikine_client = n.serviceClient<moveit_utils::AngularVelCtrl> ("/angular_vel_control");
+	ros::ServiceClient ikine_client = n.serviceClient<bwi_moveit_utils::AngularVelCtrl> ("/angular_vel_control");
 	
 	req.state = q_target;
 	
@@ -395,12 +395,12 @@ void moveToJointState(ros::NodeHandle n, sensor_msgs::JointState target){
 }
 
 void moveToJointStateMoveIt(ros::NodeHandle n, geometry_msgs::PoseStamped p_target/*sensor_msgs::JointState q_target*/){
-	moveit_utils::MicoMoveitCartesianPose::Request 	req;
-	moveit_utils::MicoMoveitCartesianPose::Response res;
+	bwi_moveit_utils::MicoMoveitCartesianPose::Request 	req;
+	bwi_moveit_utils::MicoMoveitCartesianPose::Response res;
 	
 	req.target = p_target;
 	
-	ros::ServiceClient client = n.serviceClient<moveit_utils::MicoMoveitCartesianPose> ("/mico_cartesianpose_service");
+	ros::ServiceClient client = n.serviceClient<bwi_moveit_utils::MicoMoveitCartesianPose> ("/mico_cartesianpose_service");
 	if(client.call(req, res)){
  		ROS_INFO("Call successful. Response:");
  		ROS_INFO_STREAM(res);

@@ -21,7 +21,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 
 
-#include <moveit_utils/MicoNavSafety.h>
+#include <bwi_moveit_utils/MicoNavSafety.h>
 
 #define NUM_JOINTS 8 //6+2 for the arm
 

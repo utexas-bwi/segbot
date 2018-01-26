@@ -5,13 +5,13 @@ add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   actionlib
-        agile_grasp
+  agile_grasp
+  bwi_moveit_utils
   geometry_msgs
   kinova_msgs
   message_generation
   moveit_msgs
   moveit_ros_planning_interface
-  moveit_utils
   pcl_conversions
   pcl_ros
   roscpp

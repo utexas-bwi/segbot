@@ -23,7 +23,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 
 
-#include <moveit_utils/MicoNavSafety.h>
+#include <bwi_moveit_utils/MicoNavSafety.h>
 
 typedef pcl::PointXYZRGB PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
