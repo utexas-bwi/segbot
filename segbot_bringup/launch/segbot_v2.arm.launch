@@ -59,7 +59,7 @@
   <include file="$(find m1n6s200_segbot_moveit_config)/launch/m1n6s200_segbot_moveit_bringup.launch"/>
  
  
-  <include file="$(find moveit_utils)/launch/moveit_utils.launch" />
+  <include file="$(find bwi_moveit_utils)/launch/moveit_utils.launch" />
    <!-- Diagnostics and battery monitor -->
   <include file="$(find segbot_sensors)/launch/diagnostic/diagnostics.launch" if="$(arg gui)"/>
 
