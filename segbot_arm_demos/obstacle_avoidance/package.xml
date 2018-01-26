@@ -12,12 +12,12 @@
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>actionlib</build_depend>
   <build_depend>agile_grasp</build_depend>
+  <build_depend>bwi_moveit_utils</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <build_depend>kinova_msgs</build_depend>
   <build_depend>message_generation</build_depend>
   <build_depend>moveit_msgs</build_depend>
   <build_depend>moveit_ros_planning_interface</build_depend>
-  <build_depend>moveit_utils</build_depend>
   <build_depend>pcl_conversions</build_depend>
   <build_depend>pcl_ros</build_depend>
   <build_depend>roscpp</build_depend>
