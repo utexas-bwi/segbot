@@ -75,7 +75,6 @@
 #include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
 
 //some message used for publishing or in the callbacks
-#include <geometry_msgs/TwistStamped.h>
 #include <nav_msgs/Odometry.h>
 #include <kinova_msgs/JointVelocity.h>
 
@@ -1059,7 +1058,7 @@ int main (int argc, char** argv)
 	ros::Rate r(ros_rate);
 
 	//msg for publishing velocity commands
-	geometry_msgs::TwistStamped v_msg;
+	kinova_msgs::PoseVelocity v_msg;
 	
 	
 
@@ -1075,7 +1074,7 @@ int main (int argc, char** argv)
 			theta_angle += (2*PI)/(cycle_length * ros_rate);
 
 			//compute z velocity and publish
-			v_msg.twist.linear.z = z_vel_magnitude * cos(theta_angle);
+			v_msg.twist_linear_z = z_vel_magnitude * cos(theta_angle);
 			pub_velocity.publish(v_msg);
 			
 		}
