@@ -18,7 +18,6 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <exec_depend>segbot_arm_demos</exec_depend>
   <exec_depend>segbot_arm_joystick</exec_depend>
   <exec_depend>segbot_arm_manipulation</exec_depend>
   <exec_depend>segbot_arm_tasks</exec_depend>
