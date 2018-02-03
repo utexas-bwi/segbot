@@ -259,7 +259,7 @@ public:
 	
 	bool not_on_table(Eigen::Vector4f center_vector, std::vector<double> orig_colorhist){
 		//check table for new objects
-		bwi_perception::TabletopPerception::Response new_scene = segbot_arm_manipulation::getTabletopScene(nh_);
+		bwi_perception::TabletopPerception::Response new_scene = bwi_perception::getTabletopScene(nh_);
 		
 		double tolerance = 0.1; 
 		

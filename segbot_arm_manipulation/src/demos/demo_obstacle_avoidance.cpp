@@ -2,6 +2,7 @@
 #include <signal.h>
 #include <sensor_msgs/JointState.h>
 #include "bwi_perception/TabletopPerception.h"
+#include <bwi_perception/bwi_perception.h>
 #include <segbot_arm_manipulation/arm_utils.h>
 #include <geometry_msgs/PoseStamped.h>
 
@@ -104,7 +105,7 @@ int main(int argc, char **argv) {
 		pressEnter("Place an obstacle and press 'Enter'");
 		
 		//Step 4: call tabletop perception service to detect the object and table
-		bwi_perception::TabletopPerception::Response tabletop_response = segbot_arm_manipulation::getTabletopScene(n);
+		bwi_perception::TabletopPerception::Response tabletop_response = bwi_perception::getTabletopScene(n);
 		
 		//check if plane was not found
 		/*if (tabletop_response.is_plane_found == false){
@@ -131,7 +132,7 @@ int main(int argc, char **argv) {
 		pressEnter("Place or remove an obstacle and press 'Enter'");
 		
 		//Step 4: call tabletop perception service to detect the object and table
-		tabletop_response = segbot_arm_manipulation::getTabletopScene(n);
+		tabletop_response = bwi_perception::getTabletopScene(n);
 		
 		//check if plane was not found
 		/*if (tabletop_response.is_plane_found == false){
@@ -151,8 +152,6 @@ int main(int argc, char **argv) {
 		
 		//now, move the arm to the goal -- it should avoid the obstacles
 		bwi_moveit_utils::MicoMoveitCartesianPose::Response resp2 = segbot_arm_manipulation::moveToPoseMoveIt(n,start_pose);
-		
-	
 	
 	}
 }

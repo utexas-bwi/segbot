@@ -7,6 +7,8 @@
 #include <pcl/common/common.h>
 
 #include <segbot_arm_manipulation/arm_utils.h>
+#include <bwi_perception/TabletopPerception.h>
+#include <bwi_perception/bwi_perception.h>
 
 using namespace pcl;
 typedef pcl::PointXYZRGB PointT;
@@ -147,7 +149,7 @@ int main(int argc, char **argv) {
 	ROS_INFO("Move the arm so that it does not occlude the table.");
 	pressEnter();
 
-    bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(nh);
+    bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(nh);
   
     if ((int)table_scene.cloud_clusters.size() == 0) {
         ROS_WARN("No objects found on table. Exiting. Please add objects and rerun.");

@@ -280,7 +280,7 @@ int main (int argc, char** argv){
 	pressEnter("Press enter to get table scene or q to quit");
 	
 	//get table scene and find all objects on table 
-	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
 	
 	if ((int)table_scene.cloud_clusters.size() == 0){
 			ROS_WARN("No objects found on table. The end...");
@@ -340,7 +340,7 @@ int main (int argc, char** argv){
 	pressEnter("Press enter to recheck table");
 	//the object has moved from the above actions, recheck table	
 	sensor_msgs::PointCloud2 tgt = table_scene.cloud_clusters[index];
-	table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	table_scene = bwi_perception::getTabletopScene(n);
 	
 	if ((int)table_scene.cloud_clusters.size() == 0){
 			ROS_WARN("No objects found on table. The end...");

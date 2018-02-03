@@ -7,6 +7,7 @@
 
 //srv for talking to table_object_detection_node.cpp
 #include "bwi_perception/TabletopPerception.h"
+#include <bwi_perception/bwi_perception.h>
 
 //action for grasping
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
@@ -16,7 +17,6 @@
 #include <segbot_arm_manipulation/arm_utils.h>
 #include <segbot_arm_manipulation/arm_positions_db.h>
 
-#include <bwi_perception/bwi_perception.h>
 
 #include "bwi_kr_execution/ExecutePlanAction.h"
 
@@ -216,7 +216,7 @@ int main(int argc, char **argv) {
 	segbot_arm_manipulation::homeArm(n);
 	segbot_arm_manipulation::arm_side_view(n);
 	
-	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
 	if (!table_scene.is_plane_found){
 		ROS_WARN("No plane found. Exiting...");
 		exit(1);

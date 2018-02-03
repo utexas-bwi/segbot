@@ -286,7 +286,7 @@ int main(int argc, char **argv) {
 	pressEnter("Press [ENTER] to proceed");
 	
 	//Step 5: get the table scene and select object to grasp
-	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
 	
 	//ensure the plane is found and there are clusters on the table	
 	if (!table_scene.is_plane_found){

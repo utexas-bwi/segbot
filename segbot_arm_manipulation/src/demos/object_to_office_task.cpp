@@ -207,7 +207,7 @@ int main(int argc, char **argv) {
 	
 	
 	//Step 7: get the table scene and select object to grasp
-	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
 		
 	if ((int)table_scene.cloud_clusters.size() == 0){
 		ROS_WARN("No objects found on table. The end...");
