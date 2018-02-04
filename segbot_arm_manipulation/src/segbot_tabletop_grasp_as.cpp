@@ -1,13 +1,4 @@
 #include <ros/ros.h>
-#include <signal.h>
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <cstdlib>
-
-#include <stdlib.h>     /* srand, rand */
-#include <time.h>       /* time */
-
 
 #include <segbot_arm_manipulation/MicoManager.h>
 #include <segbot_arm_manipulation/grasp_utils.h>
@@ -27,9 +18,6 @@
 #include <moveit_msgs/GetPositionFK.h>
 #include <moveit_msgs/GetPositionIK.h>
 
-#include <bwi_moveit_utils/AngularVelCtrl.h>
-#include <bwi_moveit_utils/MicoMoveitJointPose.h>
-#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
 
 #include <kinova_msgs/PoseVelocity.h>
 #include <geometry_msgs/PoseArray.h>
@@ -42,17 +30,13 @@
 #include <tf_conversions/tf_eigen.h>
 #include <tf/transform_broadcaster.h>
 
-#define FINGER_FULLY_OPENED 6
-#define FINGER_FULLY_CLOSED 7300
-
-#define NUM_JOINTS_ARMONLY 6
 #define NUM_JOINTS 8 //6+2 for the arm
 
 //some defines related to filtering candidate grasps
 #define MIN_DISTANCE_TO_PLANE 0.05
 
-#define HAND_OFFSET_GRASP -0.02
-#define HAND_OFFSET_APPROACH -0.13
+#define HAND_OFFSET_GRASP 0.02
+#define HAND_OFFSET_APPROACH 0.10
 
 //used to decide if someone is pulling an object from the arm
 #define FORCE_HANDOVER_THRESHOLD 3.0
@@ -62,9 +46,6 @@
 //cannot directly go from approach to grasp pose (so we filter those pairs out)
 #define ANGULAR_DIFF_THRESHOLD 3.0
 
-
-//the individual action server
-//#include "segbot_arm_manipulation/tabletop_grasp_action.h"
 
 /* define what kind of point clouds we're using */
 typedef pcl::PointXYZRGB PointT;
@@ -81,15 +62,13 @@ protected:
     // create messages that are used to published feedback/result
     segbot_arm_manipulation::TabletopGraspFeedback feedback_;
     segbot_arm_manipulation::TabletopGraspResult result_;
-    //segbot_arm_manipulation::TabletopGraspGoal goal_;
-    
+
     agile_grasp::Grasps current_grasps;
     
     ros::Publisher cloud_pub;
     ros::Publisher cloud_grasp_pub;
     ros::Publisher pose_array_pub;
     ros::Publisher pose_pub;
-    ros::Publisher pose_fk_pub;
 
     std::vector<PointCloudT::Ptr> detected_objects;
 
@@ -99,26 +78,24 @@ protected:
     bool heard_grasps;
     ros::Subscriber sub_grasps;
 
-
     //subscribers -- in an action server, these have to be class members
     MicoManager mico;
 
 public:
 
-    TabletopGraspActionServer(std::string name) :
+    TabletopGraspActionServer(const std::string &name) :
             as_(nh_, name, boost::bind(&TabletopGraspActionServer::executeCB, this, _1), false),
             action_name_(name),
-            mico(nh_){
+            mico(nh_), heard_grasps(false){
         
         //subscriber for grasps
         sub_grasps = nh_.subscribe("/find_grasps/grasps_handles", 1, &TabletopGraspActionServer::grasps_cb, this);
 
         //publish pose array
-        pose_array_pub = nh_.advertise<geometry_msgs::PoseArray>("/agile_grasp_demo/pose_array", 10);
+        pose_array_pub = nh_.advertise<geometry_msgs::PoseArray>("pose_array", 10);
 
         //publish pose 
         pose_pub = nh_.advertise<geometry_msgs::PoseStamped>("/agile_grasp_demo/pose_out", 10);
-        pose_fk_pub = nh_.advertise<geometry_msgs::PoseStamped>("/agile_grasp_demo/pose_fk_out", 10);
 
         //debugging publisher
         cloud_pub = nh_.advertise<sensor_msgs::PointCloud2>("agile_grasp_demo/cloud_debug", 10);
@@ -129,9 +106,8 @@ public:
         as_.start();
     }
 
-    ~TabletopGraspActionServer(void) {
-    }
-    
+    ~TabletopGraspActionServer() = default;
+
 
     void grasps_cb(const agile_grasp::Grasps &msg) {
         ROS_INFO("Heard grasps!");
@@ -150,71 +126,8 @@ public:
             r.sleep();
         }
     }
-    
 
-    void spinSleep(double duration) {
-        int rateHertz = 40;
-        ros::Rate r(rateHertz);
-        for (int i = 0; i < (int) duration * rateHertz; i++) {
-            ros::spinOnce();
-            r.sleep();
-        }
-    }
-
-    /*void selectGrasp(const segbot_arm_manipulation::TabletopGraspGoalConstPtr  &goal, ){
-        
-        //first, construct list of grasp commands
-        std::vector<GraspCartesianCommand> grasp_commands;
-            
-        for (unsigned int i = 0; i < current_grasps.grasps.size(); i++){
-                
-                            
-            GraspCartesianCommand gc_i = segbot_arm_manipulation::grasp_utils::constructGraspCommand(current_grasps.grasps.at(i),HAND_OFFSET_APPROACH,HAND_OFFSET_GRASP, cloud_ros.header.frame_id);
-                
-            bool ok_with_plane = segbot_arm_manipulation::grasp_utils::checkPlaneConflict(gc_i,plane_coef_vector,MIN_DISTANCE_TO_PLANE);
-                
-            if (ok_with_plane){
-                    
-                listener.transformPose("m1n6s200_link_base", gc_i.approach_pose, gc_i.approach_pose);
-                listener.transformPose("m1n6s200_link_base", gc_i.grasp_pose, gc_i.grasp_pose);
-                    
-                //filter two -- if IK fails
-                moveit_msgs::GetPositionIK::Response  ik_response_approach = segbot_arm_manipulation::computeIK(nh_,gc_i.approach_pose);
-                    
-                if (ik_response_approach.error_code.val == 1){
-                    moveit_msgs::GetPositionIK::Response  ik_response_grasp = segbot_arm_manipulation::computeIK(nh_,gc_i.grasp_pose);
-                
-                    if (ik_response_grasp.error_code.val == 1){
-                            
-                            
-                        //now check to see how close the two sets of joint angles are
-                        std::vector<double> D = segbot_arm_manipulation::getJointAngleDifferences(ik_response_approach.solution.joint_state, ik_response_grasp.solution.joint_state );
-                            
-                        double sum_d = 0;
-                        for (int p = 0; p < D.size(); p++){
-                            sum_d += D[p];
-                        }
-                        
-                        
-                        if (sum_d < ANGULAR_DIFF_THRESHOLD){
-                            ROS_INFO("Angle diffs for grasp %i: %f, %f, %f, %f, %f, %f",(int)grasp_commands.size(),D[0],D[1],D[2],D[3],D[4],D[5]);
-                                
-                            ROS_INFO("Sum diff: %f",sum_d);
-                            
-                            
-                            //store the IK results
-                            gc_i.approach_q = ik_response_approach.solution.joint_state;
-                            gc_i.grasp_q = ik_response_grasp.solution.joint_state;
-                                
-                            grasp_commands.push_back(gc_i);
-                        }
-                    }
-                }
-            }
-        }
-    }*/
-
-    bool passesFilter(std::string filterName, GraspCartesianCommand gc) {
+    bool passesFilter(const std::string &filterName, const GraspCartesianCommand &gc) {
 
         tf::Quaternion q(gc.approach_pose.pose.orientation.x,
                          gc.approach_pose.pose.orientation.y,
@@ -225,8 +138,6 @@ public:
         double r, p, y;
         m.getRPY(r, p, y);
 
-        ROS_INFO_STREAM(gc.approach_pose);
-        ROS_INFO("RPY: %f %f %f", r, p, y);
 
         if (filterName == segbot_arm_manipulation::TabletopGraspGoal::SIDEWAY_GRASP_FILTER) {
 
@@ -251,53 +162,11 @@ public:
         return true;
     }
 
-    /*
-     * blocks until force of sufficient amount is detected or timeout is exceeded
-     * returns true of force degected, false if timeout
-     */
-    bool waitForForce(double force_threshold, double timeout) {
-        double rate = 40.0;
-        ros::Rate r(rate);
-
-        double total_grav_free_effort = 0;
-        double total_delta;
-        double delta_effort[6];
-
-        mico.wait_for_data();
-        sensor_msgs::JointState prev_effort_state = mico.current_state;
-
-        double elapsed_time = 0;
-
-        while (ros::ok()) {
-
-            ros::spinOnce();
-
-            total_delta = 0.0;
-            for (int i = 0; i < 6; i++) {
-                delta_effort[i] = fabs(mico.current_state.effort[i] - prev_effort_state.effort[i]);
-                total_delta += delta_effort[i];
-                //ROS_INFO("Total delta=%f",total_delta);
-            }
-
-            if (total_delta > fabs(FORCE_HANDOVER_THRESHOLD)) {
-                ROS_INFO("[segbot_tabletop_grasp_as.cpp] Force detected");
-                return true;
-            }
-
-            r.sleep();
-            elapsed_time += (1.0) / rate;
-
-            if (timeout > 0 && elapsed_time > timeout) {
-                ROS_WARN("[segbot_tabletop_grasp_as.cpp] Wait for force function timed out");
-                return false;
-            }
-        }
-    }
 
     void executeCB(const segbot_arm_manipulation::TabletopGraspGoalConstPtr &goal) {
         if (goal->action_name == segbot_arm_manipulation::TabletopGraspGoal::GRASP) {
 
-            if (goal->cloud_clusters.size() == 0) {
+            if (goal->cloud_clusters.empty()) {
                 ROS_INFO("[segbot_tabletop_grap_as.cpp] No object point clouds received...aborting");
                 as_.setAborted(result_);
                 return;
@@ -342,17 +211,24 @@ public:
             std::vector<GraspCartesianCommand> grasp_commands;
 
 
-            for (unsigned int i = 0; i < current_grasps.grasps.size(); i++) {
-
+            for (const auto &grasp : current_grasps.grasps) {
 
                 GraspCartesianCommand gc_i = segbot_arm_manipulation::grasp_utils::constructGraspCommand(
-                        current_grasps.grasps.at(i), HAND_OFFSET_APPROACH, HAND_OFFSET_GRASP, sensor_frame_id);
+                        grasp, HAND_OFFSET_APPROACH, HAND_OFFSET_GRASP, sensor_frame_id);
 
-
-
+                geometry_msgs::PoseArray pa;
+                pa.header = gc_i.approach_pose.header;
+                pa.poses.push_back(gc_i.approach_pose.pose);
+                pa.poses.push_back(gc_i.grasp_pose.pose);
+                pose_array_pub.publish(pa);
+                ros::spinOnce();
                 //filter 1: if the grasp is too close to plane, reject it
                 bool ok_with_plane = segbot_arm_manipulation::grasp_utils::checkPlaneConflict(gc_i, plane_coef_vector,
                                                                                               MIN_DISTANCE_TO_PLANE);
+                if (!ok_with_plane) {
+                    ROS_INFO("Grasp too close to plane");
+                    continue;
+                }
 
                 //for filter 2, the grasps need to be in the arm's frame of reference
                 listener.transformPose("m1n6s200_link_base", gc_i.approach_pose, gc_i.approach_pose);
@@ -362,52 +238,52 @@ public:
                 //filter 2: apply grasp filter method in request
                 bool passed_filter = passesFilter(goal->grasp_filter_method, gc_i);
 
-                if (passed_filter && ok_with_plane) {
-                    ROS_INFO("Found grasp fine with filter and plane");
-
-
-
-                    //filter two -- if IK fails
-                    moveit_msgs::GetPositionIK::Response ik_response_approach = mico.compute_ik(gc_i.approach_pose);
-
-                    if (ik_response_approach.error_code.val == 1) {
-                        moveit_msgs::GetPositionIK::Response ik_response_grasp = mico.compute_ik(gc_i.grasp_pose);
-
-                        if (ik_response_grasp.error_code.val == 1) {
-
-                            ROS_INFO("...grasp fine with IK");
-
-
-                            //now check to see how close the two sets of joint angles are -- if the joint configurations for the approach and grasp poses differ by too much, the grasp will not be accepted
-                            std::vector<double> D = segbot_arm_manipulation::getJointAngleDifferences(
-                                    ik_response_approach.solution.joint_state, ik_response_grasp.solution.joint_state);
-
-                            double sum_d = 0;
-                            for (int p = 0; p < D.size(); p++) {
-                                sum_d += D[p];
-                            }
-
-
-                            if (sum_d < ANGULAR_DIFF_THRESHOLD) {
-                                //ROS_INFO("Angle diffs for grasp %i: %f, %f, %f, %f, %f, %f",(int)grasp_commands.size(),D[0],D[1],D[2],D[3],D[4],D[5]);
-
-                                //ROS_INFO("Sum diff: %f",sum_d);
-
-                                //store the IK results
-                                gc_i.approach_q = ik_response_approach.solution.joint_state;
-                                gc_i.grasp_q = ik_response_grasp.solution.joint_state;
-
-                                grasp_commands.push_back(gc_i);
-
-                                ROS_INFO("...fine with continuity");
-                            }
-                        }
-                    }
+                if (!passed_filter) {
+                    ROS_INFO("Filter failed");
+                    continue;
                 }
+
+
+                //filter two -- if IK fails
+                moveit_msgs::GetPositionIK::Response ik_response_approach = mico.compute_ik(gc_i.approach_pose);
+
+                if (ik_response_approach.error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS) {
+                    ROS_INFO("No IK solution for approach pose");
+                    continue;
+                }
+                moveit_msgs::GetPositionIK::Response ik_response_grasp = mico.compute_ik(gc_i.grasp_pose);
+
+                if (ik_response_grasp.error_code.val !=  moveit_msgs::MoveItErrorCodes::SUCCESS) {
+                    ROS_INFO("No IK solution for grasp pose");
+                    continue;
+                }
+
+
+                //now check to see how close the two sets of joint angles are -- if the joint configurations for the approach and grasp poses differ by too much, the grasp will not be accepted
+                std::vector<double> D = segbot_arm_manipulation::getJointAngleDifferences(
+                        ik_response_approach.solution.joint_state, ik_response_grasp.solution.joint_state);
+
+                double sum_d = 0;
+                for (double p : D) {
+                    sum_d += p;
+                }
+
+
+                if (sum_d >= ANGULAR_DIFF_THRESHOLD) {
+                    ROS_INFO("Approach and grasp configurations too different");
+                    continue;
+                }
+
+                //store the IK results
+                gc_i.approach_q = ik_response_approach.solution.joint_state;
+                gc_i.grasp_q = ik_response_grasp.solution.joint_state;
+
+                grasp_commands.push_back(gc_i);
             }
 
+
             //check to see if all potential grasps have been filtered out
-            if (grasp_commands.size() == 0) {
+            if (grasp_commands.empty()) {
                 ROS_WARN("[segbot_tabletop_grasp_as.cpp] No feasible grasps found. Aborting.");
                 as_.setAborted(result_);
                 return;
@@ -447,15 +323,14 @@ public:
                             grasp_commands.at(i).approach_q, mico.current_state);
 
                     double sum_d = 0;
-                    for (int p = 0; p < D_i.size(); p++)
-                        sum_d += D_i[p];
+                    for (double p : D_i)
+                        sum_d += p;
 
                     if (sum_d < min_diff) {
                         selected_grasp_index = (int) i;
                         min_diff = sum_d;
                     }
                 }
-
 
             }
 
@@ -520,7 +395,7 @@ public:
                 for (int i = 0; i < 6; i++) {
                     delta_effort[i] = fabs(mico.current_state.effort[i] - prev_effort_state.effort[i]);
                     total_delta += delta_effort[i];
-                    ROS_INFO("Total delta=%f", total_delta);
+                    ROS_INFO_THROTTLE(1, "Total delta=%f", total_delta);
                 }
 
                 if (total_delta > fabs(FORCE_HANDOVER_THRESHOLD)) {
@@ -559,7 +434,7 @@ public:
             //update readings
             mico.wait_for_data();
 
-            bool result = waitForForce(FORCE_HANDOVER_THRESHOLD, goal->timeout_seconds);
+            bool result = mico.wait_for_force(FORCE_HANDOVER_THRESHOLD, goal->timeout_seconds);
 
             if (result) {
                 mico.close_hand();
@@ -586,12 +461,9 @@ public:
             //step 4: move to home
             mico.move_home();
 
-
         }
 
-
     }
-
 
 };
 
@@ -604,5 +476,3 @@ int main(int argc, char **argv) {
 
     return 0;
 }
-
-

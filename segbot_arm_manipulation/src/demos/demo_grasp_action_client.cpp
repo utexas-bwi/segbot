@@ -28,8 +28,8 @@ void sig_handler(int sig) {
 // Blocking call for user input
 void pressEnter(std::string message){
 	std::cout << message;
-	while (true){
-		char c = std::cin.get();
+	while (ros::ok()){
+		int c = std::cin.get();
 		if (c == '\n')
 			break;
 		else if (c == 'q'){
@@ -80,8 +80,9 @@ int main(int argc, char **argv) {
 		bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
 		
 		if ((int)table_scene.cloud_clusters.size() == 0){
-			ROS_WARN("No objects found on table. The end...");
-			exit(1);
+			ROS_WARN("No objects found on table.");
+            pressEnter("Press 'Enter' to try again or 'q' to quit.");
+            break;
 		}
 		
 		//select the object with most points as the target object
