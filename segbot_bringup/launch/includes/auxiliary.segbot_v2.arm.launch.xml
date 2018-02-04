@@ -22,7 +22,8 @@
   <!-- launch the joint state publisher to default values -->
   <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher">
 	  <param name="robot_description"
-		command="$(find xacro)/xacro '$(arg urdf_file_baseonly)' use_full_gazebo_model:=$(arg use_full_gazebo_model)" />
+		command="$(find xacro)/xacro '$(arg urdf_file)' use_full_gazebo_model:=$(arg use_full_gazebo_model)" />
+      <rosparam param="source_list">["m1n6s200_driver/out/joint_state"]</rosparam>
 
   </node>
 

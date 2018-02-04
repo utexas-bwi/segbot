@@ -28,7 +28,7 @@
     <arg name="fake_execution" value="false"/>
     <arg name="info" value="true"/>
     <arg name="debug" value="$(arg debug)"/>
-    <arg name="joint_states_ns" value="/m1n6s200_driver/out/joint_state"/> 
+    <arg name="joint_states_ns" value="/joint_states"/>
     <arg name="controller_manager" value="m1n6s200"/> 
   </include>
 

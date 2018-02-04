@@ -6,6 +6,7 @@
   <arg name="device_id" default="#1" />
   <arg name="rviz" default="true" />
   <arg name="gui" default="true" />
+  <arg name="use_nav_kinect" default="true" />
 
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
@@ -16,7 +17,7 @@
   </include>
 
   <!-- launch the kinect sensor in laserscan configuration -->
-  <include file="$(find segbot_sensors)/launch/kinect/kinect.launch">
+  <include file="$(find segbot_sensors)/launch/kinect/kinect.launch" if="$(arg use_nav_kinect)">
     <arg name="name" value="nav_kinect" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="device_id" value="$(arg device_id)" />
