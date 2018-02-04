@@ -5,15 +5,7 @@
 #include <bwi_perception/bwi_perception.h>
 #include <segbot_arm_manipulation/arm_utils.h>
 #include <geometry_msgs/PoseStamped.h>
-
-#define NUM_JOINTS 8 //6+2 for the arm
-
-//global variables for storing data
-sensor_msgs::JointState current_state;
-bool heardJoinstState;
-
-geometry_msgs::PoseStamped current_pose;
-bool heardPose;
+#include <segbot_arm_manipulation/MicoManager.h>
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -26,39 +18,6 @@ void sig_handler(int sig) {
   ros::shutdown();
   exit(1);
 };
-
-//Joint state cb
-void joint_state_cb (const sensor_msgs::JointStateConstPtr& input) {
-	
-	if (input->position.size() == NUM_JOINTS){
-		current_state = *input;
-		heardJoinstState = true;
-	}
-}
-
-
-//Joint state cb
-void toolpos_cb (const geometry_msgs::PoseStamped &msg) {
-  current_pose = msg;
-  heardPose = true;
-}
-
-//blocking call to listen for arm data (in this case, joint states)
-void listenForArmData(){
-	
-	heardJoinstState = false;
-	heardPose = false;
-	ros::Rate r(10.0);
-	
-	while (ros::ok()){
-		ros::spinOnce();
-		
-		if (heardJoinstState && heardPose)
-			return;
-		
-		r.sleep();
-	}
-}
 
 
 // Blocking call for user input
@@ -73,13 +32,7 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "demo_obstacle_avoidance");
 	
 	ros::NodeHandle n;
-
-	//create subscriber to joint angles
-	ros::Subscriber sub_angles = n.subscribe ("/m1n6s200_driver/out/joint_state", 1, joint_state_cb);
-	
-	//create subscriber to tool position topic
-	ros::Subscriber sub_tool = n.subscribe("/m1n6s200_driver/out/tool_pose", 1, toolpos_cb);
-
+    MicoManager mico(n);
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
 	
@@ -87,16 +40,16 @@ int main(int argc, char **argv) {
 	pressEnter("Move the arm to the goal position and press 'Enter'");
 	
 	//update the arm's position
-	listenForArmData();
+	mico.wait_for_data();
 	
 	//store the position as the goal
-	geometry_msgs::PoseStamped goal_pose = current_pose;
+	geometry_msgs::PoseStamped goal_pose = mico.current_pose;
 	
 	//Step 2: move the arm to the start position
 	pressEnter("Move the arm to the start position and press 'Enter'");
 	//update the arm's position
-	listenForArmData();
-	geometry_msgs::PoseStamped start_pose = current_pose;
+	mico.wait_for_data();
+	geometry_msgs::PoseStamped start_pose = mico.current_pose;
 	
 	
 	while (ros::ok()){
@@ -126,7 +79,7 @@ int main(int argc, char **argv) {
 		segbot_arm_manipulation::setArmObstacles(n,obstacle_clouds);
 		
 		//now, move the arm to the goal -- it should avoid the obstacles
-		bwi_moveit_utils::MicoMoveitCartesianPose::Response resp = segbot_arm_manipulation::moveToPoseMoveIt(n,goal_pose);
+		bool resp = mico.move_to_pose_moveit(goal_pose);
 		
 		//Step 3: ask user to place an obstacle on the table between the two positions
 		pressEnter("Place or remove an obstacle and press 'Enter'");
@@ -151,7 +104,7 @@ int main(int argc, char **argv) {
 		}
 		
 		//now, move the arm to the goal -- it should avoid the obstacles
-		bwi_moveit_utils::MicoMoveitCartesianPose::Response resp2 = segbot_arm_manipulation::moveToPoseMoveIt(n,start_pose);
+		bool resp2 = mico.move_to_pose_moveit(start_pose);
 	
 	}
 }

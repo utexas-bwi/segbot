@@ -13,6 +13,12 @@
 #include <moveit/planning_scene_interface/planning_scene_interface.h>
 #include <moveit/trajectory_processing/iterative_time_parameterization.h>
 #include <moveit/robot_state/conversions.h>
+#include <geometry_msgs/WrenchStamped.h>
+
+#include <bwi_moveit_utils/MicoNavSafety.h>
+#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
+#include <bwi_moveit_utils/MicoMoveitWaypoint.h>
+
 using namespace std;
 
 MicoManager::MicoManager(ros::NodeHandle n) : pose_action(pose_action_topic, true),
@@ -27,9 +33,11 @@ MicoManager::MicoManager(ros::NodeHandle n) : pose_action(pose_action_topic, tru
     finger_sub = n.subscribe(finger_position_topic, 1, &MicoManager::fingers_cb, this);
     home_client = n.serviceClient<kinova_msgs::HomeArm>(home_arm_service);
     safety_client = n.serviceClient<bwi_moveit_utils::MicoNavSafety>("/mico_nav_safety");
-    pose_moveit_client = n.serviceClient<bwi_moveit_utils::MicoMoveitCartesianPose>("/mico_cartesianpose_service");
-    joint_angles_moveit_client = n.serviceClient<bwi_moveit_utils::MicoMoveitJointPose>("/mico_jointpose_service");
+    pose_moveit_client = n.serviceClient<bwi_moveit_utils::MicoMoveitCartesianPose>("/mico_cartesian_pose_service");
+    joint_angles_moveit_client = n.serviceClient<bwi_moveit_utils::MicoMoveitJointPose>("/mico_joint_pose_service");
+    waypoint_moveit_client = n.serviceClient<bwi_moveit_utils::MicoMoveitWaypoint>("/mico_waypoint_service");
     joint_pose_client_old = n.serviceClient<bwi_moveit_utils::AngularVelCtrl>("/angular_vel_control");
+    wrench_sub = n.subscribe("/m1n6s200_driver/out/tool_wrench", 1, &MicoManager::wrench_cb, this);
     ik_client = n.serviceClient<moveit_msgs::GetPositionIK>("/compute_ik");
     add_waypoint_client = n.serviceClient<kinova_msgs::AddPoseToCartesianTrajectory>("/m1n6s200_driver/in/add_pose_to_Cartesian_trajectory");
     clear_waypoints_client = n.serviceClient<kinova_msgs::ClearTrajectories>("/m1n6s200_driver/in/clear_trajectories");
@@ -65,18 +73,23 @@ void MicoManager::fingers_cb(const kinova_msgs::FingerPositionConstPtr &msg) {
     heardFingers = true;
 }
 
+void MicoManager::wrench_cb(const geometry_msgs::WrenchStampedConstPtr &msg) {
+    current_wrench = *msg;
+    heardWrench = true;
+}
+
 //blocking call to listen for arm data (in this case, joint states)
 void MicoManager::wait_for_data() {
     heardJointState = false;
     heardTool = false;
     heardFingers = false;
 
-    ros::Rate r(40.0);
+    ros::Rate r(100.0);
 
     while (ros::ok()) {
         ros::spinOnce();
 
-        if (heardJointState && heardTool && heardFingers)
+        if (heardJointState && heardTool && heardFingers && heardWrench)
             return;
 
         r.sleep();
@@ -89,7 +102,6 @@ void MicoManager::wait_for_data() {
    */
 bool MicoManager::wait_for_force(const double force_threshold, const double timeout) {
 
-    double total_grav_free_effort = 0;
     double total_delta;
     double delta_effort[6];
 
@@ -306,6 +318,23 @@ bool MicoManager::move_to_joint_state_moveit(const sensor_msgs::JointState &targ
 }
 
 
+bool MicoManager::move_through_waypoints_moveit(const vector<geometry_msgs::Pose> &waypoints,
+                                                const vector<sensor_msgs::PointCloud2> &obstacles,
+                                                const moveit_msgs::Constraints &constraints) {
+    bwi_moveit_utils::MicoMoveitWaypoint::Request req;
+    bwi_moveit_utils::MicoMoveitWaypoint::Response res;
+
+    vector<moveit_msgs::CollisionObject> moveit_obstacles = segbot_arm_manipulation::get_collision_boxes(obstacles);
+
+    req.waypoints = waypoints;
+    req.collision_objects = moveit_obstacles;
+    req.constraints = constraints;
+    return waypoint_moveit_client.call(req, res);
+}
+
+
+
+
 bool MicoManager::move_to_side_view() {
     if (!position_db->hasCarteseanPosition("side_view")) {
         return false;
@@ -333,7 +362,6 @@ void MicoManager::move_with_angular_velocities(const kinova_msgs::JointAngles &v
     // Per the Kinova documentation, we have to publish at exactly 100Hz to get
     // predictable behavior
     ros::Rate r(100);
-
 
     ros::Time end = ros::Time::now() + ros::Duration(seconds);
     while (ros::ok()) {
@@ -392,52 +420,3 @@ bool MicoManager::move_through_waypoints(const vector<geometry_msgs::Pose> &wayp
     }
     return true;
 }
-
-bool MicoManager::move_through_waypoints_moveit(const vector<geometry_msgs::Pose> &waypoints,
-                                                const vector<sensor_msgs::PointCloud2> &obstacles,
-                                                const moveit_msgs::Constraints &constraints) {
-
-    for (int i = 0; i < waypoints.size(); ++i) {
-        ROS_INFO_STREAM(waypoints.at(i));
-    }
-
-    vector<moveit_msgs::CollisionObject> moveit_obstacles = segbot_arm_manipulation::get_collision_boxes(obstacles);
-
-    moveit::planning_interface::PlanningSceneInterface planning_scene_interface;
-    //planning_scene_interface.addCollisionObjects(moveit_obstacles);
-    group->setPlanningTime(5.0);
-    group->setPoseTarget(waypoints.at(waypoints.size() - 1));
-    group->setStartState(*group->getCurrentState());
-    //group->setPathConstraints(constraints);
-
-    moveit_msgs::RobotTrajectory result;
-    double fraction = group->computeCartesianPath(waypoints, 0.01, 0,result);
-
-    // We'll only execute if the full trajectory was generated
-    if (fraction < 1) {
-        return false;
-    }
-
-    robot_trajectory::RobotTrajectory rt(group->getCurrentState()->getRobotModel(), "arm");
-    rt.setRobotTrajectoryMsg(*group->getCurrentState(), result);
-
-    // Thrid create a IterativeParabolicTimeParameterization object
-    trajectory_processing::IterativeParabolicTimeParameterization iptp;
-
-    // Fourth compute computeTimeStamps
-    bool success = iptp.computeTimeStamps(rt);
-    ROS_INFO("Computed time stamp %s",success?"SUCCEDED":"FAILED");
-
-    // Get RobotTrajectory_msg from RobotTrajectory
-    rt.getRobotTrajectoryMsg(result);
-
-    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-
-    moveit_msgs::RobotState start_state;
-    moveit::core::robotStateToRobotStateMsg(*group->getCurrentState(), start_state);
-    my_plan.start_state_= start_state;
-    my_plan.trajectory_= result;
-    moveit::planning_interface::MoveItErrorCode error = group->execute(my_plan);
-    return error == moveit::planning_interface::MoveItErrorCode::SUCCESS;
-}
-

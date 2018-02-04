@@ -8,8 +8,6 @@
 #include <bwi_perception/bwi_perception.h>
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 
-#define NUM_JOINTS 8 //6+2 for the arm
-
 MicoManager *mico;
 
 //true if Ctrl-C is pressed
@@ -175,11 +173,11 @@ int main(int argc, char **argv) {
 		
 		/*sleep(2.0);
 		lift(n,-0.07);
-		segbot_arm_manipulation::openHand();
+		mico->open_hand();
 		lift(n,0.07);
 		
-		segbot_arm_manipulation::homeArm(n);
-		segbot_arm_manipulation::moveToJointState(n,joint_state_outofview);
+		mico->move_home();
+		mico->move_to_joint_state(,joint_state_outofview);
 		*/
 	
 		//return 1;

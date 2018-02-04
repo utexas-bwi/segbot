@@ -10,8 +10,6 @@
 #include <kinova_msgs/SetFingersPositionAction.h>
 #include <kinova_msgs/ArmJointAnglesAction.h>
 #include <kinova_msgs/HomeArm.h>
-#include <bwi_moveit_utils/MicoNavSafety.h>
-#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
 #include <moveit_msgs/GetPositionIK.h>
 #include <moveit/planning_interface/planning_interface.h>
 #include <moveit/move_group_interface/move_group_interface.h>
@@ -19,6 +17,7 @@
 
 #include <sensor_msgs/PointCloud2.h>
 #include <kinova_msgs/PoseVelocity.h>
+#include <geometry_msgs/WrenchStamped.h>
 #include "MicoManager.h"
 
 #define OPEN_FINGER_VALUE 100
@@ -35,6 +34,7 @@ class MicoManager {
     ros::Subscriber joint_state_sub;
     ros::Subscriber tool_sub;
     ros::Subscriber finger_sub;
+    ros::Subscriber wrench_sub;
     ArmPositionDB *position_db;
 
 public:
@@ -45,6 +45,7 @@ public:
     ros::ServiceClient safety_client;
     ros::ServiceClient pose_moveit_client;
     ros::ServiceClient joint_angles_moveit_client;
+    ros::ServiceClient waypoint_moveit_client;
     ros::ServiceClient joint_pose_client_old;
     ros::ServiceClient ik_client;
     ros::ServiceClient add_waypoint_client;
@@ -54,12 +55,15 @@ public:
     sensor_msgs::JointState current_state;
     geometry_msgs::PoseStamped current_pose;
     kinova_msgs::FingerPosition current_finger;
+    geometry_msgs::WrenchStamped current_wrench;
+
 
     moveit::planning_interface::MoveGroupInterface *group;
 
     bool heardJointState;
     bool heardTool;
     bool heardFingers;
+    bool heardWrench;
 
     MicoManager(ros::NodeHandle n);
 
@@ -70,6 +74,8 @@ public:
     void toolpose_cb(const geometry_msgs::PoseStampedConstPtr &msg);
 
     void fingers_cb(const kinova_msgs::FingerPositionConstPtr &msg);
+
+    void wrench_cb(const geometry_msgs::WrenchStampedConstPtr &msg);
 
     void wait_for_data();
 

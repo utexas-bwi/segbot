@@ -1,11 +1,6 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 
-#include <signal.h>
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <cstdlib>
 #include <std_msgs/String.h>
 
 #include <geometry_msgs/TwistStamped.h>
@@ -25,7 +20,6 @@
 #include "bwi_perception/TabletopPerception.h"
 
 // PCL specific includes
-//#include <pcl/conversions.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
 #include <pcl/console/parse.h>
@@ -46,15 +40,9 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 
-#include <pcl/kdtree/kdtree.h>
-
-#include <pcl_conversions/pcl_conversions.h>
-
 #include <tf/transform_listener.h>
 #include <tf/tf.h>
 
-
-#include <geometry_msgs/TwistStamped.h>
 
 //the action definition
 #include "segbot_arm_manipulation/TabletopApproachAction.h"
@@ -63,7 +51,7 @@
 
 #include <nav_msgs/Odometry.h>
 
-#include <segbot_arm_manipulation/arm_utils.h>
+#include <segbot_arm_manipulation/MicoManager.h>
 #include <segbot_arm_manipulation/arm_positions_db.h>
 
 //for playing sounds when backing up
@@ -104,13 +92,13 @@ protected:
 	ros::Subscriber sub_odom_;
 	
 	//holds set of predefined positions
-	ArmPositionDB *posDB;
+	MicoManager mico;
 	
 public:
 
   TableApproachActionServer(std::string name) :
     as_(nh_, name, boost::bind(&TableApproachActionServer::executeCB, this, _1), false),
-    action_name_(name)
+    action_name_(name), mico(nh_)
   {
 
 	
@@ -125,13 +113,7 @@ public:
 	
 	//velocity publisher
 	pub_base_velocity = nh_.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
-	
-    //load database of joint- and tool-space positions
-	std::string j_pos_filename = ros::package::getPath("segbot_arm_manipulation")+"/data/jointspace_position_db.txt";
-	std::string c_pos_filename = ros::package::getPath("segbot_arm_manipulation")+"/data/toolspace_position_db.txt";
-	
-	posDB = new ArmPositionDB(j_pos_filename, c_pos_filename);
-	
+
     as_.start();
   }
 
@@ -172,27 +154,13 @@ public:
 		if (goal->command == "approach"){
 		
 			//step 1: query table_object_detection_node to segment the blobs on the table
-			posDB->print();
-			
-			
-			
+
 			//home the arm
-			segbot_arm_manipulation::homeArm(nh_);
-			segbot_arm_manipulation::closeHand();
+			mico.move_home();
+			mico.close_hand();
 	
-			
-			//first, we need to move the arm out of view so the camera can see the table
-			if (posDB->hasCarteseanPosition("side_view")){
-				ROS_INFO("Moving out of the way...");
-				geometry_msgs::PoseStamped out_of_view_pose = posDB->getToolPositionStamped("side_view","/m1n6s200_link_base");
-				
-				//now go to the pose
-				segbot_arm_manipulation::moveToPoseMoveIt(nh_,out_of_view_pose);
-			}
-			else {
-				ROS_ERROR("[segbot_table_approach_as.cpp] Cannot move arm out of view!");
-			}
-				
+
+            mico.move_to_side_view();
 			
 			
 			ros::ServiceClient client_tabletop_perception = nh_.serviceClient<bwi_perception::TabletopPerception>("tabletop_object_detection_service");
@@ -275,8 +243,8 @@ public:
 			
 			
 			//next, make arm safe to move again
-			segbot_arm_manipulation::homeArm(nh_);
-			bool safe = segbot_arm_manipulation::makeSafeForTravel(nh_);
+			mico.move_home();
+			bool safe = mico.make_safe_for_travel();
 			if (!safe) {
 				ROS_ERROR("[segbot_table_approach_as.cpp] Cannot make arm safe for travel! Aborting!");
 				result_.success = false;
