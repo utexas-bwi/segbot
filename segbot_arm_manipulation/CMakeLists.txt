@@ -73,7 +73,7 @@ catkin_package(
         LIBRARIES arm_utilities
 )
 
-add_library(arm_utilities src/MicoManager.cpp src/arm_utils.cpp)
+add_library(arm_utilities src/MicoManager.cpp src/arm_utils.cpp src/grasp_utils.cpp)
 target_link_libraries(arm_utilities ${catkin_LIBRARIES})
 
 

@@ -8,40 +8,42 @@ namespace segbot_arm_manipulation {
     std::vector<double>
     getJointAngleDifferences(sensor_msgs::JointState A, sensor_msgs::JointState B) {
         std::vector<double> result;
-
-        for (unsigned int i = 0; i < A.position.size(); i++) {
-            //check if this is a m1n6s200 arm joint or not
-            bool is_arm_joint = false;
-            for (int k = 0; k < NUM_JOINTS; k++) {
-                if (A.name[i] == jointNames[k]) {
-                    is_arm_joint = true;
-                    break;
-                }
-            }
-
-            if (is_arm_joint) {
-
-                if (A.name[i] == "m1n6s200_joint_2" || A.name[i] == "m1n6s200_joint_3")
-                    result.push_back(fabs(A.position[i] - B.position[i]));
-                else {
-                    if (B.position[i] > A.position[i]) {
-                        if (B.position[i] - A.position[i] < A.position[i] + 2 * PI - B.position[i])
-                            result.push_back(fabs(B.position[i] - A.position[i]));
-                        else
-                            result.push_back(fabs(2 * PI - B.position[i] + A.position[i]));
-                    } else {
-                        if (A.position[i] - B.position[i] > B.position[i] + 2 * PI - A.position[i])
-                            result.push_back(fabs(B.position[i] + 2 * PI - A.position[i]));
-                        else
-                            result.push_back(fabs(A.position[i] - B.position[i]));
-                    }
-
-                }
-
-
-            }
+        std::set<string> arm_joints;
+        arm_joints.insert(std::begin(jointNames), std::end(jointNames));
+        std::map<string, double> a_pos;
+        std::map<string, double> b_pos;
+        for(int i = 0; i < A.name.size(); i++) {
+            a_pos.insert(std::pair<string, double>(A.name.at(i), A.position.at(i)));
+        }
+        for(int i = 0; i < B.name.size(); i++) {
+            b_pos.insert(std::pair<string, double>(B.name.at(i), B.position.at(i)));
         }
 
+        for (unsigned int i = 0; i < arm_joints.size(); i++) {
+            std::string name = jointNames[i];
+            assert(a_pos.count(name) == 1 && b_pos.count(name) == 1);
+            double a_p = a_pos[name];
+            double b_p = b_pos[name];
+
+            double d;
+            if (name == "m1n6s200_joint_2" || name == "m1n6s200_joint_3")
+                d = fabs(a_p - b_p);
+            else {
+                if (b_p > a_p) {
+                    if (b_p - a_p < a_p + 2 * PI - b_p)
+                        d = fabs(b_p - a_p);
+                    else
+                        d = fabs(2 * PI - b_p + a_p);
+                } else {
+                    if (a_p - b_p > b_p + 2 * PI - a_p)
+                        d = fabs(b_p + 2 * PI - a_p);
+                    else
+                        d = fabs(a_p - b_p);
+                }
+
+            }
+            result.push_back(d);
+        }
         return result;
     }
 

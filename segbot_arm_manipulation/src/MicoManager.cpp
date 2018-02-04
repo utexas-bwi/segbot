@@ -49,10 +49,8 @@ MicoManager::~MicoManager(){
 }
 //Joint positions cb
 void MicoManager::joint_state_cb(const sensor_msgs::JointStateConstPtr &msg) {
-    if (msg->position.size() == NUM_JOINTS) {
-        current_state = *msg;
-        heardJointState = true;
-    }
+    current_state = *msg;
+    heardJointState = true;
 }
 
 //tool pose cb
@@ -82,6 +80,47 @@ void MicoManager::wait_for_data() {
             return;
 
         r.sleep();
+    }
+}
+
+/*
+   * blocks until force of sufficient amount is detected or timeout is exceeded
+   * returns true of force degected, false if timeout
+   */
+bool MicoManager::wait_for_force(const double force_threshold, const double timeout) {
+
+    double total_grav_free_effort = 0;
+    double total_delta;
+    double delta_effort[6];
+
+    wait_for_data();
+    sensor_msgs::JointState prev_effort_state = current_state;
+
+
+    ros::Rate r(100);
+
+    ros::Time end = ros::Time::now() + ros::Duration(timeout);
+    while (ros::ok()) {
+        //collect messages
+        ros::spinOnce();
+
+        total_delta = 0.0;
+        for (int i = 0; i < 6; i++) {
+            delta_effort[i] = fabs(current_state.effort[i] - prev_effort_state.effort[i]);
+            total_delta += delta_effort[i];
+            //ROS_INFO("Total delta=%f",total_delta);
+        }
+
+        if (total_delta > fabs(force_threshold)) {
+            return true;
+        }
+
+        r.sleep();
+        //publish velocity message
+
+        if (ros::Time::now() > end) {
+            break;
+        }
     }
 }
 

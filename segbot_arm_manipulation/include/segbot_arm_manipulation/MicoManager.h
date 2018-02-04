@@ -73,6 +73,8 @@ public:
 
     void wait_for_data();
 
+    bool wait_for_force(double force_threshold, double timeout);
+
     bool move_to_joint_state(const sensor_msgs::JointState &target);
 
     bool move_to_joint_state(const kinova_msgs::JointAngles &target);
