@@ -15,7 +15,6 @@
 #include "segbot_arm_manipulation/LiftVerifyAction.h"
 
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/arm_positions_db.h>
 
 
 #include "bwi_kr_execution/ExecutePlanAction.h"
@@ -24,17 +23,11 @@
 
 
 #include <bwi_moveit_utils/MicoNavSafety.h>
+#include <segbot_arm_manipulation/MicoManager.h>
 
 #include "segbot_arm_manipulation/ObjReplacementAction.h"
 
-#define NUM_JOINTS 8 //6+2 for the arm
-
-//global variables for storing data
-sensor_msgs::JointState current_state;
-bool heardJointState;
-
-geometry_msgs::PoseStamped current_pose;
-bool heardPose;
+MicoManager *mico;
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -47,22 +40,8 @@ void sig_handler(int sig) {
   exit(1);
 };
 
-//Joint state cb
-void joint_state_cb (const sensor_msgs::JointStateConstPtr& input) {
-	
-	if (input->position.size() == NUM_JOINTS){
-		current_state = *input;
-		heardJointState = true;
-	}
-}
 
-//Joint state cb
-void toolpos_cb (const geometry_msgs::PoseStamped &msg) {
-  current_pose = msg;
-  heardPose = true;
-}
-
-void go_to_place(std::string table){
+void go_to_place(const std::string &table){
 	bwi_kr_execution::ExecutePlanGoal table_goal;
     bwi_kr_execution::AspRule table_rule;
     bwi_kr_execution::AspFluent table_fluent;
@@ -129,7 +108,7 @@ void call_approach(std::string command){
 	}
 }
 
-void grasp_largest_object(ros::NodeHandle n, bwi_perception::TabletopPerception::Response table_scene, int largest_pc_index){
+void grasp_largest_object(bwi_perception::TabletopPerception::Response table_scene, int largest_pc_index){
 
 	
 	actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopGraspAction> ac_grasp("segbot_tabletop_grasp_as",true);
@@ -153,7 +132,7 @@ void grasp_largest_object(ros::NodeHandle n, bwi_perception::TabletopPerception:
 	ROS_INFO("Grasp action Finished...");
 }
 
-void lift_object(ros::NodeHandle n, bwi_perception::TabletopPerception::Response table_scene, int largest_pc_index){
+void lift_object(bwi_perception::TabletopPerception::Response table_scene, int largest_pc_index){
 	actionlib::SimpleActionClient<segbot_arm_manipulation::LiftVerifyAction> lift_ac("arm_lift_verify_as", true);
 	lift_ac.waitForServer();
 	ROS_INFO("lift and verify action server made...");
@@ -178,7 +157,7 @@ void lift_object(ros::NodeHandle n, bwi_perception::TabletopPerception::Response
 		ROS_INFO("Verification succeeded.");
 	}else{
 		ROS_WARN("Verification failed");
-		segbot_arm_manipulation::homeArm(n);
+		mico->move_home();
 		exit(1);
 	}
 	
@@ -188,19 +167,16 @@ void lift_object(ros::NodeHandle n, bwi_perception::TabletopPerception::Response
 int main(int argc, char **argv) {
 	ros::init(argc, argv, "object_table_delivery_task"); 
 	
-	ros::NodeHandle n; 
-	
-	//create subscribers for arm topics
-	ros::Subscriber sub_angles = n.subscribe ("/joint_states", 1, joint_state_cb);
-	ros::Subscriber sub_tool = n.subscribe("/m1n6s200_driver/out/tool_position", 1, toolpos_cb);
+	ros::NodeHandle n;
 	
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
 
+	mico = new MicoManager(n);
 	//Step 1: make arm safe and go to table location
-	segbot_arm_manipulation::closeHand();
-	segbot_arm_manipulation::homeArm(n);
-	bool safe = segbot_arm_manipulation::makeSafeForTravel(n);
+	mico->close_hand();
+	mico->move_home();
+	bool safe = mico->make_safe_for_travel();
 	if (!safe){
 		ROS_WARN("the robot and arm cannot be made safe for travel");
 		exit(1);
@@ -213,7 +189,7 @@ int main(int argc, char **argv) {
 	call_approach("approach");
 
 	//Step 3: get the table scene and target object
-	segbot_arm_manipulation::homeArm(n);
+	mico->move_home();
 	segbot_arm_manipulation::arm_side_view(n);
 	
 	bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
@@ -228,15 +204,15 @@ int main(int argc, char **argv) {
 	
 	
 	//Step 4: grasp the target object
-	grasp_largest_object(n, table_scene, largest_pc_index);
+	grasp_largest_object(table_scene, largest_pc_index);
 
 	//Step 5: lift and verify object
-	lift_object(n, table_scene, largest_pc_index);
+	lift_object(table_scene, largest_pc_index);
 
 	//Step 6: make arm safe and go to goal table location
-	segbot_arm_manipulation::closeHand();
-	segbot_arm_manipulation::homeArm(n);
-	safe = segbot_arm_manipulation::makeSafeForTravel(n);
+	mico->close_hand();
+	mico->move_home();
+	safe = mico->make_safe_for_travel();
 	if (!safe){
 		ROS_WARN("the robot and arm cannot be made safe for travel");
 		exit(1);
@@ -265,12 +241,12 @@ int main(int argc, char **argv) {
 		ROS_INFO("Replacement succeeded.");
 	}else{
 		ROS_WARN("Replacement failed");
-		segbot_arm_manipulation::homeArm(n);
+		mico->move_home();
 		exit(1);
 	}
 
-	segbot_arm_manipulation::homeArm(n);
-	safe = segbot_arm_manipulation::makeSafeForTravel(n);
+	mico->move_home();
+	safe = mico->make_safe_for_travel();
 	if (!safe){
 		ROS_WARN("the robot and arm cannot be made safe for travel");
 		exit(1);
