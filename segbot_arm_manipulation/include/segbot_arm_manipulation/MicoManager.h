@@ -29,6 +29,7 @@ const std::string moveit_cartesian_pose_service = "";
 
 const std::string j_pos_filename = ros::package::getPath("segbot_arm_manipulation")+"/data/jointspace_position_db.txt";
 const std::string c_pos_filename = ros::package::getPath("segbot_arm_manipulation")+"/data/toolspace_position_db.txt";
+const double arm_poll_rate = 100.0;
 
 class MicoManager {
     ros::Subscriber joint_state_sub;
@@ -57,17 +58,14 @@ public:
     kinova_msgs::FingerPosition current_finger;
     geometry_msgs::WrenchStamped current_wrench;
 
+    bool heard_joint_state;
+    bool heard_tool;
+    bool heard_fingers;
+    bool heard_wrench;
 
-    moveit::planning_interface::MoveGroupInterface *group;
+    explicit MicoManager(ros::NodeHandle n);
 
-    bool heardJointState;
-    bool heardTool;
-    bool heardFingers;
-    bool heardWrench;
-
-    MicoManager(ros::NodeHandle n);
-
-    ~MicoManager();
+    ~MicoManager() = default;
 
     void joint_state_cb(const sensor_msgs::JointStateConstPtr &msg);
 
@@ -77,9 +75,9 @@ public:
 
     void wrench_cb(const geometry_msgs::WrenchStampedConstPtr &msg);
 
-    void wait_for_data();
+    bool wait_for_data(double timeout = -1.0);
 
-    bool wait_for_force(double force_threshold, double timeout);
+    bool wait_for_force(double force_threshold, double timeout = -1.0);
 
     bool move_to_joint_state(const sensor_msgs::JointState &target);
 
@@ -110,8 +108,6 @@ public:
                              const std::vector<sensor_msgs::PointCloud2> &obstacles = std::vector<sensor_msgs::PointCloud2>(), const moveit_msgs::Constraints &constraints = moveit_msgs::Constraints());
 
     moveit_msgs::GetPositionIK::Response compute_ik(const geometry_msgs::PoseStamped &p);
-
-
 
     bool open_hand();
 

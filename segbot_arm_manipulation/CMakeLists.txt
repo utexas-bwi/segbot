@@ -43,6 +43,7 @@ catkin_python_setup()
 
 add_action_files(
         FILES
+        Handover.action
         TabletopGrasp.action
         TabletopApproach.action
         LiftVerify.action
@@ -101,6 +102,10 @@ target_link_libraries(arm_shake_as arm_utilities ${catkin_LIBRARIES})
 add_executable(segbot_table_approach_as src/segbot_table_approach_as.cpp)
 target_link_libraries(segbot_table_approach_as arm_utilities ${catkin_LIBRARIES})
 add_dependencies(segbot_table_approach_as arm_utilities segbot_arm_manipulation_gencpp)
+
+add_executable(segbot_handover_as src/segbot_handover_as.cpp)
+target_link_libraries(segbot_handover_as arm_utilities ${catkin_LIBRARIES})
+add_dependencies(segbot_handover_as arm_utilities segbot_arm_manipulation_gencpp)
 
 add_executable(ispy_arm_server src/ispy_arm_server.cpp)
 target_link_libraries(ispy_arm_server arm_utilities ${catkin_LIBRARIES})

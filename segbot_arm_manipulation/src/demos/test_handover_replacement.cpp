@@ -11,6 +11,8 @@
 
 #include <geometry_msgs/PoseArray.h>
 #include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/HandoverGoal.h>
+#include <segbot_arm_manipulation/HandoverAction.h>
 
 
 // Blocking call for user input
@@ -42,34 +44,24 @@ int main(int argc, char** argv){
 	mico.wait_for_data();
 	
 	//action clients
-	actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopGraspAction> ac_grasp("segbot_tabletop_grasp_as",true);
-	ac_grasp.waitForServer();
+    actionlib::SimpleActionClient<segbot_arm_manipulation::HandoverAction> ac_handover("segbot_handover_as", true);
+    ac_handover.waitForServer();
 
 	actionlib::SimpleActionClient<segbot_arm_manipulation::ObjReplacementAction> ac_replace("segbot_obj_replacement_as",true);
 	ac_replace.waitForServer();
-	
-
-	mico.wait_for_data();
-	
-	//Open hand and move to home position
-	mico.move_home();
-	mico.open_hand();
-	
-	// Go to handover position 
-	mico.move_to_handover();
 		
     pressEnter("Press [Enter] to proceed");
 
 	//now receive object
-	std::cout << "Please place an object in robot's hand\n"; 
-	segbot_arm_manipulation::TabletopGraspGoal receive_goal;
-	receive_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::HANDOVER_FROM_HUMAN;
+	std::cout << "Please place an object in robot's hand\n";
+    segbot_arm_manipulation::HandoverGoal receive_goal;
+    receive_goal.type = segbot_arm_manipulation::HandoverGoal::RECEIVE;
 	receive_goal.timeout_seconds = -1.0;
-	
-	ac_grasp.sendGoal(receive_goal);
-	ac_grasp.waitForResult();
-	
-	if(ac_grasp.getResult()->success == false) {
+
+    ac_handover.sendGoal(receive_goal);
+    ac_handover.waitForResult();
+
+    if (ac_handover.getResult()->success == false) {
 		ROS_ERROR("HANDOVER_FROM_HUMAN grasp failed:"); 
 		return 1; 
 	}

@@ -25,6 +25,7 @@
 
 
 #include <bwi_moveit_utils/MicoNavSafety.h>
+#include <segbot_arm_manipulation/HandoverAction.h>
 
 typedef pcl::PointXYZRGB PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
@@ -147,7 +148,6 @@ void grasp_largest_object(ros::NodeHandle n, bwi_perception::TabletopPerception:
 		grasp_goal.cloud_clusters.push_back(table_scene.cloud_clusters[i]);
 	}
 	grasp_goal.target_object_cluster_index = largest_pc_index;
-	grasp_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::GRASP;
 	grasp_goal.grasp_selection_method=segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION;
 			
 	//send the goal and wait
@@ -158,17 +158,17 @@ void grasp_largest_object(ros::NodeHandle n, bwi_perception::TabletopPerception:
 }
 
 void handover_object(){
-	actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopGraspAction> ac_grasp("segbot_tabletop_grasp_as",true);
-	ac_grasp.waitForServer();
+	actionlib::SimpleActionClient<segbot_arm_manipulation::HandoverAction> ac("segbot_handover_as",true);
+	ac.waitForServer();
 	ROS_INFO("handing the object over");
 	
-	segbot_arm_manipulation::TabletopGraspGoal handover_goal;
-	handover_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::HANDOVER;
+	segbot_arm_manipulation::HandoverGoal handover_goal;
+	handover_goal.type = segbot_arm_manipulation::HandoverGoal::GIVE;
 	handover_goal.timeout_seconds = 30.0;
 	
 	//send goal and wait for response
-	ac_grasp.sendGoal(handover_goal);
-	ac_grasp.waitForResult();
+	ac.sendGoal(handover_goal);
+	ac.waitForResult();
 }
 
 void lift_object(ros::NodeHandle n, bwi_perception::TabletopPerception::Response table_scene, int largest_pc_index){

@@ -12,13 +12,13 @@ find_package(catkin REQUIRED COMPONENTS
     bwi_kr_execution
     bwi_moveit_utils
     bwi_msgs
+    bwi_perception
     bwi_services
     kinova_msgs
     pcl_ros
     pcl_conversions
     roscpp
     rospy
-    bwi_perception
     segbot_arm_manipulation
     std_msgs
     move_base_msgs

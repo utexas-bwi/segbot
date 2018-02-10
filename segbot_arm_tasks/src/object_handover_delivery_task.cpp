@@ -12,14 +12,11 @@
 //action for grasping
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 #include "segbot_arm_manipulation/TabletopApproachAction.h"
-
-
+#include "segbot_arm_manipulation/HandoverAction.h"
 
 #include "bwi_kr_execution/ExecutePlanAction.h"
 
 #include <move_base_msgs/MoveBaseAction.h>
-
-
 
 //audio service
 #include "bwi_services/SpeakMessage.h"
@@ -168,20 +165,24 @@ int main(int argc, char **argv) {
 	//action clients
 	actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopGraspAction> ac_grasp("segbot_tabletop_grasp_as",true);
 	ac_grasp.waitForServer();
-	
+
+	actionlib::SimpleActionClient<segbot_arm_manipulation::HandoverAction> ac_handover("segbot_handover_as",true);
+	ac_grasp.waitForServer();
+
+
 	//move arm into the handover view
 	mico->move_to_handover();
 
 	//now receive object
 	std::cout << "Please place an object in robot's hand\n"; 
-	segbot_arm_manipulation::TabletopGraspGoal receive_goal;
-	receive_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::HANDOVER_FROM_HUMAN;
+	segbot_arm_manipulation::HandoverGoal receive_goal;
+	receive_goal.type = segbot_arm_manipulation::HandoverGoal::RECEIVE;
 	receive_goal.timeout_seconds = -1.0;
 	
-	ac_grasp.sendGoal(receive_goal);
-	ac_grasp.waitForResult();
+	ac_handover.sendGoal(receive_goal);
+	ac_handover.waitForResult();
 	
-	if(ac_grasp.getResult()->success == false) {
+	if(ac_handover.getResult()->success == false) {
 		ROS_ERROR("HANDOVER_FROM_HUMAN grasp failed:"); 
 		return 1; 
 	}
@@ -262,14 +263,14 @@ int main(int argc, char **argv) {
 	
 	std::cout << "Please take the object from the robot's hand\n"; 
 	
-	segbot_arm_manipulation::TabletopGraspGoal handover_goal;
-	handover_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::HANDOVER;
+	segbot_arm_manipulation::HandoverGoal handover_goal;
+	handover_goal.type = segbot_arm_manipulation::HandoverGoal::GIVE;
 	handover_goal.timeout_seconds = -1.0;
 	
-	ac_grasp.sendGoal(handover_goal);
-	ac_grasp.waitForResult();
+	ac_handover.sendGoal(handover_goal);
+	ac_handover.waitForResult();
 	
-	if(ac_grasp.getResult()->success == false) {
+	if(ac_handover.getResult()->success == false) {
 		ROS_ERROR("HANDOVER grasp failed:"); 
 		return 1; 
 	}

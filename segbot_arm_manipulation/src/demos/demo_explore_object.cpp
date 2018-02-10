@@ -303,10 +303,8 @@ int main (int argc, char** argv){
 		
 	//create and fill goal
 	segbot_arm_manipulation::TabletopGraspGoal grasp_goal;
-		
-	//we want the robot to execute the GRASP action
-	grasp_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::GRASP;
-	grasp_goal.grasp_selection_method=segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION;
+
+    grasp_goal.grasp_selection_method=segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION;
 	
 	//fill in the table scene
 	grasp_goal.cloud_plane = table_scene.cloud_plane;

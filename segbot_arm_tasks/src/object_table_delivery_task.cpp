@@ -122,7 +122,6 @@ void grasp_largest_object(bwi_perception::TabletopPerception::Response table_sce
 		grasp_goal.cloud_clusters.push_back(table_scene.cloud_clusters[i]);
 	}
 	grasp_goal.target_object_cluster_index = largest_pc_index;
-	grasp_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::GRASP;
 	grasp_goal.grasp_selection_method=segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION;
 			
 	//send the goal and wait

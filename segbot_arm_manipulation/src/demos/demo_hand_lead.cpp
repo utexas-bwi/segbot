@@ -91,8 +91,8 @@ int main(int argc, char **argv) {
 	
 	while (elapsed_time < 1.0){
 		ros::spinOnce();
-		
-		if (mico.heardWrench){
+
+        if (mico.heard_wrench) {
 			auto current_wrench = mico.current_wrench;
 			x_vals.push_back(current_wrench.wrench.force.x);
 			y_vals.push_back(current_wrench.wrench.force.y);
@@ -125,8 +125,8 @@ int main(int argc, char **argv) {
 	while (ros::ok()){
 		
 		ros::spinOnce();
-		
-		if (mico.heardWrench){
+
+        if (mico.heard_wrench) {
 			auto current_wrench = mico.current_wrench;
 			ROS_INFO("Current force: %f, %f, %f",
 			current_wrench.wrench.force.x,current_wrench.wrench.force.y,current_wrench.wrench.force.z);
@@ -195,8 +195,8 @@ int main(int argc, char **argv) {
 				
 				mico.cartesian_velocity_pub.publish(velocityMsg);
 			}
-			
-			mico.heardWrench = false;
+
+            mico.heard_wrench = false;
 		}
 		
 		r.sleep();

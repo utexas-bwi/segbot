@@ -45,54 +45,56 @@ MicoManager::MicoManager(ros::NodeHandle n) : pose_action(pose_action_topic, tru
     angular_velocity_pub = n.advertise<kinova_msgs::JointAngles>("/m1n6s200_driver/in/joint_velocity", 10);
     cartesian_velocity_pub = n.advertise<kinova_msgs::PoseVelocity>("/m1n6s200_driver/in/cartesian_velocity", 10);
 
-    group = new moveit::planning_interface::MoveGroupInterface("arm");
-    group->setGoalTolerance(0.01);
-    group->setPoseReferenceFrame("m1n6s200_end_effector");
-
     position_db = new ArmPositionDB(j_pos_filename, c_pos_filename);
 }
 
-MicoManager::~MicoManager(){
-    delete group;
-}
 //Joint positions cb
 void MicoManager::joint_state_cb(const sensor_msgs::JointStateConstPtr &msg) {
     current_state = *msg;
-    heardJointState = true;
+    heard_joint_state = true;
 }
 
 //tool pose cb
 void MicoManager::toolpose_cb(const geometry_msgs::PoseStampedConstPtr &msg) {
     current_pose = *msg;
-    heardTool = true;
+    heard_tool = true;
 }
 
 //fingers state cb
 void MicoManager::fingers_cb(const kinova_msgs::FingerPositionConstPtr &msg) {
     current_finger = *msg;
-    heardFingers = true;
+    heard_fingers = true;
 }
 
 void MicoManager::wrench_cb(const geometry_msgs::WrenchStampedConstPtr &msg) {
     current_wrench = *msg;
-    heardWrench = true;
+    heard_wrench = true;
 }
 
 //blocking call to listen for arm data (in this case, joint states)
-void MicoManager::wait_for_data() {
-    heardJointState = false;
-    heardTool = false;
-    heardFingers = false;
+bool MicoManager::wait_for_data(double timeout) {
+    heard_joint_state = false;
+    heard_tool = false;
+    heard_fingers = false;
+    heard_wrench = false;
 
-    ros::Rate r(100.0);
+    ros::Rate r(arm_poll_rate);
 
+    // Negative timeout is interpreted as no timeout
+    bool use_timeout = timeout > 0.0;
+
+    ros::Time end = ros::Time::now() + ros::Duration(timeout);
     while (ros::ok()) {
         ros::spinOnce();
 
-        if (heardJointState && heardTool && heardFingers && heardWrench)
-            return;
+        if (heard_joint_state && heard_tool && heard_fingers && heard_wrench)
+            return true;
 
         r.sleep();
+
+        if (use_timeout && ros::Time::now() > end) {
+            return false;
+        }
     }
 }
 
@@ -105,18 +107,25 @@ bool MicoManager::wait_for_force(const double force_threshold, const double time
     double total_delta;
     double delta_effort[6];
 
-    wait_for_data();
+    // Set the stamp on entry. wait_for_force must take no longer than timeout seconds
+    ros::Time end = ros::Time::now() + ros::Duration(timeout);
+    bool got_data = wait_for_data(timeout);
+    if (!got_data) {
+        return got_data;
+    }
     sensor_msgs::JointState prev_effort_state = current_state;
 
 
-    ros::Rate r(100);
+    ros::Rate r(arm_poll_rate);
 
-    ros::Time end = ros::Time::now() + ros::Duration(timeout);
+    bool use_timeout = timeout > 0;
+
     while (ros::ok()) {
         //collect messages
         ros::spinOnce();
 
         total_delta = 0.0;
+
         for (int i = 0; i < 6; i++) {
             delta_effort[i] = fabs(current_state.effort[i] - prev_effort_state.effort[i]);
             total_delta += delta_effort[i];
@@ -128,10 +137,9 @@ bool MicoManager::wait_for_force(const double force_threshold, const double time
         }
 
         r.sleep();
-        //publish velocity message
 
-        if (ros::Time::now() > end) {
-            break;
+        if (use_timeout && ros::Time::now() > end) {
+            return false;
         }
     }
 }
@@ -361,7 +369,7 @@ bool MicoManager::move_to_handover() {
 void MicoManager::move_with_angular_velocities(const kinova_msgs::JointAngles &velocities, const double seconds) {
     // Per the Kinova documentation, we have to publish at exactly 100Hz to get
     // predictable behavior
-    ros::Rate r(100);
+    ros::Rate r(arm_poll_rate);
 
     ros::Time end = ros::Time::now() + ros::Duration(seconds);
     while (ros::ok()) {
@@ -383,7 +391,7 @@ void MicoManager::move_with_angular_velocities(const kinova_msgs::JointAngles &v
 void MicoManager::move_with_cartesian_velocities(const kinova_msgs::PoseVelocity &velocities, const double seconds) {
     // Per the Kinova documentation, we have to publish at exactly 100Hz to get
     // predictable behavior
-    ros::Rate r(100);
+    ros::Rate r(arm_poll_rate);
 
     ros::Time end = ros::Time::now() + ros::Duration(seconds);
     while (ros::ok()) {

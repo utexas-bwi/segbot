@@ -6,6 +6,7 @@
 #include <segbot_arm_manipulation/MicoManager.h>
 #include "bwi_perception/TabletopPerception.h"
 #include <bwi_perception/bwi_perception.h>
+#include <segbot_arm_manipulation/HandoverAction.h>
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 
 MicoManager *mico;
@@ -99,12 +100,12 @@ int main(int argc, char **argv) {
 		//create the action client
 		actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopGraspAction> ac("segbot_tabletop_grasp_as",true);
 		ac.waitForServer();
+        actionlib::SimpleActionClient<segbot_arm_manipulation::HandoverAction> ac_handover("segbot_handover_as", true);
+        ac.waitForServer();
 		
 		//create and fill goal
 		segbot_arm_manipulation::TabletopGraspGoal grasp_goal;
-		
-		//we want the robot to execute the GRASP action
-		grasp_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::GRASP;
+
 		
 		//for that action, we have to specify the method used for picking the target grasp out of the candidates
 		//grasp_goal.grasp_selection_method=segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION;
@@ -152,18 +153,19 @@ int main(int argc, char **argv) {
 			mico->move_home();
 			
 			//now wait for human to pull on object
-			segbot_arm_manipulation::TabletopGraspGoal handover_goal;
-			handover_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::HANDOVER;
-			
-		
-			ac.waitForServer();
+            segbot_arm_manipulation::HandoverGoal handover_goal;
+            handover_goal.type = segbot_arm_manipulation::HandoverGoal::GIVE;
+            handover_goal.timeout_seconds = -1.0;
+
+
+            ac_handover.waitForServer();
 			ROS_INFO("Sending goal to action server...");
-			ac.sendGoal(handover_goal);
+            ac_handover.sendGoal(handover_goal);
 			
 			//block until the action is completed
 			ROS_INFO("Waiting for result...");
-			
-			ac.waitForResult();
+
+            ac_handover.waitForResult();
 			ROS_INFO("Action Finished...");
 			
 			//move out of view and try again

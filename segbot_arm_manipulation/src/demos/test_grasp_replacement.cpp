@@ -16,6 +16,8 @@
 #include <geometry_msgs/PoseArray.h>
 #include <actionlib/client/simple_action_client.h>
 #include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/ObjReplacementGoal.h>
+#include <segbot_arm_manipulation/ObjReplacementAction.h>
 
 
 /*Blocking call for user input to ensure safety*/
@@ -84,7 +86,6 @@ int main(int argc, char** argv){
 				
 	//create and fill goal
 	segbot_arm_manipulation::TabletopGraspGoal grasp_goal;
-	grasp_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::GRASP;
 				
 				
 	//for that action, we have to specify the method used for picking the target grasp out of the candidates
@@ -142,21 +143,20 @@ int main(int argc, char** argv){
 	mico.move_home();
 				
 	/*create action for replacement*/
-	actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopGraspAction> replacement_ac("segbot_tabletop_grasp_as",true);
+    actionlib::SimpleActionClient<segbot_arm_manipulation::ObjReplacementAction> replacement_ac(
+            "segbot_obj_replacement_as", true);
 	replacement_ac.waitForServer();
 	ROS_INFO("action server made...");
 				
 	//create goal for the replacement
-	segbot_arm_manipulation::TabletopGraspGoal replacement_goal;
-	replacement_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::REPLACEMENT;
-	replacement_goal.grasped_joint_state = grasped_state;
+    segbot_arm_manipulation::ObjReplacementGoal replacement_goal;
 			
 	ROS_INFO("Sending goal to action server...");
-	ac.sendGoal(replacement_goal);
+    replacement_ac.sendGoal(replacement_goal);
 				
 	//Wait for result
 	ROS_INFO("Waiting for result...");
-	ac.waitForResult();
+    replacement_ac.waitForResult();
 	ROS_INFO("Action Finished...");
 		
 		

@@ -29,16 +29,12 @@
 #include <tf_conversions/tf_eigen.h>
 #include <tf/transform_broadcaster.h>
 
-#define NUM_JOINTS 8 //6+2 for the arm
-
 //some defines related to filtering candidate grasps
 #define MIN_DISTANCE_TO_PLANE 0.05
 
 #define HAND_OFFSET_GRASP 0.02
 #define HAND_OFFSET_APPROACH 0.10
 
-//used to decide if someone is pulling an object from the arm
-#define FORCE_HANDOVER_THRESHOLD 3.0
 
 //used when deciding whether a pair of an approach pose and a grasp pose are good;
 //if the angular difference in joint space is too big, this means that the robot 
@@ -163,305 +159,206 @@ public:
 
 
     void executeCB(const segbot_arm_manipulation::TabletopGraspGoalConstPtr &goal) {
-        if (goal->action_name == segbot_arm_manipulation::TabletopGraspGoal::GRASP) {
 
-            if (goal->cloud_clusters.empty()) {
-                ROS_INFO("[segbot_tabletop_grap_as.cpp] No object point clouds received...aborting");
-                as_.setAborted(result_);
-                return;
+        if (goal->cloud_clusters.empty()) {
+            ROS_INFO("[segbot_tabletop_grap_as.cpp] No object point clouds received...aborting");
+            as_.setAborted(result_);
+            return;
+        }
+
+
+        ROS_INFO("[segbot_tabletop_grap_as.cpp] Received action request...proceeding.");
+        mico.wait_for_data();
+
+        //the result
+        segbot_arm_manipulation::TabletopGraspResult result;
+
+        //get the data out of the goal
+        Eigen::Vector4f plane_coef_vector;
+        for (int i = 0; i < 4; i++)
+            plane_coef_vector(i) = goal->cloud_plane_coef[i];
+        int selected_object = goal->target_object_cluster_index;
+
+        PointCloudT::Ptr target_object(new PointCloudT);
+        pcl::PCLPointCloud2 target_object_pc2;
+        pcl_conversions::toPCL(goal->cloud_clusters.at(goal->target_object_cluster_index), target_object_pc2);
+        pcl::fromPCLPointCloud2(target_object_pc2, *target_object);
+
+        ROS_INFO("[segbot_tabletop_grasp_as.cpp] Publishing point cloud...");
+        cloud_grasp_pub.publish(goal->cloud_clusters.at(goal->target_object_cluster_index));
+
+        //wait for response at 5 Hz
+        listenForGrasps(40.0);
+
+        ROS_INFO("[segbot_tabletop_grasp_as.cpp] Heard %i grasps", (int) current_grasps.grasps.size());
+
+        //next, compute approach and grasp poses for each detected grasp
+
+        //wait for transform from visual space to arm space
+
+        std::string sensor_frame_id = goal->cloud_clusters.at(goal->target_object_cluster_index).header.frame_id;
+
+        listener.waitForTransform(sensor_frame_id, "m1n6s200_link_base", ros::Time(0), ros::Duration(3.0));
+
+
+        //here, we'll store all grasp options that pass the filters
+        std::vector<GraspCartesianCommand> grasp_commands;
+
+
+        for (const auto &grasp : current_grasps.grasps) {
+
+            GraspCartesianCommand gc_i = segbot_arm_manipulation::grasp_utils::constructGraspCommand(
+                    grasp, HAND_OFFSET_APPROACH, HAND_OFFSET_GRASP, sensor_frame_id);
+
+            geometry_msgs::PoseArray pa;
+            pa.header = gc_i.approach_pose.header;
+            pa.poses.push_back(gc_i.approach_pose.pose);
+            pa.poses.push_back(gc_i.grasp_pose.pose);
+            pose_array_pub.publish(pa);
+            ros::spinOnce();
+            //filter 1: if the grasp is too close to plane, reject it
+            bool ok_with_plane = segbot_arm_manipulation::grasp_utils::checkPlaneConflict(gc_i, plane_coef_vector,
+                                                                                          MIN_DISTANCE_TO_PLANE);
+            if (!ok_with_plane) {
+                ROS_INFO("Grasp too close to plane");
+                continue;
+            }
+
+            //for filter 2, the grasps need to be in the arm's frame of reference
+            listener.transformPose("m1n6s200_link_base", gc_i.approach_pose, gc_i.approach_pose);
+            listener.transformPose("m1n6s200_link_base", gc_i.grasp_pose, gc_i.grasp_pose);
+
+
+            //filter 2: apply grasp filter method in request
+            bool passed_filter = passesFilter(goal->grasp_filter_method, gc_i);
+
+            if (!passed_filter) {
+                ROS_INFO("Filter failed");
+                continue;
             }
 
 
-            ROS_INFO("[segbot_tabletop_grap_as.cpp] Received action request...proceeding.");
-            mico.wait_for_data();
+            //filter two -- if IK fails
+            moveit_msgs::GetPositionIK::Response ik_response_approach = mico.compute_ik(gc_i.approach_pose);
 
-            //the result
-            segbot_arm_manipulation::TabletopGraspResult result;
+            if (ik_response_approach.error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS) {
+                ROS_INFO("No IK solution for approach pose");
+                continue;
+            }
+            moveit_msgs::GetPositionIK::Response ik_response_grasp = mico.compute_ik(gc_i.grasp_pose);
 
-            //get the data out of the goal
-            Eigen::Vector4f plane_coef_vector;
-            for (int i = 0; i < 4; i++)
-                plane_coef_vector(i) = goal->cloud_plane_coef[i];
-            int selected_object = goal->target_object_cluster_index;
-
-            PointCloudT::Ptr target_object(new PointCloudT);
-            pcl::PCLPointCloud2 target_object_pc2;
-            pcl_conversions::toPCL(goal->cloud_clusters.at(goal->target_object_cluster_index), target_object_pc2);
-            pcl::fromPCLPointCloud2(target_object_pc2, *target_object);
-
-            ROS_INFO("[segbot_tabletop_grasp_as.cpp] Publishing point cloud...");
-            cloud_grasp_pub.publish(goal->cloud_clusters.at(goal->target_object_cluster_index));
-
-            //wait for response at 5 Hz
-            listenForGrasps(40.0);
-
-            ROS_INFO("[segbot_tabletop_grasp_as.cpp] Heard %i grasps", (int) current_grasps.grasps.size());
-
-            //next, compute approach and grasp poses for each detected grasp
-
-            //wait for transform from visual space to arm space
-
-            std::string sensor_frame_id = goal->cloud_clusters.at(goal->target_object_cluster_index).header.frame_id;
-
-            listener.waitForTransform(sensor_frame_id, "m1n6s200_link_base", ros::Time(0), ros::Duration(3.0));
+            if (ik_response_grasp.error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS) {
+                ROS_INFO("No IK solution for grasp pose");
+                continue;
+            }
 
 
-            //here, we'll store all grasp options that pass the filters
-            std::vector<GraspCartesianCommand> grasp_commands;
+            //now check to see how close the two sets of joint angles are -- if the joint configurations for the approach and grasp poses differ by too much, the grasp will not be accepted
+            std::vector<double> D = segbot_arm_manipulation::getJointAngleDifferences(
+                    ik_response_approach.solution.joint_state, ik_response_grasp.solution.joint_state);
+
+            double sum_d = 0;
+            for (double p : D) {
+                sum_d += p;
+            }
 
 
-            for (const auto &grasp : current_grasps.grasps) {
+            if (sum_d >= ANGULAR_DIFF_THRESHOLD) {
+                ROS_INFO("Approach and grasp configurations too different");
+                continue;
+            }
 
-                GraspCartesianCommand gc_i = segbot_arm_manipulation::grasp_utils::constructGraspCommand(
-                        grasp, HAND_OFFSET_APPROACH, HAND_OFFSET_GRASP, sensor_frame_id);
+            //store the IK results
+            gc_i.approach_q = ik_response_approach.solution.joint_state;
+            gc_i.grasp_q = ik_response_grasp.solution.joint_state;
 
-                geometry_msgs::PoseArray pa;
-                pa.header = gc_i.approach_pose.header;
-                pa.poses.push_back(gc_i.approach_pose.pose);
-                pa.poses.push_back(gc_i.grasp_pose.pose);
-                pose_array_pub.publish(pa);
-                ros::spinOnce();
-                //filter 1: if the grasp is too close to plane, reject it
-                bool ok_with_plane = segbot_arm_manipulation::grasp_utils::checkPlaneConflict(gc_i, plane_coef_vector,
-                                                                                              MIN_DISTANCE_TO_PLANE);
-                if (!ok_with_plane) {
-                    ROS_INFO("Grasp too close to plane");
-                    continue;
+            grasp_commands.push_back(gc_i);
+        }
+
+
+        //check to see if all potential grasps have been filtered out
+        if (grasp_commands.empty()) {
+            ROS_WARN("[segbot_tabletop_grasp_as.cpp] No feasible grasps found. Aborting.");
+            as_.setAborted(result_);
+            return;
+        }
+
+        //make sure we're working with the correct tool pose
+        mico.wait_for_data();
+
+        int selected_grasp_index = -1;
+
+
+        if (goal->grasp_selection_method ==
+            segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION) {
+            //find the grasp with closest orientatino to current pose
+            double min_diff = 1000000.0;
+            for (unsigned int i = 0; i < grasp_commands.size(); i++) {
+                double d_i = segbot_arm_manipulation::grasp_utils::quat_angular_difference(
+                        grasp_commands.at(i).approach_pose.pose.orientation, mico.current_pose.pose.orientation);
+
+                ROS_INFO("Distance for pose %i:\t%f", (int) i, d_i);
+                if (d_i < min_diff) {
+                    selected_grasp_index = (int) i;
+                    min_diff = d_i;
                 }
+            }
+        } else if (goal->grasp_selection_method == segbot_arm_manipulation::TabletopGraspGoal::RANDOM_SELECTION) {
 
-                //for filter 2, the grasps need to be in the arm's frame of reference
-                listener.transformPose("m1n6s200_link_base", gc_i.approach_pose, gc_i.approach_pose);
-                listener.transformPose("m1n6s200_link_base", gc_i.grasp_pose, gc_i.grasp_pose);
+            srand(time(NULL));
+            selected_grasp_index = rand() % grasp_commands.size();
+            ROS_INFO("Randomly selected grasp = %i", selected_grasp_index);
+        } else if (goal->grasp_selection_method ==
+                   segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_JOINTSPACE_SELECTION) {
 
-
-                //filter 2: apply grasp filter method in request
-                bool passed_filter = passesFilter(goal->grasp_filter_method, gc_i);
-
-                if (!passed_filter) {
-                    ROS_INFO("Filter failed");
-                    continue;
-                }
-
-
-                //filter two -- if IK fails
-                moveit_msgs::GetPositionIK::Response ik_response_approach = mico.compute_ik(gc_i.approach_pose);
-
-                if (ik_response_approach.error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS) {
-                    ROS_INFO("No IK solution for approach pose");
-                    continue;
-                }
-                moveit_msgs::GetPositionIK::Response ik_response_grasp = mico.compute_ik(gc_i.grasp_pose);
-
-                if (ik_response_grasp.error_code.val !=  moveit_msgs::MoveItErrorCodes::SUCCESS) {
-                    ROS_INFO("No IK solution for grasp pose");
-                    continue;
-                }
-
-
-                //now check to see how close the two sets of joint angles are -- if the joint configurations for the approach and grasp poses differ by too much, the grasp will not be accepted
-                std::vector<double> D = segbot_arm_manipulation::getJointAngleDifferences(
-                        ik_response_approach.solution.joint_state, ik_response_grasp.solution.joint_state);
+            double min_diff = 1000000.0;
+            for (unsigned int i = 0; i < grasp_commands.size(); i++) {
+                std::vector<double> D_i = segbot_arm_manipulation::getJointAngleDifferences(
+                        grasp_commands.at(i).approach_q, mico.current_state);
 
                 double sum_d = 0;
-                for (double p : D) {
+                for (double p : D_i)
                     sum_d += p;
-                }
 
-
-                if (sum_d >= ANGULAR_DIFF_THRESHOLD) {
-                    ROS_INFO("Approach and grasp configurations too different");
-                    continue;
-                }
-
-                //store the IK results
-                gc_i.approach_q = ik_response_approach.solution.joint_state;
-                gc_i.grasp_q = ik_response_grasp.solution.joint_state;
-
-                grasp_commands.push_back(gc_i);
-            }
-
-
-            //check to see if all potential grasps have been filtered out
-            if (grasp_commands.empty()) {
-                ROS_WARN("[segbot_tabletop_grasp_as.cpp] No feasible grasps found. Aborting.");
-                as_.setAborted(result_);
-                return;
-            }
-
-            //make sure we're working with the correct tool pose
-            mico.wait_for_data();
-
-            int selected_grasp_index = -1;
-
-
-            if (goal->grasp_selection_method ==
-                segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION) {
-                //find the grasp with closest orientatino to current pose
-                double min_diff = 1000000.0;
-                for (unsigned int i = 0; i < grasp_commands.size(); i++) {
-                    double d_i = segbot_arm_manipulation::grasp_utils::quat_angular_difference(
-                            grasp_commands.at(i).approach_pose.pose.orientation, mico.current_pose.pose.orientation);
-
-                    ROS_INFO("Distance for pose %i:\t%f", (int) i, d_i);
-                    if (d_i < min_diff) {
-                        selected_grasp_index = (int) i;
-                        min_diff = d_i;
-                    }
-                }
-            } else if (goal->grasp_selection_method == segbot_arm_manipulation::TabletopGraspGoal::RANDOM_SELECTION) {
-
-                srand(time(NULL));
-                selected_grasp_index = rand() % grasp_commands.size();
-                ROS_INFO("Randomly selected grasp = %i", selected_grasp_index);
-            } else if (goal->grasp_selection_method ==
-                       segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_JOINTSPACE_SELECTION) {
-
-                double min_diff = 1000000.0;
-                for (unsigned int i = 0; i < grasp_commands.size(); i++) {
-                    std::vector<double> D_i = segbot_arm_manipulation::getJointAngleDifferences(
-                            grasp_commands.at(i).approach_q, mico.current_state);
-
-                    double sum_d = 0;
-                    for (double p : D_i)
-                        sum_d += p;
-
-                    if (sum_d < min_diff) {
-                        selected_grasp_index = (int) i;
-                        min_diff = sum_d;
-                    }
-                }
-
-            }
-
-            if (selected_grasp_index == -1) {
-                ROS_WARN("[segbot_tabletop_grasp_as.cpp] Grasp selection failed. Aborting.");
-                as_.setAborted(result_);
-                return;
-            }
-
-            //compute RPY for target pose
-            ROS_INFO("Selected approach pose:");
-            ROS_INFO_STREAM(grasp_commands.at(selected_grasp_index).approach_pose);
-
-            //publish individual pose for visualization purposes
-            pose_pub.publish(grasp_commands.at(selected_grasp_index).approach_pose);
-
-            //close fingers while moving
-            mico.close_hand();
-
-            //move to approach pose -- do it twice to correct 
-            mico.move_to_pose_moveit(grasp_commands.at(selected_grasp_index).approach_pose);
-            mico.move_to_pose_moveit(grasp_commands.at(selected_grasp_index).approach_pose);
-
-            //open fingers
-            mico.open_hand();
-
-            //move to grasp pose
-            mico.move_to_pose_moveit(grasp_commands.at(selected_grasp_index).grasp_pose);
-
-            //close hand
-            mico.close_hand();
-
-            result_.success = true;
-            as_.setSucceeded(result_);
-            return;
-        } else if (goal->action_name == segbot_arm_manipulation::TabletopGraspGoal::HANDOVER) {
-            //TO DO: move to handover position
-
-            ROS_INFO("Starting handover action...");
-
-            //listen for haptic feedback
-
-            double rate = 40;
-
-            ros::Rate r(rate);
-
-            double total_grav_free_effort = 0;
-            double total_delta;
-            double delta_effort[6];
-
-            mico.wait_for_data();
-            sensor_msgs::JointState prev_effort_state = mico.current_state;
-
-
-            double elapsed_time = 0;
-
-            while (ros::ok()) {
-
-                ros::spinOnce();
-
-                total_delta = 0.0;
-                for (int i = 0; i < 6; i++) {
-                    delta_effort[i] = fabs(mico.current_state.effort[i] - prev_effort_state.effort[i]);
-                    total_delta += delta_effort[i];
-                    ROS_INFO_THROTTLE(1, "Total delta=%f", total_delta);
-                }
-
-                if (total_delta > fabs(FORCE_HANDOVER_THRESHOLD)) {
-                    ROS_INFO("[segbot_tabletop_grasp_as.cpp] Force detected");
-
-                    //now open the hand
-                    mico.open_hand();
-
-                    result_.success = true;
-                    as_.setSucceeded(result_);
-                    return;
-
-                }
-
-                r.sleep();
-                elapsed_time += (1.0) / rate;
-
-                if (goal->timeout_seconds > 0 && elapsed_time > goal->timeout_seconds) {
-
-                    ROS_WARN("Handover action timed out...");
-
-                    result_.success = false;
-                    as_.setAborted(result_);
-
-                    return;
+                if (sum_d < min_diff) {
+                    selected_grasp_index = (int) i;
+                    min_diff = sum_d;
                 }
             }
-
-
-            result_.success = true;
-            as_.setSucceeded(result_);
-        } else if (goal->action_name == segbot_arm_manipulation::TabletopGraspGoal::HANDOVER_FROM_HUMAN) {
-            //open fingers
-            mico.open_hand();
-
-            //update readings
-            mico.wait_for_data();
-
-            bool result = mico.wait_for_force(FORCE_HANDOVER_THRESHOLD, goal->timeout_seconds);
-
-            if (result) {
-                mico.close_hand();
-                result_.success = true;
-                as_.setSucceeded(result_);
-            } else {
-                result_.success = false;
-                as_.setAborted(result_);
-            }
-
-        } else if (goal->action_name == segbot_arm_manipulation::TabletopGraspGoal::REPLACEMENT) {
-            //step 1: move to side position
-
-            //TO DO: smarter way to select placement, in this case, need to move arm out of the way
-            //and percieve the table, find a bounding area to place obj and create a pose/state
-
-
-            //step 2: move to goal pose
-            mico.move_to_joint_state_moveit(goal->grasped_joint_state); //need to make sure it can go to this
-
-            //step 3: open fingers
-            mico.open_hand();
-
-            //step 4: move to home
-            mico.move_home();
 
         }
 
+        if (selected_grasp_index == -1) {
+            ROS_WARN("[segbot_tabletop_grasp_as.cpp] Grasp selection failed. Aborting.");
+            as_.setAborted(result_);
+            return;
+        }
+
+        //compute RPY for target pose
+        ROS_INFO("Selected approach pose:");
+        ROS_INFO_STREAM(grasp_commands.at(selected_grasp_index).approach_pose);
+
+        //publish individual pose for visualization purposes
+        pose_pub.publish(grasp_commands.at(selected_grasp_index).approach_pose);
+
+        //close fingers while moving
+        mico.close_hand();
+
+        //move to approach pose -- do it twice to correct
+        mico.move_to_pose_moveit(grasp_commands.at(selected_grasp_index).approach_pose);
+        mico.move_to_pose_moveit(grasp_commands.at(selected_grasp_index).approach_pose);
+
+        //open fingers
+        mico.open_hand();
+
+        //move to grasp pose
+        mico.move_to_pose_moveit(grasp_commands.at(selected_grasp_index).grasp_pose);
+
+        //close hand
+        mico.close_hand();
+
+        result_.success = true;
+        as_.setSucceeded(result_);
     }
 
 };
