@@ -18,7 +18,7 @@
 #include <bwi_perception/bwi_perception.h>
 
 
-#include "bwi_kr_execution/ExecutePlanAction.h"
+#include "plan_execution/ExecutePlanAction.h"
 
 #include <move_base_msgs/MoveBaseAction.h>
 
@@ -154,12 +154,12 @@ void returnToHome(){
 		}
 	}
 	
-	bwi_kr_execution::ExecutePlanGoal goal_asp;
-    bwi_kr_execution::AspRule rule;
-    bwi_kr_execution::AspFluent fluent;
+	plan_execution::ExecutePlanGoal goal_asp;
+    plan_execution::AspRule rule;
+    plan_execution::AspFluent fluent;
     fluent.variables.push_back("l3_414a");
     
-    actionlib::SimpleActionClient<bwi_kr_execution::ExecutePlanAction> client_asp("/action_executor/execute_plan", true);
+    actionlib::SimpleActionClient<plan_execution::ExecutePlanAction> client_asp("/action_executor/execute_plan", true);
 	client_asp.waitForServer();
 
 	rule.body.push_back(fluent);
@@ -279,13 +279,13 @@ int main(int argc, char **argv) {
 	ROS_INFO_STREAM("Going to " << delivery_door);
 	
 	//now travel to goal 
-	bwi_kr_execution::ExecutePlanGoal goal_asp;
-    bwi_kr_execution::AspRule rule;
-    bwi_kr_execution::AspFluent fluent;
+	plan_execution::ExecutePlanGoal goal_asp;
+    plan_execution::AspRule rule;
+    plan_execution::AspFluent fluent;
     fluent.name = "not facing";
     fluent.variables.push_back(delivery_door);
 	
-	actionlib::SimpleActionClient<bwi_kr_execution::ExecutePlanAction> client_asp("/action_executor/execute_plan", true);
+	actionlib::SimpleActionClient<plan_execution::ExecutePlanAction> client_asp("/action_executor/execute_plan", true);
 	client_asp.waitForServer();
 
 	rule.body.push_back(fluent);
