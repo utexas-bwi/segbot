@@ -55,11 +55,17 @@ int main(int argc, char **argv) {
     mico.move_home();
 
     pressEnter("Press enter to move through waypoints with Kinova firmware...");
+
+
     geometry_msgs::Pose pose;
-    pose.orientation.x = 0.582292258739;
-    pose.orientation.y = 0.392894953489;
-    pose.orientation.z = 0.374028086662;
-    pose.orientation.w = 0.605534791946;
+
+    tf::Quaternion quat;
+    quat.setX(0.58);
+    quat.setY(0.39);
+    quat.setZ(0.37);
+    quat.setW(0.61);
+    quat.normalize();
+    tf::quaternionTFToMsg(quat, pose.orientation);
 
     geometry_msgs::Pose to_add;
     std::vector<geometry_msgs::Pose> waypoints;
