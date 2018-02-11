@@ -3,6 +3,7 @@
 #include <segbot_arm_manipulation/MicoManager.h>
 #include <segbot_arm_manipulation/grasp_utils.h>
 #include <segbot_arm_manipulation/arm_utils.h>
+#include "segbot_arm_manipulation/TabletopGraspAction.h"
 
 
 //actions
@@ -15,19 +16,11 @@
 #include <moveit_msgs/DisplayRobotState.h>
 // Kinematics
 #include <moveit_msgs/GetPositionFK.h>
-#include <moveit_msgs/GetPositionIK.h>
 
-
-#include <kinova_msgs/PoseVelocity.h>
 #include <geometry_msgs/PoseArray.h>
 
 //the action definition
-#include "segbot_arm_manipulation/TabletopGraspAction.h"
 
-//tf stuff
-#include <tf/transform_datatypes.h>
-#include <tf_conversions/tf_eigen.h>
-#include <tf/transform_broadcaster.h>
 
 //some defines related to filtering candidate grasps
 #define MIN_DISTANCE_TO_PLANE 0.05
@@ -51,6 +44,7 @@ class TabletopGraspActionServer {
 protected:
 
     ros::NodeHandle nh_;
+    ros::NodeHandle pnh;
     // NodeHandle instance must be created before this line. Otherwise strange error may occur.
     actionlib::SimpleActionServer<segbot_arm_manipulation::TabletopGraspAction> as_;
     std::string action_name_;
@@ -63,7 +57,6 @@ protected:
     ros::Publisher cloud_pub;
     ros::Publisher cloud_grasp_pub;
     ros::Publisher pose_array_pub;
-    ros::Publisher pose_pub;
 
     std::vector<PointCloudT::Ptr> detected_objects;
 
@@ -82,15 +75,12 @@ public:
             as_(nh_, name, boost::bind(&TabletopGraspActionServer::executeCB, this, _1), false),
             action_name_(name),
             mico(nh_), heard_grasps(false){
-        
+        pnh = ros::NodeHandle("~");
         //subscriber for grasps
         sub_grasps = nh_.subscribe("/find_grasps/grasps_handles", 1, &TabletopGraspActionServer::grasps_cb, this);
 
         //publish pose array
-        pose_array_pub = nh_.advertise<geometry_msgs::PoseArray>("pose_array", 10);
-
-        //publish pose 
-        pose_pub = nh_.advertise<geometry_msgs::PoseStamped>("/agile_grasp_demo/pose_out", 10);
+        pose_array_pub = pnh.advertise<geometry_msgs::PoseArray>("grasp_candidate", 10);
 
         //debugging publisher
         cloud_pub = nh_.advertise<sensor_msgs::PointCloud2>("agile_grasp_demo/cloud_debug", 10);
@@ -158,6 +148,107 @@ public:
     }
 
 
+    std::vector<GraspCartesianCommand>
+    generate_agile_grasps(const PointCloudT::Ptr &target_cloud, const std::string &frame_id) {
+        //wait for response at 5 Hz
+        listenForGrasps(40.0);
+
+        ROS_INFO("[segbot_tabletop_grasp_as.cpp] Heard %i grasps", (int) current_grasps.grasps.size());
+
+        //next, compute approach and grasp poses for each detected grasp
+
+
+        listener.waitForTransform(frame_id, "m1n6s200_link_base", ros::Time(0), ros::Duration(3.0));
+
+
+        //here, we'll store all grasp options that pass the filters
+        std::vector<GraspCartesianCommand> grasp_commands;
+
+        for (const auto &grasp: current_grasps.grasps) {
+            GraspCartesianCommand gc = segbot_arm_manipulation::grasp_utils::grasp_command_from_agile_grasp(
+                    grasp, HAND_OFFSET_APPROACH, HAND_OFFSET_GRASP, frame_id);
+            grasp_commands.push_back(gc);
+        }
+        return grasp_commands;
+
+
+    }
+
+    std::vector<GraspCartesianCommand>
+    generate_heuristic_grasps(const PointCloudT::Ptr &target_cloud, const std::string &frame_id) {
+
+        std::vector<GraspCartesianCommand> grasp_commands;
+        Eigen::Vector4f centroid;
+        pcl::compute3DCentroid(*target_cloud, centroid);
+        Eigen::Vector4f min;
+        Eigen::Vector4f max;
+        pcl::getMinMax3D(*target_cloud, min, max);
+
+        geometry_msgs::PoseStamped grasp_pose;
+
+        grasp_pose.header.frame_id = frame_id;
+        grasp_pose.pose.position.x = centroid[0];
+        grasp_pose.pose.position.y = centroid[1];
+        grasp_pose.pose.position.z = centroid[2];
+
+
+        tf::Stamped<tf::Quaternion> quat;
+        quat.setRPY(0.0, M_PI / 2, 0);
+        quat.frame_id_ = "m1n6s200_link_base";
+        listener.transformQuaternion(frame_id, quat, quat);
+
+        geometry_msgs::QuaternionStamped quat_stamped;
+        tf::quaternionStampedTFToMsg(quat, quat_stamped);
+        grasp_pose.pose.orientation = quat_stamped.quaternion;
+
+        GraspCartesianCommand gc = segbot_arm_manipulation::grasp_utils::grasp_command_from_grasp_pose(grasp_pose);
+        grasp_commands.push_back(gc);
+
+        return grasp_commands;
+
+    }
+
+    ulong select_grasp(vector<GraspCartesianCommand> grasps, const std::string &selection_method) {
+        ulong selected_grasp_index;
+        if (selection_method ==
+            segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION) {
+            //find the grasp with closest orientatino to current pose
+            double min_diff = std::numeric_limits<double>::max();
+            for (unsigned int i = 0; i < grasps.size(); i++) {
+                double d_i = segbot_arm_manipulation::quat_angular_difference(
+                        grasps.at(i).approach_pose.pose.orientation, mico.current_pose.pose.orientation);
+
+                ROS_INFO("Distance for pose %i:\t%f", (int) i, d_i);
+                if (d_i < min_diff) {
+                    selected_grasp_index = (int) i;
+                    min_diff = d_i;
+                }
+            }
+        } else if (selection_method == segbot_arm_manipulation::TabletopGraspGoal::RANDOM_SELECTION) {
+
+            srand(time(NULL));
+            selected_grasp_index = rand() % grasps.size();
+            ROS_INFO("Randomly selected grasp = %i", (int) selected_grasp_index);
+        } else if (selection_method == segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_JOINTSPACE_SELECTION) {
+
+            double min_diff = std::numeric_limits<double>::max();
+            for (unsigned int i = 0; i < grasps.size(); i++) {
+                std::vector<double> D_i = segbot_arm_manipulation::getJointAngleDifferences(
+                        grasps.at(i).approach_joint_state, mico.current_state);
+
+                double sum_d = 0;
+                for (double p : D_i)
+                    sum_d += p;
+
+                if (sum_d < min_diff) {
+                    selected_grasp_index = (int) i;
+                    min_diff = sum_d;
+                }
+            }
+        }
+        return selected_grasp_index;
+    }
+
     void executeCB(const segbot_arm_manipulation::TabletopGraspGoalConstPtr &goal) {
 
         if (goal->cloud_clusters.empty()) {
@@ -185,52 +276,44 @@ public:
         pcl::fromPCLPointCloud2(target_object_pc2, *target_object);
 
         ROS_INFO("[segbot_tabletop_grasp_as.cpp] Publishing point cloud...");
-        cloud_grasp_pub.publish(goal->cloud_clusters.at(goal->target_object_cluster_index));
+        cloud_grasp_pub.publish(target_object_pc2);
 
-        //wait for response at 5 Hz
-        listenForGrasps(40.0);
+        std::string sensor_frame_id = goal->cloud_clusters.at(
+                goal->target_object_cluster_index).header.frame_id;
 
-        ROS_INFO("[segbot_tabletop_grasp_as.cpp] Heard %i grasps", (int) current_grasps.grasps.size());
-
-        //next, compute approach and grasp poses for each detected grasp
-
-        //wait for transform from visual space to arm space
-
-        std::string sensor_frame_id = goal->cloud_clusters.at(goal->target_object_cluster_index).header.frame_id;
-
-        listener.waitForTransform(sensor_frame_id, "m1n6s200_link_base", ros::Time(0), ros::Duration(3.0));
+        std::vector<GraspCartesianCommand> candidate_grasps;
+        if (goal->grasp_generation_method == segbot_arm_manipulation::TabletopGraspGoal::HEURISTIC) {
+            candidate_grasps = generate_heuristic_grasps(target_object, sensor_frame_id);
+        } else {
+            candidate_grasps = generate_agile_grasps(target_object, sensor_frame_id);
+        }
+        std::vector<GraspCartesianCommand> surviving_grasps;
 
 
-        //here, we'll store all grasp options that pass the filters
-        std::vector<GraspCartesianCommand> grasp_commands;
-
-
-        for (const auto &grasp : current_grasps.grasps) {
-
-            GraspCartesianCommand gc_i = segbot_arm_manipulation::grasp_utils::constructGraspCommand(
-                    grasp, HAND_OFFSET_APPROACH, HAND_OFFSET_GRASP, sensor_frame_id);
+        for (const auto &grasp : candidate_grasps) {
 
             geometry_msgs::PoseArray pa;
-            pa.header = gc_i.approach_pose.header;
-            pa.poses.push_back(gc_i.approach_pose.pose);
-            pa.poses.push_back(gc_i.grasp_pose.pose);
+            pa.header = grasp.approach_pose.header;
+            pa.poses.push_back(grasp.approach_pose.pose);
+            pa.poses.push_back(grasp.grasp_pose.pose);
             pose_array_pub.publish(pa);
             ros::spinOnce();
             //filter 1: if the grasp is too close to plane, reject it
-            bool ok_with_plane = segbot_arm_manipulation::grasp_utils::checkPlaneConflict(gc_i, plane_coef_vector,
+            bool ok_with_plane = segbot_arm_manipulation::grasp_utils::checkPlaneConflict(grasp, plane_coef_vector,
                                                                                           MIN_DISTANCE_TO_PLANE);
             if (!ok_with_plane) {
                 ROS_INFO("Grasp too close to plane");
                 continue;
             }
+            auto complete_grasp = grasp;
 
             //for filter 2, the grasps need to be in the arm's frame of reference
-            listener.transformPose("m1n6s200_link_base", gc_i.approach_pose, gc_i.approach_pose);
-            listener.transformPose("m1n6s200_link_base", gc_i.grasp_pose, gc_i.grasp_pose);
+            listener.transformPose("m1n6s200_link_base", complete_grasp.approach_pose, complete_grasp.approach_pose);
+            listener.transformPose("m1n6s200_link_base", complete_grasp.grasp_pose, complete_grasp.grasp_pose);
 
 
             //filter 2: apply grasp filter method in request
-            bool passed_filter = passesFilter(goal->grasp_filter_method, gc_i);
+            bool passed_filter = passesFilter(goal->grasp_filter_method, complete_grasp);
 
             if (!passed_filter) {
                 ROS_INFO("Filter failed");
@@ -239,13 +322,13 @@ public:
 
 
             //filter two -- if IK fails
-            moveit_msgs::GetPositionIK::Response ik_response_approach = mico.compute_ik(gc_i.approach_pose);
+            moveit_msgs::GetPositionIK::Response ik_response_approach = mico.compute_ik(complete_grasp.approach_pose);
 
             if (ik_response_approach.error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS) {
                 ROS_INFO("No IK solution for approach pose");
                 continue;
             }
-            moveit_msgs::GetPositionIK::Response ik_response_grasp = mico.compute_ik(gc_i.grasp_pose);
+            moveit_msgs::GetPositionIK::Response ik_response_grasp = mico.compute_ik(complete_grasp.grasp_pose);
 
             if (ik_response_grasp.error_code.val != moveit_msgs::MoveItErrorCodes::SUCCESS) {
                 ROS_INFO("No IK solution for grasp pose");
@@ -269,90 +352,43 @@ public:
             }
 
             //store the IK results
-            gc_i.approach_q = ik_response_approach.solution.joint_state;
-            gc_i.grasp_q = ik_response_grasp.solution.joint_state;
 
-            grasp_commands.push_back(gc_i);
+            complete_grasp.approach_joint_state = ik_response_approach.solution.joint_state;
+            complete_grasp.grasp_joint_state = ik_response_grasp.solution.joint_state;
+
+            surviving_grasps.push_back(complete_grasp);
         }
 
-
         //check to see if all potential grasps have been filtered out
-        if (grasp_commands.empty()) {
+        if (surviving_grasps.empty()) {
             ROS_WARN("[segbot_tabletop_grasp_as.cpp] No feasible grasps found. Aborting.");
             as_.setAborted(result_);
             return;
         }
 
+
         //make sure we're working with the correct tool pose
         mico.wait_for_data();
 
-        int selected_grasp_index = -1;
-
-
-        if (goal->grasp_selection_method ==
-            segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION) {
-            //find the grasp with closest orientatino to current pose
-            double min_diff = 1000000.0;
-            for (unsigned int i = 0; i < grasp_commands.size(); i++) {
-                double d_i = segbot_arm_manipulation::quat_angular_difference(
-                        grasp_commands.at(i).approach_pose.pose.orientation, mico.current_pose.pose.orientation);
-
-                ROS_INFO("Distance for pose %i:\t%f", (int) i, d_i);
-                if (d_i < min_diff) {
-                    selected_grasp_index = (int) i;
-                    min_diff = d_i;
-                }
-            }
-        } else if (goal->grasp_selection_method == segbot_arm_manipulation::TabletopGraspGoal::RANDOM_SELECTION) {
-
-            srand(time(NULL));
-            selected_grasp_index = rand() % grasp_commands.size();
-            ROS_INFO("Randomly selected grasp = %i", selected_grasp_index);
-        } else if (goal->grasp_selection_method ==
-                   segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_JOINTSPACE_SELECTION) {
-
-            double min_diff = 1000000.0;
-            for (unsigned int i = 0; i < grasp_commands.size(); i++) {
-                std::vector<double> D_i = segbot_arm_manipulation::getJointAngleDifferences(
-                        grasp_commands.at(i).approach_q, mico.current_state);
-
-                double sum_d = 0;
-                for (double p : D_i)
-                    sum_d += p;
-
-                if (sum_d < min_diff) {
-                    selected_grasp_index = (int) i;
-                    min_diff = sum_d;
-                }
-            }
-
-        }
-
-        if (selected_grasp_index == -1) {
-            ROS_WARN("[segbot_tabletop_grasp_as.cpp] Grasp selection failed. Aborting.");
-            as_.setAborted(result_);
-            return;
-        }
+        ulong selected_grasp_index = select_grasp(surviving_grasps, goal->grasp_selection_method);
 
         //compute RPY for target pose
         ROS_INFO("Selected approach pose:");
-        ROS_INFO_STREAM(grasp_commands.at(selected_grasp_index).approach_pose);
+        ROS_INFO_STREAM(surviving_grasps.at(selected_grasp_index).approach_pose);
 
-        //publish individual pose for visualization purposes
-        pose_pub.publish(grasp_commands.at(selected_grasp_index).approach_pose);
 
         //close fingers while moving
         mico.close_hand();
 
         //move to approach pose -- do it twice to correct
-        mico.move_to_pose_moveit(grasp_commands.at(selected_grasp_index).approach_pose);
-        mico.move_to_pose_moveit(grasp_commands.at(selected_grasp_index).approach_pose);
+        mico.move_to_pose_moveit(surviving_grasps.at(selected_grasp_index).approach_pose);
+        mico.move_to_pose_moveit(surviving_grasps.at(selected_grasp_index).approach_pose);
 
         //open fingers
         mico.open_hand();
 
         //move to grasp pose
-        mico.move_to_pose_moveit(grasp_commands.at(selected_grasp_index).grasp_pose);
+        mico.move_to_pose_moveit(surviving_grasps.at(selected_grasp_index).grasp_pose);
 
         //close hand
         mico.close_hand();

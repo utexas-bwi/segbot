@@ -9,6 +9,9 @@ string CLOSEST_ORIENTATION_SELECTION="closest_orientation"
 string CLOSEST_JOINTSPACE_SELECTION="closest_joint_space"
 
 
+# constants for which method to use to generate grasps
+string HEURISTIC="heuristic_grasp"
+string AGILE_GRASP="agile_grasp"
 
 # Goal
 sensor_msgs/PointCloud2 cloud_plane
@@ -16,11 +19,9 @@ float32[4] cloud_plane_coef
 sensor_msgs/PointCloud2[] cloud_clusters
 int32 target_object_cluster_index
 
-# specific for "grasp" action
+string grasp_generation_method
 string grasp_selection_method
 string grasp_filter_method
-
-
 
 
 ---

@@ -21,7 +21,6 @@
 #include <pcl/segmentation/extract_clusters.h>
 
 
-
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/PoseStamped.h>
 
@@ -33,10 +32,10 @@
 #include "agile_grasp/Grasps.h"
 
 struct GraspCartesianCommand {
-    sensor_msgs::JointState approach_q;
+    sensor_msgs::JointState approach_joint_state;
     geometry_msgs::PoseStamped approach_pose;
 
-    sensor_msgs::JointState grasp_q;
+    sensor_msgs::JointState grasp_joint_state;
     geometry_msgs::PoseStamped grasp_pose;
 
 };
@@ -45,8 +44,7 @@ namespace segbot_arm_manipulation {
     namespace grasp_utils {
 
 
-        Eigen::Matrix3d reorderHandAxes(const Eigen::Matrix3d& Q)
-        {
+        Eigen::Matrix3d reorderHandAxes(const Eigen::Matrix3d &Q) {
             std::vector<int> axis_order_;
             axis_order_.push_back(2);
             axis_order_.push_back(0);
@@ -59,16 +57,16 @@ namespace segbot_arm_manipulation {
             return R;
         }
 
-        bool checkPlaneConflict(GraspCartesianCommand gcc, Eigen::Vector4f plane_c, float min_distance_to_plane){
+        bool checkPlaneConflict(GraspCartesianCommand gcc, Eigen::Vector4f plane_c, float min_distance_to_plane) {
             pcl::PointXYZ p_a;
-            p_a.x=gcc.approach_pose.pose.position.x;
-            p_a.y=gcc.approach_pose.pose.position.y;
-            p_a.z=gcc.approach_pose.pose.position.z;
+            p_a.x = gcc.approach_pose.pose.position.x;
+            p_a.y = gcc.approach_pose.pose.position.y;
+            p_a.z = gcc.approach_pose.pose.position.z;
 
             pcl::PointXYZ p_g;
-            p_g.x=gcc.grasp_pose.pose.position.x;
-            p_g.y=gcc.grasp_pose.pose.position.y;
-            p_g.z=gcc.grasp_pose.pose.position.z;
+            p_g.x = gcc.grasp_pose.pose.position.x;
+            p_g.y = gcc.grasp_pose.pose.position.y;
+            p_g.z = gcc.grasp_pose.pose.position.z;
 
             return !(pcl::pointToPlaneDistance(p_a, plane_c) < min_distance_to_plane
                      || pcl::pointToPlaneDistance(p_g, plane_c) < min_distance_to_plane);
@@ -76,7 +74,9 @@ namespace segbot_arm_manipulation {
         };
 
 
-        GraspCartesianCommand constructGraspCommand(const agile_grasp::Grasp &grasp, const float offset_approach, const float offset_grasp, const std::string &object_cloud_frameid){
+        GraspCartesianCommand grasp_command_from_agile_grasp(const agile_grasp::Grasp &grasp,
+                                                             const float offset_approach, const float offset_grasp,
+                                                             const std::string &object_cloud_frameid) {
 
             Eigen::Vector3d center; // grasp position
             Eigen::Vector3d surface_center; //  grasp position projected back onto the surface of the object
@@ -118,6 +118,16 @@ namespace segbot_arm_manipulation {
             gc.grasp_pose = grasp_msg;
 
             return gc;
+        }
+
+        GraspCartesianCommand
+        grasp_command_from_grasp_pose(const geometry_msgs::PoseStamped &grasp_pose, const double offset_approach) {
+            GraspCartesianCommand command;
+            command.grasp_pose = grasp_pose;
+            // TODO: Calculate the approach as a pose with the same orientation pulled back along the approach axis
+            // offset_approach meters
+            command.approach_pose = grasp_pose;
+            return command;
         }
     }
 }
