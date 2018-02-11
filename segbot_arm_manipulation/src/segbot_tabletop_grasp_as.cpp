@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 
-#include <segbot_arm_manipulation/MicoManager.h>
-#include <segbot_arm_manipulation/grasp_utils.h>
+#include <segbot_arm_manipulation/Mico.h>
+#include <bwi_manipulation/grasp_utils.h>
 #include <segbot_arm_manipulation/arm_utils.h>
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 
@@ -67,7 +67,7 @@ protected:
     ros::Subscriber sub_grasps;
 
     //subscribers -- in an action server, these have to be class members
-    MicoManager mico;
+    segbot_arm_manipulation::Mico mico;
 
 public:
 
@@ -165,7 +165,7 @@ public:
         std::vector<GraspCartesianCommand> grasp_commands;
 
         for (const auto &grasp: current_grasps.grasps) {
-            GraspCartesianCommand gc = segbot_arm_manipulation::grasp_utils::grasp_command_from_agile_grasp(
+            GraspCartesianCommand gc = bwi_manipulation::grasp_utils::grasp_command_from_agile_grasp(
                     grasp, HAND_OFFSET_APPROACH, HAND_OFFSET_GRASP, frame_id);
             grasp_commands.push_back(gc);
         }
@@ -191,7 +191,10 @@ public:
         grasp_pose.pose.position.y = centroid[1];
         grasp_pose.pose.position.z = centroid[2];
 
-
+        // The end effector frame has z extending along the finger tips. Here
+        // we set roll pitch yaw with respect to the link base axes, which have the x axis extending
+        // forward from the base of the robot. We pitch by 90 degrees to point the hands along the base's x axis
+        // (point forward).
         tf::Stamped<tf::Quaternion> quat;
         quat.setRPY(0.0, M_PI / 2, 0);
         quat.frame_id_ = "m1n6s200_link_base";
@@ -201,7 +204,7 @@ public:
         tf::quaternionStampedTFToMsg(quat, quat_stamped);
         grasp_pose.pose.orientation = quat_stamped.quaternion;
 
-        GraspCartesianCommand gc = segbot_arm_manipulation::grasp_utils::grasp_command_from_grasp_pose(grasp_pose);
+        GraspCartesianCommand gc = bwi_manipulation::grasp_utils::grasp_command_from_grasp_pose(grasp_pose);
         grasp_commands.push_back(gc);
 
         return grasp_commands;
@@ -212,7 +215,7 @@ public:
         ulong selected_grasp_index;
         if (selection_method ==
             segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION) {
-            //find the grasp with closest orientatino to current pose
+            //find the grasp with closest orientation to current pose
             double min_diff = std::numeric_limits<double>::max();
             for (unsigned int i = 0; i < grasps.size(); i++) {
                 double d_i = segbot_arm_manipulation::quat_angular_difference(
@@ -299,8 +302,8 @@ public:
             pose_array_pub.publish(pa);
             ros::spinOnce();
             //filter 1: if the grasp is too close to plane, reject it
-            bool ok_with_plane = segbot_arm_manipulation::grasp_utils::checkPlaneConflict(grasp, plane_coef_vector,
-                                                                                          MIN_DISTANCE_TO_PLANE);
+            bool ok_with_plane = bwi_manipulation::grasp_utils::checkPlaneConflict(grasp, plane_coef_vector,
+                                                                                   MIN_DISTANCE_TO_PLANE);
             if (!ok_with_plane) {
                 ROS_INFO("Grasp too close to plane");
                 continue;

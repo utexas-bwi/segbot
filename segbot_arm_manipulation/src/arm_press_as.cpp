@@ -28,7 +28,7 @@
 #include <tf/transform_broadcaster.h>
 
 
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 #define MIN_DISTANCE_TO_PLANE 0.05
 
@@ -53,7 +53,7 @@ protected:
   
   tf::TransformListener listener;
 
-	MicoManager mico;
+    segbot_arm_manipulation::Mico mico;
 
  
 public:

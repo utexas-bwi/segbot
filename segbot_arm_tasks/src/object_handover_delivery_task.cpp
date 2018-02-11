@@ -22,10 +22,10 @@
 #include "bwi_services/SpeakMessage.h"
 
 #include <bwi_msgs/QuestionDialog.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 
-MicoManager *mico;
+segbot_arm_manipulation::Mico *mico;
 
 
 //true if Ctrl-C is pressed
@@ -157,7 +157,7 @@ int main(int argc, char **argv) {
 	std::vector<std::string> rooms = getRooms();
 	std::vector<std::string> doors = getDoors(); 
 
-    mico = new MicoManager(n);
+    mico = new segbot_arm_manipulation::Mico(n);
 
 	//register ctrl-c
 	signal(SIGINT, sig_handler);

@@ -1,7 +1,7 @@
 #include <ros/ros.h>
 
-#include <segbot_arm_manipulation/MicoManager.h>
-#include <segbot_arm_manipulation/grasp_utils.h>
+#include <segbot_arm_manipulation/Mico.h>
+#include <bwi_manipulation/grasp_utils.h>
 #include <segbot_arm_manipulation/arm_utils.h>
 
 //actions
@@ -44,7 +44,7 @@ protected:
     segbot_arm_manipulation::HandoverResult result_;
 
     //subscribers -- in an action server, these have to be class members
-    MicoManager mico;
+    segbot_arm_manipulation::Mico mico;
 
 public:
 

@@ -4,7 +4,7 @@
 
 #include <sensor_msgs/JointState.h>
 #include <actionlib/client/simple_action_client.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 //srv for talking to table_object_detection_node.cpp
 #include "bwi_perception/TabletopPerception.h"
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 	
 	ros::NodeHandle n;
 
-    MicoManager mico(n);
+    segbot_arm_manipulation::Mico mico(n);
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
 	

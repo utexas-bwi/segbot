@@ -7,7 +7,7 @@
 
 //our own arm library 
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 
 //true if Ctrl-C is pressed
@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
     signal(SIGINT, sig_handler);
 
     bool success = false;
-    MicoManager mico(n);
+    segbot_arm_manipulation::Mico mico(n);
 
     mico.move_home();
 

@@ -1,6 +1,6 @@
 #include <ros/ros.h>
 
-#include <segbot_arm_manipulation/grasp_utils.h>
+#include <bwi_manipulation/grasp_utils.h>
 
 #include <actionlib/server/simple_action_server.h>
 
@@ -15,7 +15,7 @@
 
 #include <geometry_msgs/PoseArray.h>
 #include <actionlib/client/simple_action_client.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 #include <segbot_arm_manipulation/ObjReplacementGoal.h>
 #include <segbot_arm_manipulation/ObjReplacementAction.h>
 
@@ -64,9 +64,9 @@ int main(int argc, char** argv){
 	//initialize ros
 	ros::init(argc, argv, "test_grasp_replacement");
 	ros::NodeHandle nh;
-	
 
-	MicoManager mico(nh);
+
+    segbot_arm_manipulation::Mico mico(nh);
 	mico.wait_for_data();
 	
 	//joint state for use in sending to replacement

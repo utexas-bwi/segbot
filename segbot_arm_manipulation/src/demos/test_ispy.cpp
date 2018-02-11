@@ -4,7 +4,7 @@
 
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 //srv for talking to table_object_detection_node.cpp
 #include "bwi_perception/TabletopPerception.h"
@@ -14,7 +14,7 @@
 #include "segbot_arm_manipulation/iSpyDetectTouch.h"
 #include "segbot_arm_manipulation/iSpyFaceTable.h"
 
-MicoManager *mico;
+segbot_arm_manipulation::Mico *mico;
 
 #define NUM_TABLE_OBJECTS 4
 
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "test_ispy");
 	
 	ros::NodeHandle n;
-	mico = new MicoManager(n);
+    mico = new segbot_arm_manipulation::Mico(n);
 
 	//register ctrl-c
 	signal(SIGINT, sig_handler);

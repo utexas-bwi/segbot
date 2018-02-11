@@ -7,7 +7,7 @@
 
 //our own arm library 
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
     //register ctrl-c
     signal(SIGINT, sig_handler);
         
-    MicoManager mico(n);
+    segbot_arm_manipulation::Mico mico(n);
 
     pressEnter("Press enter to move to candle pose with MoveIt");
 

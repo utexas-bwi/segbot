@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
         actionlib
         actionlib_msgs
         agile_grasp
+        bwi_manipulation
         bwi_moveit_utils
         geometry_msgs
         kinova_driver
@@ -69,12 +70,12 @@ generate_messages(
 )
 
 catkin_package(
-        CATKIN_DEPENDS actionlib actionlib_msgs bwi_moveit_utils geometry_msgs kinova_msgs kinova_driver moveit_ros_planning_interface message_runtime moveit_msgs roscpp rospy std_msgs
+        CATKIN_DEPENDS actionlib actionlib_msgs bwi_moveit_utils bwi_manipulation geometry_msgs kinova_msgs kinova_driver moveit_ros_planning_interface message_runtime moveit_msgs roscpp rospy std_msgs
         INCLUDE_DIRS include
         LIBRARIES arm_utilities
 )
 
-add_library(arm_utilities src/MicoManager.cpp src/arm_utils.cpp src/grasp_utils.cpp)
+add_library(arm_utilities src/Mico.cpp src/arm_utils.cpp)
 target_link_libraries(arm_utilities ${catkin_LIBRARIES})
 
 

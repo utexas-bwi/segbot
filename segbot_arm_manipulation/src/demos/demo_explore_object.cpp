@@ -31,7 +31,7 @@
 #include <segbot_arm_manipulation/LiftVerifyAction.h>
 #include <segbot_arm_manipulation/ShakeAction.h>
 
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 
 #define FINGER_FULLY_OPENED 6
@@ -215,7 +215,7 @@ int main (int argc, char** argv){
 	ros::init(argc, argv, "demo_explore_object");
 	
 	ros::NodeHandle n;
-	MicoManager mico(n);
+    segbot_arm_manipulation::Mico mico(n);
 	
 	//create a publisher for rviz text markers
 	vis_pub = n.advertise<visualization_msgs::Marker>( "/visualization_marker", 0 );	

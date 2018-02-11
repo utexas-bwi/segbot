@@ -51,7 +51,7 @@
 
 #include <nav_msgs/Odometry.h>
 
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 #include <segbot_arm_manipulation/arm_positions_db.h>
 
 //for playing sounds when backing up
@@ -92,7 +92,7 @@ protected:
 	ros::Subscriber sub_odom_;
 	
 	//holds set of predefined positions
-	MicoManager mico;
+    segbot_arm_manipulation::Mico mico;
 	
 public:
 

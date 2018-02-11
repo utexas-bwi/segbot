@@ -6,7 +6,7 @@
 #include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/grasp_utils.h>
+#include <bwi_manipulation/grasp_utils.h>
 
 
 //actions
@@ -24,7 +24,7 @@
 #include <moveit_msgs/GetPositionIK.h>
 
 
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 #define MIN_DISTANCE_TO_PLANE 0.05
 
@@ -43,7 +43,7 @@ protected:
     //used to compute transforms
     tf::TransformListener listener;
 
-    MicoManager mico;
+    segbot_arm_manipulation::Mico mico;
 
 public:
 

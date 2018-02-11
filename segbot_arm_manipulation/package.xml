@@ -10,19 +10,20 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <depend>agile_grasp</depend>
   <depend>actionlib</depend>
   <depend>actionlib_msgs</depend>
+  <depend>agile_grasp</depend>
+  <depend>bwi_manipulation</depend>
+  <depend>bwi_moveit_utils</depend>
+  <depend>bwi_perception</depend>
   <depend>geometry_msgs</depend>
   <depend>kinova_msgs</depend>
   <depend>kinova_driver</depend>
   <depend>moveit_ros_planning_interface</depend>
-  <depend>bwi_moveit_utils</depend>
   <depend>moveit_msgs</depend>
   <depend>move_base_msgs</depend>
   <depend>roscpp</depend>
   <depend>rospy</depend>
-  <depend>bwi_perception</depend>
   <depend>std_msgs</depend>
   <depend>tf</depend>
 

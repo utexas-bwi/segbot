@@ -23,11 +23,11 @@
 
 
 #include <bwi_moveit_utils/MicoNavSafety.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 #include "segbot_arm_manipulation/ObjReplacementAction.h"
 
-MicoManager *mico;
+segbot_arm_manipulation::Mico *mico;
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
 
-	mico = new MicoManager(n);
+	mico = new segbot_arm_manipulation::Mico(n);
 	//Step 1: make arm safe and go to table location
 	mico->close_hand();
 	mico->move_home();

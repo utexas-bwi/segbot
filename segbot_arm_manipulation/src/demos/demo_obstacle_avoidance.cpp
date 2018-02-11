@@ -5,7 +5,7 @@
 #include <bwi_perception/bwi_perception.h>
 #include <segbot_arm_manipulation/arm_utils.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "demo_obstacle_avoidance");
 	
 	ros::NodeHandle n;
-    MicoManager mico(n);
+    segbot_arm_manipulation::Mico mico(n);
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
 	

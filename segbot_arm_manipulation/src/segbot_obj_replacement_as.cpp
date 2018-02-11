@@ -33,14 +33,14 @@
 
 //the action definition
 #include "segbot_arm_manipulation/ObjReplacementAction.h"
-#include "segbot_arm_manipulation/MicoManager.h"
+#include "segbot_arm_manipulation/Mico.h"
 
 //srv for talking to table_object_detection_node.cpp
 #include "bwi_perception/TabletopPerception.h"
 #include "bwi_perception/bwi_perception.h"
 
 
-#include <segbot_arm_manipulation/grasp_utils.h>
+#include <bwi_manipulation/grasp_utils.h>
 #include <segbot_arm_manipulation/arm_utils.h>
 
 
@@ -80,7 +80,7 @@ protected:
 	ros::Publisher down_pub; 
     
     std::vector<geometry_msgs::Quaternion> orientations;
-    MicoManager mico;
+    segbot_arm_manipulation::Mico mico;
 
 
 

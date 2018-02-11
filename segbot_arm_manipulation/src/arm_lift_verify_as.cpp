@@ -21,7 +21,7 @@
 #include <segbot_arm_manipulation/LiftVerifyAction.h>
 #include <segbot_arm_manipulation/arm_utils.h>
 
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 #define FINGER_FULLY_OPENED 6
 #define FINGER_FULLY_CLOSED 7300
@@ -47,7 +47,7 @@ protected:
   segbot_arm_manipulation::LiftVerifyFeedback feedback_;
   segbot_arm_manipulation::LiftVerifyResult result_;
 
-	MicoManager mico;
+    segbot_arm_manipulation::Mico mico;
   int num_bins;
  
 public:

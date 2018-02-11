@@ -14,7 +14,7 @@
 #include "segbot_arm_manipulation/LiftVerifyAction.h"
 
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 #include <bwi_perception/bwi_perception.h>
 
@@ -36,7 +36,7 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
 
-MicoManager *mico;
+segbot_arm_manipulation::Mico *mico;
 
 
 /* what happens when ctr-c is pressed */
@@ -208,7 +208,7 @@ int main(int argc, char **argv) {
 	
 	ros::NodeHandle n;
 
-    mico = new MicoManager(n);
+    mico = new segbot_arm_manipulation::Mico(n);
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
 

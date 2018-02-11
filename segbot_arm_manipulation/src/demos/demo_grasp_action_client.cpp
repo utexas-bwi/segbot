@@ -3,13 +3,13 @@
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <actionlib/client/simple_action_client.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 #include "bwi_perception/TabletopPerception.h"
 #include <bwi_perception/bwi_perception.h>
 #include <segbot_arm_manipulation/HandoverAction.h>
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 
-MicoManager *mico;
+segbot_arm_manipulation::Mico *mico;
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 
 	ros::NodeHandle n;
 
-    mico = new MicoManager(n);
+    mico = new segbot_arm_manipulation::Mico(n);
 
 	//register ctrl-c
 	signal(SIGINT, sig_handler);

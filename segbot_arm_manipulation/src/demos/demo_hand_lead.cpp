@@ -15,7 +15,7 @@
 
 
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 
 
@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "demo_hand_lead");
 	
 	ros::NodeHandle n;
-	MicoManager mico(n);
+	segbot_arm_manipulation::Mico mico(n);
 	
 	//base velocity publisher
 	ros::Publisher pub_base_velocity = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);

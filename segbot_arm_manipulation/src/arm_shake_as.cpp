@@ -22,7 +22,7 @@
 
 #include <segbot_arm_manipulation/ShakeAction.h>
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 
 
@@ -44,8 +44,8 @@ protected:
   segbot_arm_manipulation::ShakeResult result_;
   
   tf::TransformListener listener;
-	
-	MicoManager mico;
+
+    segbot_arm_manipulation::Mico mico;
 
  
 public:
