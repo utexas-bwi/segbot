@@ -75,11 +75,9 @@ int main(int argc, char **argv) {
 		for (unsigned int i = 0; i < tabletop_response.cloud_clusters.size(); i++){
 			obstacle_clouds.push_back(tabletop_response.cloud_clusters.at(i));
 		}
-		
-		segbot_arm_manipulation::setArmObstacles(n,obstacle_clouds);
-		
+
 		//now, move the arm to the goal -- it should avoid the obstacles
-		bool resp = mico.move_to_pose_moveit(goal_pose);
+		bool resp = mico.move_to_pose_moveit(goal_pose, obstacle_clouds);
 		
 		//Step 3: ask user to place an obstacle on the table between the two positions
 		pressEnter("Place or remove an obstacle and press 'Enter'");
@@ -104,7 +102,7 @@ int main(int argc, char **argv) {
 		}
 		
 		//now, move the arm to the goal -- it should avoid the obstacles
-		bool resp2 = mico.move_to_pose_moveit(start_pose);
+		bool resp2 = mico.move_to_pose_moveit(start_pose, obstacle_clouds);
 	
 	}
 }

@@ -189,7 +189,7 @@ int main(int argc, char **argv) {
 
 	//Step 3: get the table scene and target object
 	mico->move_home();
-	segbot_arm_manipulation::arm_side_view(n);
+	mico->move_to_side_view();
 	
 	bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
 	if (!table_scene.is_plane_found){

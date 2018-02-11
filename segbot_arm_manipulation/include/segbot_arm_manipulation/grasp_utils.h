@@ -64,9 +64,6 @@ struct GraspCartesianCommand {
 namespace segbot_arm_manipulation {
 	namespace grasp_utils {
 		
-		double quat_angular_difference(geometry_msgs::Quaternion c,geometry_msgs::Quaternion d);
-	
-		
 		Eigen::Matrix3d reorderHandAxes(const Eigen::Matrix3d& Q);
 		
 		bool checkPlaneConflict(GraspCartesianCommand gcc, Eigen::Vector4f plane_c, float min_distance_to_plane);

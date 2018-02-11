@@ -6,41 +6,31 @@
 
 #include <pcl/common/common.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <pcl/point_cloud.h>
 #include <pcl/console/parse.h>
-#include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
 #include <pcl/sample_consensus/sac_model_plane.h>
 #include <pcl/common/time.h>
-#include <pcl/common/common.h>
 
 #include <pcl/filters/crop_box.h>
 #include <pcl/filters/passthrough.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/extract_indices.h>
 
-#include <pcl/ModelCoefficients.h>
 #include <pcl/sample_consensus/method_types.h>
-#include <pcl/sample_consensus/model_types.h>
 #include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/segmentation/extract_clusters.h>
 
-#include <pcl/kdtree/kdtree.h>
 
-#include <pcl_conversions/pcl_conversions.h>
 
 #include <sensor_msgs/JointState.h>
 #include <geometry_msgs/PoseStamped.h>
 
 //tf stuff
 #include <tf/transform_listener.h>
-#include <tf/tf.h>
-#include <tf/transform_datatypes.h>
 #include <tf_conversions/tf_eigen.h>
 #include <tf/transform_broadcaster.h>
 
 #include "agile_grasp/Grasps.h"
-#include "agile_grasp/Grasp.h"
 
 struct GraspCartesianCommand {
     sensor_msgs::JointState approach_q;
@@ -53,18 +43,6 @@ struct GraspCartesianCommand {
 
 namespace segbot_arm_manipulation {
     namespace grasp_utils {
-
-        double quat_angular_difference(geometry_msgs::Quaternion c,geometry_msgs::Quaternion d){
-            Eigen::Vector4f dv;
-            dv[0] = d.w; dv[1] = d.x; dv[2] = d.y; dv[3] = d.z;
-            Eigen::Matrix<float, 3,4> inv;
-            inv(0,0) = -c.x; inv(0,1) = c.w; inv(0,2) = -c.z; inv(0,3) = c.y;
-            inv(1,0) = -c.y; inv(1,1) = c.z; inv(1,2) = c.w;	inv(1,3) = -c.x;
-            inv(2,0) = -c.z; inv(2,1) = -c.y;inv(2,2) = c.x;  inv(2,3) = c.w;
-
-            Eigen::Vector3f m = inv * dv * -2.0;
-            return m.norm();
-        }
 
 
         Eigen::Matrix3d reorderHandAxes(const Eigen::Matrix3d& Q)
@@ -92,13 +70,9 @@ namespace segbot_arm_manipulation {
             p_g.y=gcc.grasp_pose.pose.position.y;
             p_g.z=gcc.grasp_pose.pose.position.z;
 
-            if (pcl::pointToPlaneDistance(p_a, plane_c) < min_distance_to_plane
-                || pcl::pointToPlaneDistance(p_g, plane_c) < min_distance_to_plane){
+            return !(pcl::pointToPlaneDistance(p_a, plane_c) < min_distance_to_plane
+                     || pcl::pointToPlaneDistance(p_g, plane_c) < min_distance_to_plane);
 
-                return false;
-            }
-
-            return true;
         };
 
 

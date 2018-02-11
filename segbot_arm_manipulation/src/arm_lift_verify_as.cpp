@@ -1,10 +1,4 @@
 #include <ros/ros.h>
-#include <signal.h>
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <cstdlib>
-#include <stdlib.h>
 #include <std_msgs/String.h>
 
 #include <Eigen/Dense>
@@ -50,11 +44,13 @@
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
+#include <segbot_arm_manipulation/MicoManager.h>
 
 #define FINGER_FULLY_OPENED 6
 #define FINGER_FULLY_CLOSED 7300
 
 #define NUM_JOINTS 8 //6+2 for the arm
+
 
 typedef pcl::PointXYZRGB PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
@@ -73,48 +69,16 @@ protected:
   //messages to publish feedback and result of action
   segbot_arm_manipulation::LiftVerifyFeedback feedback_;
   segbot_arm_manipulation::LiftVerifyResult result_;
-  
-  
-  ros::Subscriber sub_angles;
-  ros::Subscriber sub_torques;
-  ros::Subscriber sub_tool;
-  ros::Subscriber sub_finger;
-  ros::Subscriber sub_wrench;
-  
-  sensor_msgs::JointState current_state;
-  kinova_msgs::FingerPosition current_finger;
-  geometry_msgs::PoseStamped current_pose;
-  geometry_msgs::WrenchStamped current_wrench;
-  
-  bool heardPose;
-  bool heardJoinstState;
-  bool heardWrench;
-  bool heardEffort;
-  
+
+	MicoManager mico;
   int num_bins;
  
 public:
 
   LiftVerifyActionServer(std::string name) :
     as_(nh_, name, boost::bind(&LiftVerifyActionServer::executeCB, this, _1), false),
-    action_name_(name)
+    action_name_(name), mico(nh_)
   {
-	heardPose = false;
-	heardJoinstState = false;
-	heardWrench = false;
-	heardEffort = false;
-
-	//create subscriber to joint angles
-	sub_angles = nh_.subscribe ("/m1n6s200_driver/out/joint_state", 1, &LiftVerifyActionServer::joint_state_cb, this);
-
-	//create subscriber to tool position topic
-	sub_tool = nh_.subscribe("/m1n6s200_driver/out/tool_pose", 1, &LiftVerifyActionServer::toolpos_cb, this);
-
-	//subscriber for fingers
-	sub_finger = nh_.subscribe("/m1n6s200_driver/out/finger_position", 1, &LiftVerifyActionServer::fingers_cb, this);
-	  
-	//subscriber for wrench
-	sub_wrench = nh_.subscribe("/m1n6s200_driver/out/tool_wrench", 1, &LiftVerifyActionServer::wrench_cb, this);
 	
 	ROS_INFO("Lift and verify action has started");
 	
@@ -124,48 +88,6 @@ public:
   ~LiftVerifyActionServer(void)
   {
   }
-  
-  //Joint state cb
-	void joint_state_cb (const sensor_msgs::JointStateConstPtr& input) {
-		if (input->position.size() == NUM_JOINTS){
-			current_state = *input;
-			heardJoinstState = true;
-		}
-	}
-	
-	//tool position cb
-	void toolpos_cb (const geometry_msgs::PoseStamped &msg) {
-	  current_pose = msg;
-	  heardPose = true;
-	}
-
-	//fingers state cb
-	void fingers_cb (const kinova_msgs::FingerPosition msg) {
-	  current_finger = msg;
-	}
-
-	//Callback for toolwrench 
-	void wrench_cb(const geometry_msgs::WrenchStamped &msg){ 
-		current_wrench = msg;
-		heardWrench = true;
-	}
-	
-	//wait for updated data
-	void listenForArmData(float rate){
-		heardPose = false;
-		heardJoinstState = false;
-		heardWrench = false;
-		ros::Rate r(rate);
-		
-		while (ros::ok()){
-			ros::spinOnce();
-			
-			if (heardPose && heardJoinstState && heardWrench)
-				return;
-			
-			r.sleep();
-		}
-	}	
 	
 	std::vector<double> get_color_hist(PointCloudT desired_cloud, int dim){ 
 		//get a color histogram and save it as a one dimensional vector for comparison
@@ -224,14 +146,14 @@ public:
 	
 	bool down_force(double goal_down_force){
 		//compares the downward force after grabbing the object to the expected force without an object
-		 listenForArmData(30.0);
+		 mico.wait_for_data();
 		 
 		 bool greater_force = false;
 		 double threshold = 0.2;
 		 
-		 listenForArmData(30.0);
+		 mico.wait_for_data();
 		 
-		 double diff = current_wrench.wrench.force.z - goal_down_force; 
+		 double diff = mico.current_wrench.wrench.force.z - goal_down_force;
 		 
 		 if(diff>threshold){ 
 			 ROS_INFO("force test succeeded");
@@ -244,10 +166,10 @@ public:
 	
 	bool fingers_open(){ 
 		//if the fingers are within some distance to closed, the arm didn't grab the object
-		 listenForArmData(30.0);
+		 mico.wait_for_data();
 		 double tolerance = 120;
-		 double finger1_diff = (double) abs(current_finger.finger1 - FINGER_FULLY_CLOSED); 
-		 double finger2_diff = (double) abs(current_finger.finger2 - FINGER_FULLY_CLOSED);
+		 double finger1_diff = (double) abs(mico.current_finger.finger1 - FINGER_FULLY_CLOSED);
+		 double finger2_diff = (double) abs(mico.current_finger.finger2 - FINGER_FULLY_CLOSED);
 		 
 		 if(finger1_diff < tolerance && finger2_diff < tolerance){
 			 ROS_WARN("fingers test failed");
@@ -294,7 +216,7 @@ public:
 	
 	void executeCB(const segbot_arm_manipulation::LiftVerifyGoalConstPtr  &goal){
 		
-		listenForArmData(30.0);
+		mico.wait_for_data();
 		
 		if (as_.isPreemptRequested() || !ros::ok()){
 			ROS_INFO("Lift verification: Preempted");
@@ -305,7 +227,7 @@ public:
 			return;
         }
 		
-		segbot_arm_manipulation::arm_side_view(nh_);
+		mico.move_to_side_view();
 		
 		//expected downward force, must be changed for new arm locations
 		double goal_down_force = 0.9;

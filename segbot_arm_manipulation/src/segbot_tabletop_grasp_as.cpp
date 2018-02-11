@@ -294,7 +294,7 @@ public:
             //find the grasp with closest orientatino to current pose
             double min_diff = 1000000.0;
             for (unsigned int i = 0; i < grasp_commands.size(); i++) {
-                double d_i = segbot_arm_manipulation::grasp_utils::quat_angular_difference(
+                double d_i = segbot_arm_manipulation::quat_angular_difference(
                         grasp_commands.at(i).approach_pose.pose.orientation, mico.current_pose.pose.orientation);
 
                 ROS_INFO("Distance for pose %i:\t%f", (int) i, d_i);

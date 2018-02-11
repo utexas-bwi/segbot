@@ -156,37 +156,8 @@ bool MicoManager::move_to_pose(const geometry_msgs::PoseStamped &pose) {
 
 }
 
-kinova_msgs::JointAngles state_to_angles(const sensor_msgs::JointState &state) {
-    //check if this is specified just for the arm
-    sensor_msgs::JointState just_arm;
-    if (state.position.size() > NUM_JOINTS) {
-        //in this case, the first four values are for the base joints
-        for (int i = 4; i < state.position.size(); i++) {
-            just_arm.position.push_back(state.position.at(i));
-            just_arm.name.push_back(state.name.at(i));
-        }
-        just_arm.header = state.header;
-    } else {
-        just_arm = state;
-    }
-    kinova_msgs::JointAngles as_angles;
-
-    for (int i = 0; i < NUM_JOINTS; i++) {
-        as_angles.joint1 = just_arm.position.at(0);
-        as_angles.joint2 = just_arm.position.at(1);
-        as_angles.joint3 = just_arm.position.at(2);
-        as_angles.joint4 = just_arm.position.at(3);
-        as_angles.joint5 = just_arm.position.at(4);
-        as_angles.joint6 = just_arm.position.at(5);
-    }
-    return as_angles;
-}
-
-
-
-
 bool MicoManager::move_to_joint_state(const sensor_msgs::JointState &target) {
-    return move_to_joint_state(state_to_angles(target));
+    return move_to_joint_state(segbot_arm_manipulation::state_to_angles(target));
 }
 
 
@@ -322,7 +293,7 @@ bool MicoManager::move_to_joint_state_moveit(const sensor_msgs::JointState &targ
                                              const vector<sensor_msgs::PointCloud2> &obstacles,
                                              const moveit_msgs::Constraints &constraints) {
 
-    return move_to_joint_state_moveit(state_to_angles(target), obstacles, constraints);
+    return move_to_joint_state_moveit(segbot_arm_manipulation::state_to_angles(target), obstacles, constraints);
 }
 
 

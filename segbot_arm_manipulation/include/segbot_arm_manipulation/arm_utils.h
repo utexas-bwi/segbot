@@ -2,13 +2,7 @@
 #define ARM_UTILS_H
 
 #include <ros/ros.h>
-#include <ros/package.h>
-#include <signal.h>
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <cstdlib>
-#include <std_msgs/String.h>
+
 
 //actions
 #include <actionlib/client/simple_action_client.h>
@@ -40,9 +34,6 @@
 #define CLOSED_FINGER_VALUE 7200
 #define NUM_JOINTS 8
 
-
-#define PI 3.14159265
-
 using namespace std;
 
 const string jointNames[] = {"m1n6s200_joint_1", "m1n6s200_joint_2", "m1n6s200_joint_3", "m1n6s200_joint_4",
@@ -63,36 +54,19 @@ namespace segbot_arm_manipulation {
     typedef pcl::PointCloud<PointT> PointCloudT;
 
 
-    sensor_msgs::JointState valuesToJointState(std::vector<float> joint_values);
+    sensor_msgs::JointState values_to_joint_state(std::vector<float> joint_values);
 
     std::vector<double> getJointAngleDifferences(sensor_msgs::JointState A, sensor_msgs::JointState B);
 
-    bool makeSafeForTravel(ros::NodeHandle n);
-
-    void homeArm(ros::NodeHandle n);
-
-    bool setArmObstacles(ros::NodeHandle n, std::vector<sensor_msgs::PointCloud2> clouds);
-
-    bwi_moveit_utils::MicoMoveitCartesianPose::Response
-    moveToPoseMoveIt(ros::NodeHandle n, geometry_msgs::PoseStamped p_target);
+    std::vector<double> getJointAngleDifferences(kinova_msgs::JointAngles A, kinova_msgs::JointAngles B);
 
     // put the boxes around the collision objects
     std::vector<moveit_msgs::CollisionObject>
     get_collision_boxes(std::vector<sensor_msgs::PointCloud2> obstacles);
 
+    kinova_msgs::JointAngles state_to_angles(const sensor_msgs::JointState &state);
 
-    void moveToJointState(ros::NodeHandle n, sensor_msgs::JointState target);
 
-    void moveToPoseJaco(geometry_msgs::PoseStamped g);
-
-    void openHand();
-
-    void closeHand();
-
-    void arm_side_view(ros::NodeHandle n);
-
-    void arm_handover_view(ros::NodeHandle n);
-
-    moveit_msgs::GetPositionIK::Response computeIK(ros::NodeHandle n, geometry_msgs::PoseStamped p);
+    double quat_angular_difference(const geometry_msgs::Quaternion &a, const geometry_msgs::Quaternion &b);
 }
 #endif

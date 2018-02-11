@@ -1,27 +1,34 @@
-
 #include <vector>
 #include <sensor_msgs/JointState.h>
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <pcl/point_cloud.h>
 
 namespace segbot_arm_manipulation {
-    std::vector<double>
-    getJointAngleDifferences(sensor_msgs::JointState A, sensor_msgs::JointState B) {
+    std::vector<double> getJointAngleDifferences(sensor_msgs::JointState A, sensor_msgs::JointState B) {
+        return segbot_arm_manipulation::getJointAngleDifferences(segbot_arm_manipulation::state_to_angles(A), segbot_arm_manipulation::state_to_angles(B));
+    }
+
+    std::vector<double> getJointAngleDifferences(kinova_msgs::JointAngles A, kinova_msgs::JointAngles B) {
         std::vector<double> result;
         std::set<string> arm_joints;
         arm_joints.insert(std::begin(jointNames), std::end(jointNames));
         std::map<string, double> a_pos;
         std::map<string, double> b_pos;
-        for(int i = 0; i < A.name.size(); i++) {
-            a_pos.insert(std::pair<string, double>(A.name.at(i), A.position.at(i)));
-        }
-        for(int i = 0; i < B.name.size(); i++) {
-            b_pos.insert(std::pair<string, double>(B.name.at(i), B.position.at(i)));
-        }
+        a_pos.insert(std::pair<string, double>(jointNames[0], A.joint1));
+        a_pos.insert(std::pair<string, double>(jointNames[1], A.joint2));
+        a_pos.insert(std::pair<string, double>(jointNames[2], A.joint3));
+        a_pos.insert(std::pair<string, double>(jointNames[3], A.joint4));
+        a_pos.insert(std::pair<string, double>(jointNames[4], A.joint5));
+        a_pos.insert(std::pair<string, double>(jointNames[5], A.joint6));
+
+        b_pos.insert(std::pair<string, double>(jointNames[0], B.joint1));
+        b_pos.insert(std::pair<string, double>(jointNames[1], B.joint2));
+        b_pos.insert(std::pair<string, double>(jointNames[2], B.joint3));
+        b_pos.insert(std::pair<string, double>(jointNames[3], B.joint4));
+        b_pos.insert(std::pair<string, double>(jointNames[4], B.joint5));
+        b_pos.insert(std::pair<string, double>(jointNames[5], B.joint6));
 
         for (unsigned int i = 0; i < arm_joints.size(); i++) {
             std::string name = jointNames[i];
-            assert(a_pos.count(name) == 1 && b_pos.count(name) == 1);
             double a_p = a_pos[name];
             double b_p = b_pos[name];
 
@@ -45,57 +52,6 @@ namespace segbot_arm_manipulation {
             result.push_back(d);
         }
         return result;
-    }
-
-    bool makeSafeForTravel(ros::NodeHandle n) {
-        ros::ServiceClient safety_client = n.serviceClient<bwi_moveit_utils::MicoNavSafety>("/mico_nav_safety");
-        safety_client.waitForExistence();
-        bwi_moveit_utils::MicoNavSafety srv_safety;
-        srv_safety.request.getSafe = true;
-
-        if (safety_client.call(srv_safety)) {
-
-            return srv_safety.response.safe;
-        } else {
-            ROS_ERROR("Failed to call safety service....aborting");
-            return false;
-        }
-    }
-
-    bool setArmObstacles(ros::NodeHandle n, std::vector<sensor_msgs::PointCloud2> clouds) {
-        ros::ServiceClient client_set_obstalces = n.serviceClient<bwi_perception::SetObstacles>(
-                "bwi_perception/set_obstacles");
-
-        bwi_perception::SetObstacles srv_obstacles;
-        for (unsigned int i = 0; i < clouds.size(); i++) {
-            srv_obstacles.request.clouds.push_back(clouds.at(i));
-        }
-
-        if (client_set_obstalces.call(srv_obstacles)) {
-            ROS_INFO("[demo_obstacle_avoidance.cpp] Obstacles set");
-            return true;
-        } else {
-            ROS_ERROR("Failed to call service bwi_perception/set_obstacles");
-            return false;
-        }
-    }
-
-    bwi_moveit_utils::MicoMoveitCartesianPose::Response
-    moveToPoseMoveIt(ros::NodeHandle n, geometry_msgs::PoseStamped p_target) {
-        bwi_moveit_utils::MicoMoveitCartesianPose::Request req;
-        bwi_moveit_utils::MicoMoveitCartesianPose::Response res;
-
-        req.target = p_target;
-
-        ros::ServiceClient client = n.serviceClient<bwi_moveit_utils::MicoMoveitCartesianPose>(
-                "/mico_cartesianpose_service");
-        if (client.call(req, res)) {
-            ROS_INFO("MoveToPoseMoveIt Call successful. Response:");
-        } else {
-            ROS_ERROR("MoveToPoseMoveIt Call failed. Terminating.");
-        }
-
-        return res;
     }
 
     std::vector<moveit_msgs::CollisionObject>
@@ -160,135 +116,8 @@ namespace segbot_arm_manipulation {
         return collision_objects;
     }
 
-    void moveToJointState(ros::NodeHandle n, sensor_msgs::JointState target) {
-        //check if this is specified just for the arm
-        sensor_msgs::JointState q_target;
-        if (target.position.size() > NUM_JOINTS) {
-            //in this case, the first four values are for the base joints
-            for (int i = 4; i < target.position.size(); i++) {
-                q_target.position.push_back(target.position.at(i));
-                q_target.name.push_back(target.name.at(i));
-            }
-            q_target.header = target.header;
-        } else
-            q_target = target;
 
-        /*ROS_INFO("Target joint state:");
-        ROS_INFO_STREAM(q_target);
-        pressEnter();*/
-
-        bwi_moveit_utils::AngularVelCtrl::Request req;
-        bwi_moveit_utils::AngularVelCtrl::Response resp;
-
-        ros::ServiceClient ikine_client = n.serviceClient<bwi_moveit_utils::AngularVelCtrl>("/angular_vel_control");
-
-        req.state = q_target;
-
-
-        if (ikine_client.call(req, resp)) {
-            ROS_INFO("Call successful. Response:");
-            ROS_INFO_STREAM(resp);
-        } else {
-            ROS_ERROR("Call failed. Terminating.");
-            //ros::shutdown();
-        }
-
-    }
-
-    void moveToPoseJaco(geometry_msgs::PoseStamped g) {
-        actionlib::SimpleActionClient<kinova_msgs::ArmPoseAction> ac(pose_action_topic, true);
-
-        kinova_msgs::ArmPoseGoal goalPose;
-        goalPose.pose = g;
-
-        ac.waitForServer();
-
-        //finally, send goal and wait
-        ac.sendGoal(goalPose);
-        ac.waitForResult();
-    }
-
-    void moveFingers(int finger_value1, int finger_value2) {
-        actionlib::SimpleActionClient<kinova_msgs::SetFingersPositionAction> ac(finger_action_topic, true);
-
-        kinova_msgs::SetFingersPositionGoal goalFinger;
-        goalFinger.fingers.finger1 = finger_value1;
-        goalFinger.fingers.finger2 = finger_value2;
-        // Not used for our arm
-        goalFinger.fingers.finger3 = 0;
-
-        ac.waitForServer();
-        ac.sendGoal(goalFinger);
-        ac.waitForResult();
-    }
-
-    void moveFingers(int finger_value) {
-        actionlib::SimpleActionClient<kinova_msgs::SetFingersPositionAction> ac(finger_action_topic, true);
-
-        kinova_msgs::SetFingersPositionGoal goalFinger;
-        goalFinger.fingers.finger1 = finger_value;
-        goalFinger.fingers.finger2 = finger_value;
-        // Not used for our arm
-        goalFinger.fingers.finger3 = 0;
-
-        ac.waitForServer();
-        ac.sendGoal(goalFinger);
-        ac.waitForResult();
-    }
-
-    void openHand() {
-        moveFingers(OPEN_FINGER_VALUE);
-    }
-
-    void closeHand() {
-        moveFingers(CLOSED_FINGER_VALUE);
-    }
-
-    void arm_side_view(ros::NodeHandle n) {
-        std::string j_pos_filename =
-                ros::package::getPath("segbot_arm_manipulation") + "/data/jointspace_position_db.txt";
-        std::string c_pos_filename =
-                ros::package::getPath("segbot_arm_manipulation") + "/data/toolspace_position_db.txt";
-
-        ArmPositionDB *positionDB;
-        positionDB = new ArmPositionDB(j_pos_filename, c_pos_filename);
-        positionDB->print();
-
-        if (positionDB->hasCarteseanPosition("side_view")) {
-            ROS_INFO("Moving arm to side view...");
-            geometry_msgs::PoseStamped out_of_view_pose = positionDB->getToolPositionStamped("side_view",
-                                                                                             "/m1n6s200_link_base");
-            moveToPoseMoveIt(n, out_of_view_pose);
-        } else {
-            ROS_ERROR("[arm_utils] Cannot move arm to side view!");
-        }
-    }
-
-
-    void arm_handover_view(ros::NodeHandle n) {
-        std::string j_pos_filename =
-                ros::package::getPath("segbot_arm_manipulation") + "/data/jointspace_position_db.txt";
-        std::string c_pos_filename =
-                ros::package::getPath("segbot_arm_manipulation") + "/data/toolspace_position_db.txt";
-
-        ArmPositionDB *positionDB;
-        positionDB = new ArmPositionDB(j_pos_filename, c_pos_filename);
-        positionDB->print();
-
-        if (positionDB->hasCarteseanPosition("handover_front")) {
-            geometry_msgs::PoseStamped handover_pose = positionDB->getToolPositionStamped("handover_front",
-                                                                                          "m1n6s200_link_base");
-
-            ROS_INFO("Moving to handover position");
-
-            moveToPoseMoveIt(n, handover_pose);
-        } else {
-            ROS_ERROR("[arm_utils] cannot move to the handover position!");
-        }
-
-    }
-
-    sensor_msgs::JointState valuesToJointState(std::vector<float> joint_values) {
+    sensor_msgs::JointState values_to_joint_state(std::vector<float> joint_values) {
         sensor_msgs::JointState js;
 
         for (unsigned int i = 0; i < 8; i++) {
@@ -306,34 +135,39 @@ namespace segbot_arm_manipulation {
         return js;
     }
 
-    void homeArm(ros::NodeHandle n) {
-        ros::ServiceClient home_client = n.serviceClient<kinova_msgs::HomeArm>("/m1n6s200_driver/in/home_arm");
-
-        kinova_msgs::HomeArm srv;
-        if (home_client.call(srv))
-            ROS_INFO("Homing arm");
-        else
-            ROS_INFO("Cannot contact homing service. Is it running?");
-    }
-
-    moveit_msgs::GetPositionIK::Response
-    computeIK(ros::NodeHandle n, geometry_msgs::PoseStamped p) {
-
-        ros::ServiceClient ikine_client = n.serviceClient<moveit_msgs::GetPositionIK>("/compute_ik");
 
 
-        moveit_msgs::GetPositionIK::Request ikine_request;
-        moveit_msgs::GetPositionIK::Response ikine_response;
-        ikine_request.ik_request.group_name = "arm";
-        ikine_request.ik_request.pose_stamped = p;
+    kinova_msgs::JointAngles state_to_angles(const sensor_msgs::JointState &state) {
+        //check if this is specified just for the arm
 
-        /* Call the service */
-        if (ikine_client.call(ikine_request, ikine_response)) {
-            return ikine_response;
-        } else {
-            ROS_ERROR("IK service call FAILED. Exiting");
-            return ikine_response;
+        std::map<string, double> joint_pos;
+        for(int i = 0; i < state.name.size(); i++) {
+            joint_pos.insert(std::pair<string, double>(state.name.at(i), state.position.at(i)));
         }
+
+        kinova_msgs::JointAngles as_angles;
+        as_angles.joint1 = joint_pos[jointNames[0]];
+        as_angles.joint2 = joint_pos[jointNames[1]];
+        as_angles.joint3 = joint_pos[jointNames[2]];
+        as_angles.joint4 = joint_pos[jointNames[3]];
+        as_angles.joint5 = joint_pos[jointNames[4]];
+        as_angles.joint6 = joint_pos[jointNames[5]];
+
+        return as_angles;
     }
+
+
+    double quat_angular_difference(const geometry_msgs::Quaternion &a, const geometry_msgs::Quaternion &b){
+        Eigen::Vector4f dv;
+        dv[0] = b.w; dv[1] = b.x; dv[2] = b.y; dv[3] = b.z;
+        Eigen::Matrix<float, 3,4> inv;
+        inv(0,0) = -a.x; inv(0,1) = a.w; inv(0,2) = -a.z; inv(0,3) = a.y;
+        inv(1,0) = -a.y; inv(1,1) = a.z; inv(1,2) = a.w;	inv(1,3) = -a.x;
+        inv(2,0) = -a.z; inv(2,1) = -a.y;inv(2,2) = a.x;  inv(2,3) = a.w;
+
+        Eigen::Vector3f m = inv * dv * -2.0;
+        return m.norm();
+    }
+
 
 }
