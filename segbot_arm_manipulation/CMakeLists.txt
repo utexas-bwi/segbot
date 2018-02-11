@@ -147,6 +147,14 @@ add_executable(test_handover_replacement src/demos/test_handover_replacement.cpp
 target_link_libraries(test_handover_replacement arm_utilities ${catkin_LIBRARIES} )
 add_dependencies(test_handover_replacement arm_utilities segbot_arm_manipulation_gencpp)
 
+add_executable(trajectory_record src/trajectory_record.cpp)
+add_dependencies(trajectory_record segbot_arm_manipulation_gencpp)
+target_link_libraries(trajectory_record ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(position_record src/position_record.cpp)
+add_dependencies(position_record segbot_arm_manipulation_gencpp)
+target_link_libraries(position_record ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
 install(PROGRAMS
         scripts/arm_actions.py
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
