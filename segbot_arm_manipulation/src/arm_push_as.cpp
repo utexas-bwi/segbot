@@ -1,13 +1,11 @@
 #include <ros/ros.h>
 
-
 #include <sensor_msgs/JointState.h>
 #include <kinova_msgs/PoseVelocity.h>
 #include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <segbot_arm_manipulation/arm_utils.h>
 #include <bwi_manipulation/grasp_utils.h>
-
 
 //actions
 #include <actionlib/client/simple_action_client.h>
@@ -25,6 +23,7 @@
 
 
 #include <segbot_arm_manipulation/Mico.h>
+#include <pcl/sample_consensus/sac_model_plane.h>
 
 #define MIN_DISTANCE_TO_PLANE 0.05
 

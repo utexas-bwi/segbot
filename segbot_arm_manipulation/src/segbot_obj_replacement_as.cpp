@@ -38,6 +38,7 @@
 
 #include <bwi_manipulation/grasp_utils.h>
 #include <segbot_arm_manipulation/arm_utils.h>
+#include <agile_grasp/Grasps.h>
 
 
 /* define what kind of point clouds we're using */

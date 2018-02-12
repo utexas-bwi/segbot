@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
         agile_grasp
         bwi_manipulation
         bwi_moveit_utils
+        bwi_perception
         geometry_msgs
         kinova_driver
         kinova_msgs
@@ -24,7 +25,6 @@ find_package(catkin REQUIRED COMPONENTS
         std_msgs
         sensor_msgs
         sound_play
-        bwi_perception
         tf_conversions
         )
 
@@ -81,7 +81,7 @@ target_link_libraries(arm_utilities ${catkin_LIBRARIES})
 
 
 add_executable(segbot_tabletop_grasp_as src/segbot_tabletop_grasp_as.cpp)
-add_dependencies(segbot_tabletop_grasp_as   segbot_arm_manipulation_gencpp ${catkin_EXPORTED_TARGETS})
+add_dependencies(segbot_tabletop_grasp_as segbot_arm_manipulation_gencpp ${catkin_EXPORTED_TARGETS})
 target_link_libraries(segbot_tabletop_grasp_as arm_utilities ${catkin_LIBRARIES})
 
 add_executable(arm_lift_verify_as src/arm_lift_verify_as.cpp)

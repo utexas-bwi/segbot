@@ -1,23 +1,20 @@
 #include <ros/ros.h>
-
-#include <segbot_arm_manipulation/Mico.h>
 #include <bwi_manipulation/grasp_utils.h>
+#include <bwi_manipulation/GraspCartesianCommand.h>
+#include "bwi_perception/TabletopPerception.h"
+#include <segbot_arm_manipulation/Mico.h>
 #include <segbot_arm_manipulation/arm_utils.h>
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
-
 
 //actions
 #include <actionlib/server/simple_action_server.h>
 
-
 //srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
-
 #include <moveit_msgs/DisplayRobotState.h>
-// Kinematics
 #include <moveit_msgs/GetPositionFK.h>
-
 #include <geometry_msgs/PoseArray.h>
+#include <bwi_perception/BoundingBox.h>
+#include <agile_grasp/Grasps.h>
 
 //the action definition
 
@@ -39,6 +36,7 @@
 typedef pcl::PointXYZRGB PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
 
+using namespace bwi_manipulation;
 
 class TabletopGraspActionServer {
 protected:
@@ -112,7 +110,7 @@ public:
         }
     }
 
-    bool passesFilter(const std::string &filterName, const GraspCartesianCommand &gc) {
+    bool passesFilter(const std::string &filterName, const bwi_manipulation::GraspCartesianCommand &gc) {
 
         tf::Quaternion q(gc.approach_pose.pose.orientation.x,
                          gc.approach_pose.pose.orientation.y,
@@ -165,7 +163,7 @@ public:
         std::vector<GraspCartesianCommand> grasp_commands;
 
         for (const auto &grasp: current_grasps.grasps) {
-            GraspCartesianCommand gc = bwi_manipulation::grasp_utils::grasp_command_from_agile_grasp(
+            GraspCartesianCommand gc = bwi_manipulation::GraspCartesianCommand::from_agile_grasp(
                     grasp, HAND_OFFSET_APPROACH, HAND_OFFSET_GRASP, frame_id);
             grasp_commands.push_back(gc);
         }
@@ -178,18 +176,16 @@ public:
     generate_heuristic_grasps(const PointCloudT::Ptr &target_cloud, const std::string &frame_id) {
 
         std::vector<GraspCartesianCommand> grasp_commands;
-        Eigen::Vector4f centroid;
-        pcl::compute3DCentroid(*target_cloud, centroid);
-        Eigen::Vector4f min;
-        Eigen::Vector4f max;
-        pcl::getMinMax3D(*target_cloud, min, max);
-
+        auto boundingBox = bwi_perception::BoundingBox::from_cloud<PointT>(target_cloud);
+        // Move from the sensor frame to the arm base frame
+        bwi_perception::BoundingBox::transform("m1n6s200_link_base", boundingBox, boundingBox);
         geometry_msgs::PoseStamped grasp_pose;
 
         grasp_pose.header.frame_id = frame_id;
-        grasp_pose.pose.position.x = centroid[0];
-        grasp_pose.pose.position.y = centroid[1];
-        grasp_pose.pose.position.z = centroid[2];
+        // Center along the Y and Z, but along the bounding edge for the X
+        grasp_pose.pose.position.x = boundingBox.min.x();
+        grasp_pose.pose.position.y = boundingBox.position.y();
+        grasp_pose.pose.position.z = boundingBox.position.z();
 
         // The end effector frame has z extending along the finger tips. Here
         // we set roll pitch yaw with respect to the link base axes, which have the x axis extending
@@ -198,13 +194,12 @@ public:
         tf::Stamped<tf::Quaternion> quat;
         quat.setRPY(0.0, M_PI / 2, 0);
         quat.frame_id_ = "m1n6s200_link_base";
-        listener.transformQuaternion(frame_id, quat, quat);
 
         geometry_msgs::QuaternionStamped quat_stamped;
         tf::quaternionStampedTFToMsg(quat, quat_stamped);
         grasp_pose.pose.orientation = quat_stamped.quaternion;
 
-        GraspCartesianCommand gc = bwi_manipulation::grasp_utils::grasp_command_from_grasp_pose(grasp_pose);
+        auto gc = GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH);
         grasp_commands.push_back(gc);
 
         return grasp_commands;

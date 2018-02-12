@@ -4,6 +4,7 @@ project(mimic_motion)
 add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
+        agile_grasp
   bwi_moveit_utils
   bwi_perception
   geometry_msgs
@@ -30,7 +31,7 @@ link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
 catkin_package(
-  DEPENDS bwi_perception
+        DEPENDS
 )
 
 include_directories(
