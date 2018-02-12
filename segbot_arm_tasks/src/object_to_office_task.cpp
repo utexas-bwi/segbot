@@ -24,7 +24,6 @@
 #include <move_base_msgs/MoveBaseAction.h>
 
 
-#include <bwi_moveit_utils/MicoNavSafety.h>
 #include <segbot_arm_manipulation/HandoverAction.h>
 
 typedef pcl::PointXYZRGB PointT;

@@ -15,9 +15,10 @@
 #include <moveit/robot_state/conversions.h>
 #include <geometry_msgs/WrenchStamped.h>
 
-#include <bwi_moveit_utils/MicoNavSafety.h>
-#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
-#include <bwi_moveit_utils/MicoMoveitWaypoint.h>
+#include <bwi_moveit_utils/NavSafety.h>
+#include <bwi_moveit_utils/MoveitCartesianPose.h>
+#include <bwi_moveit_utils/MoveitJointPose.h>
+#include <bwi_moveit_utils/MoveitWaypoint.h>
 
 using namespace std;
 
@@ -33,11 +34,10 @@ namespace segbot_arm_manipulation {
         //finger positions
         finger_sub = n.subscribe(finger_position_topic, 1, &Mico::fingers_cb, this);
         home_client = n.serviceClient<kinova_msgs::HomeArm>(home_arm_service);
-        safety_client = n.serviceClient<bwi_moveit_utils::MicoNavSafety>("/mico_nav_safety");
-        pose_moveit_client = n.serviceClient<bwi_moveit_utils::MicoMoveitCartesianPose>("/mico_cartesian_pose_service");
-        joint_angles_moveit_client = n.serviceClient<bwi_moveit_utils::MicoMoveitJointPose>("/mico_joint_pose_service");
-        waypoint_moveit_client = n.serviceClient<bwi_moveit_utils::MicoMoveitWaypoint>("/mico_waypoint_service");
-        joint_pose_client_old = n.serviceClient<bwi_moveit_utils::AngularVelCtrl>("/angular_vel_control");
+        safety_client = n.serviceClient<bwi_moveit_utils::NavSafety>("/nav_safety");
+        pose_moveit_client = n.serviceClient<bwi_moveit_utils::MoveitCartesianPose>("/cartesian_pose_service");
+        joint_angles_moveit_client = n.serviceClient<bwi_moveit_utils::MoveitJointPose>("/joint_pose_service");
+        waypoint_moveit_client = n.serviceClient<bwi_moveit_utils::MoveitWaypoint>("/waypoint_service");
         wrench_sub = n.subscribe("/m1n6s200_driver/out/tool_wrench", 1, &Mico::wrench_cb, this);
         ik_client = n.serviceClient<moveit_msgs::GetPositionIK>("/compute_ik");
         add_waypoint_client = n.serviceClient<kinova_msgs::AddPoseToCartesianTrajectory>(
@@ -166,41 +166,13 @@ namespace segbot_arm_manipulation {
 
     bool Mico::move_to_joint_state(const kinova_msgs::JointAngles &target) {
         kinova_msgs::ArmJointAnglesGoal goal;
-        goal.angles;
+        goal.angles = target;
 
         joint_state_action.waitForServer();
 
         //finally, send goal and wait
         joint_state_action.sendGoal(goal);
         return joint_state_action.waitForResult();
-
-    }
-
-    bool Mico::move_to_joint_state_old(const sensor_msgs::JointState &target) {
-        //check if this is specified just for the arm
-        sensor_msgs::JointState q_target;
-        if (target.position.size() > NUM_JOINTS) {
-            //in this case, the first four values are for the base joints
-            for (int i = 4; i < target.position.size(); i++) {
-                q_target.position.push_back(target.position.at(i));
-                q_target.name.push_back(target.name.at(i));
-            }
-            q_target.header = target.header;
-        } else {
-            q_target = target;
-        }
-
-
-        bwi_moveit_utils::AngularVelCtrl::Request req;
-        bwi_moveit_utils::AngularVelCtrl::Response resp;
-
-        req.state = q_target;
-
-        if (joint_angles_moveit_client.call(req, resp)) {
-            ROS_INFO("Call successful. Response:");
-            return resp.success;
-        }
-        return false;
 
     }
 
@@ -224,7 +196,7 @@ namespace segbot_arm_manipulation {
 
     bool Mico::make_safe_for_travel() {
         safety_client.waitForExistence();
-        bwi_moveit_utils::MicoNavSafety srv_safety;
+        bwi_moveit_utils::NavSafety srv_safety;
         srv_safety.request.getSafe = true;
 
         if (safety_client.call(srv_safety)) {
@@ -266,8 +238,8 @@ namespace segbot_arm_manipulation {
                                    const vector<sensor_msgs::PointCloud2> &obstacles,
                                    const moveit_msgs::Constraints &constraints
     ) {
-        bwi_moveit_utils::MicoMoveitCartesianPose::Request req;
-        bwi_moveit_utils::MicoMoveitCartesianPose::Response res;
+        bwi_moveit_utils::MoveitCartesianPose::Request req;
+        bwi_moveit_utils::MoveitCartesianPose::Response res;
 
         vector<moveit_msgs::CollisionObject> moveit_obstacles = segbot_arm_manipulation::get_collision_boxes(obstacles);
 
@@ -281,12 +253,20 @@ namespace segbot_arm_manipulation {
     bool Mico::move_to_joint_state_moveit(const kinova_msgs::JointAngles &target,
                                           const vector<sensor_msgs::PointCloud2> &obstacles,
                                           const moveit_msgs::Constraints &constraints) {
-        bwi_moveit_utils::MicoMoveitJointPose::Request req;
-        bwi_moveit_utils::MicoMoveitJointPose::Response res;
+        bwi_moveit_utils::MoveitJointPose::Request req;
+        bwi_moveit_utils::MoveitJointPose::Response res;
 
         vector<moveit_msgs::CollisionObject> moveit_obstacles = segbot_arm_manipulation::get_collision_boxes(obstacles);
 
-        req.target = target;
+        vector<double> target_values;
+        target_values.push_back(target.joint1);
+        target_values.push_back(target.joint2);
+        target_values.push_back(target.joint3);
+        target_values.push_back(target.joint4);
+        target_values.push_back(target.joint5);
+        target_values.push_back(target.joint6);
+
+        req.target = target_values;
         req.collision_objects = moveit_obstacles;
         req.constraints = constraints;
         return joint_angles_moveit_client.call(req, res);
@@ -303,8 +283,8 @@ namespace segbot_arm_manipulation {
     bool Mico::move_through_waypoints_moveit(const vector<geometry_msgs::Pose> &waypoints,
                                              const vector<sensor_msgs::PointCloud2> &obstacles,
                                              const moveit_msgs::Constraints &constraints) {
-        bwi_moveit_utils::MicoMoveitWaypoint::Request req;
-        bwi_moveit_utils::MicoMoveitWaypoint::Response res;
+        bwi_moveit_utils::MoveitWaypoint::Request req;
+        bwi_moveit_utils::MoveitWaypoint::Response res;
 
         vector<moveit_msgs::CollisionObject> moveit_obstacles = segbot_arm_manipulation::get_collision_boxes(obstacles);
 

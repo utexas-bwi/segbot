@@ -1,9 +1,5 @@
 #include <ros/ros.h>
 #include <signal.h>
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <cstdlib>
 #include <std_msgs/String.h>
 
 #include <Eigen/Dense>
@@ -13,7 +9,6 @@
 #include <kinova_msgs/PoseVelocity.h>
 #include <geometry_msgs/PoseArray.h>
 #include <std_msgs/Float32.h>
-#include <std_msgs/String.h>
 #include <std_srvs/Empty.h>
 
 
@@ -70,9 +65,8 @@
 #include <moveit_msgs/GetPositionFK.h>
 #include <moveit_msgs/GetPositionIK.h>
 
-#include <bwi_moveit_utils/AngularVelCtrl.h>
-#include <bwi_moveit_utils/MicoMoveitJointPose.h>
-#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
+#include <bwi_moveit_utils/MoveitJointPose.h>
+#include <bwi_moveit_utils/MoveitCartesianPose.h>
 
 //some message used for publishing or in the callbacks
 #include <nav_msgs/Odometry.h>
@@ -362,20 +356,12 @@ void moveToJointState(const float* js){
 	
 	
 	
-	bwi_moveit_utils::MicoMoveitJointPose::Request req;
-	bwi_moveit_utils::MicoMoveitJointPose::Response res;
-	
-	for(int i = 0; i < 6; i++){
-        switch(i) {
-            case 0  :    req.target.joint1 = js[i]; break;
-            case 1  :    req.target.joint2 =  js[i]; break;
-            case 2  :    req.target.joint3 =  js[i]; break;
-            case 3  :    req.target.joint4 =  js[i]; break;
-            case 4  :    req.target.joint5 =  js[i]; break;
-            case 5  :    req.target.joint6 =  js[i]; break;
-        }
-	//ROS_INFO("Requested angle: %f", q_vals.at(i));
-    }
+	bwi_moveit_utils::MoveitJointPose::Request req;
+	bwi_moveit_utils::MoveitJointPose::Response res;
+
+	for (int i = 0; i < 6; ++i) {
+		req.target.push_back(js[i]);
+	}
 	
 	if(client_joint_command.call(req, res)){
  		ROS_INFO("Call successful. Response:");
@@ -1038,7 +1024,7 @@ int main (int argc, char** argv)
 	//clients
 	client_start_change = n.serviceClient<std_srvs::Empty> ("/segbot_arm_table_change_detector/start");
 	client_stop_change = n.serviceClient<std_srvs::Empty> ("/segbot_arm_table_change_detector/stop");
-	client_joint_command = n.serviceClient<bwi_moveit_utils::MicoMoveitJointPose> ("/mico_joint_pose_service");
+	client_joint_command = n.serviceClient<bwi_moveit_utils::MoveitJointPose> ("/joint_pose_service");
 	
 	//store the home arm pose
 	listenForArmData(40.0,2.0);

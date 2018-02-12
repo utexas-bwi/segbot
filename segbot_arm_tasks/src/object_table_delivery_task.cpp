@@ -21,8 +21,6 @@
 
 #include <move_base_msgs/MoveBaseAction.h>
 
-
-#include <bwi_moveit_utils/MicoNavSafety.h>
 #include <segbot_arm_manipulation/Mico.h>
 
 #include "segbot_arm_manipulation/ObjReplacementAction.h"

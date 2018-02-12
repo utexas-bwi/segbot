@@ -5,22 +5,22 @@ add_compile_options(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   bwi_moveit_utils
+  bwi_perception
+  geometry_msgs
   roscpp
   rospy
   std_msgs
   sensor_msgs
-  geometry_msgs
   message_generation
   kinova_msgs
   actionlib
   pcl_ros
   pcl_conversions
-  agile_grasp
   tf_conversions
   moveit_ros_planning_interface
   moveit_msgs
   segbot_arm_manipulation
-  bwi_perception
+
 )
 
 find_package(PCL 1.7 REQUIRED)
@@ -39,9 +39,6 @@ include_directories(
 
 add_executable(push_button_demo src/push_button_demo.cpp)
 target_link_libraries(push_button_demo ${catkin_LIBRARIES} )
-
-add_executable(angular_vel_control_test src/angular_vel_control_test.cpp)
-target_link_libraries(angular_vel_control_test ${catkin_LIBRARIES} )
 
 add_executable(candy_demo src/candy_demo.cpp)
 target_link_libraries(candy_demo ${catkin_LIBRARIES} )

@@ -3,7 +3,6 @@
 
 #include <ros/ros.h>
 
-
 //actions
 #include <actionlib/client/simple_action_client.h>
 #include "kinova_msgs/SetFingersPositionAction.h"
@@ -12,12 +11,6 @@
 #include "kinova_msgs/HomeArm.h"
 
 #include <moveit_msgs/GetPositionIK.h>
-
-#include <bwi_moveit_utils/AngularVelCtrl.h>
-#include <bwi_moveit_utils/MicoMoveitJointPose.h>
-#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
-#include <bwi_moveit_utils/MicoNavSafety.h>
-
 
 #include <sensor_msgs/PointCloud2.h>
 
