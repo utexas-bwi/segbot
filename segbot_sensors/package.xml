@@ -40,6 +40,7 @@
   <exec_depend>freenect_launch</exec_depend>
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>openni_launch</exec_depend>
+  <exec_depend>openni2_launch</exec_depend>
   <exec_depend>python-serial</exec_depend>
   <exec_depend>python-scipy</exec_depend>
   <exec_depend>python-numpy</exec_depend>

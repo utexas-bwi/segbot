@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(segbot_arm_tasks)
 
+add_compile_options(-std=c++11)
+
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -10,13 +12,13 @@ find_package(catkin REQUIRED COMPONENTS
     plan_execution
     bwi_moveit_utils
     bwi_msgs
+    bwi_perception
     bwi_services
     kinova_msgs
     pcl_ros
     pcl_conversions
     roscpp
     rospy
-    bwi_perception
     segbot_arm_manipulation
     std_msgs
     move_base_msgs
@@ -56,11 +58,9 @@ include_directories(
 )
 
 
-## example task 
 add_executable(object_to_office_task src/object_to_office_task.cpp)
 target_link_libraries(object_to_office_task ${catkin_LIBRARIES} )
 
-## example task 
 add_executable(object_handover_delivery_task src/object_handover_delivery_task.cpp)
 target_link_libraries(object_handover_delivery_task ${catkin_LIBRARIES} )
 

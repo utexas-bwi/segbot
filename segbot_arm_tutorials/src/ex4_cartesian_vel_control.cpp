@@ -18,7 +18,7 @@
 
 //our own arm library 
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 
 //true if Ctrl-C is pressed
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "ex4_cartesian_vel_control");
 	
 	ros::NodeHandle n;
-	MicoManager mico(n);
+	segbot_arm_manipulation::Mico mico(n);
 
 	//publish cartesian tool velocities
 	ros::Publisher pub_velocity = n.advertise<kinova_msgs::PoseVelocity>("/m1n6s200_driver/in/cartesian_velocity", 10);

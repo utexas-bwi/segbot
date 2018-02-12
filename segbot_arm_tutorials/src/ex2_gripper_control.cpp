@@ -16,7 +16,7 @@
 #include <kinova_msgs/SetFingersPositionAction.h>
 
 //our own arm library
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
 	ac.waitForResult();
 
 	// MicoManager is a class that facilitates many common arm motion activities
-	MicoManager mico(n);
+	segbot_arm_manipulation::Mico mico(n);
 	//now, close the hand using an API call from segbot_arm_manipulation
 	pressEnter("Press [Enter] to close the hand.");
 	mico.close_hand();

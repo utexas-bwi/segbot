@@ -1,9 +1,5 @@
 #include <ros/ros.h>
 #include <signal.h>
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <cstdlib>
 #include <std_msgs/String.h>
 
 #include <Eigen/Dense>
@@ -64,14 +60,16 @@
 #include <moveit_msgs/GetPositionFK.h>
 #include <moveit_msgs/GetPositionIK.h>
 
-#include <bwi_moveit_utils/AngularVelCtrl.h>
-#include <bwi_moveit_utils/MicoMoveitJointPose.h>
-#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
+
+#include <bwi_moveit_utils/MoveitJointPose.h>
+#include <bwi_moveit_utils/MoveitCartesianPose.h>
 
 #include <geometry_msgs/TwistStamped.h>
-
+#include <segbot_arm_manipulation/Mico.h>
 
 #define PI 3.14159265
+
+segbot_arm_manipulation::Mico *mico;
 
 /* define what kind of point clouds we're using */
 typedef pcl::PointXYZRGB PointT;
@@ -86,24 +84,7 @@ using namespace std;
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
 
-#define FINGER_FULLY_OPENED 6
-#define FINGER_FULLY_CLOSED 7300
-
-#define NUM_JOINTS_ARMONLY 6
-#define NUM_JOINTS 8 //6+2 for the arm
-
-
-sensor_msgs::JointState current_state;
-kinova_msgs::FingerPosition current_finger;
-geometry_msgs::PoseStamped current_pose;
-bool heardPose = false;
-bool heardJoinstState = false;
-
-geometry_msgs::PoseStamped current_moveit_pose;
-
-
 //publishers
-ros::Publisher pub_velocity;
 ros::Publisher cloud_pub;
 ros::Publisher pose_pub;
 ros::Publisher pose_fk_pub;
@@ -122,44 +103,6 @@ void sig_handler(int sig)
   exit(1);
 };
 
-//Joint state cb
-void joint_state_cb (const sensor_msgs::JointStateConstPtr& input) {
-	
-	if (input->position.size() == NUM_JOINTS){
-		current_state = *input;
-		heardJoinstState = true;
-	}
-  //ROS_INFO_STREAM(current_state);
-}
-
-//Joint state cb
-void toolpos_cb (const geometry_msgs::PoseStamped &msg) {
-  current_pose = msg;
-  heardPose = true;
-  //  ROS_INFO_STREAM(current_pose);
-}
-
-//Joint state cb
-void fingers_cb (const kinova_msgs::FingerPosition msg) {
-  current_finger = msg;
-}
-
-
-void listenForArmData(float rate){
-	heardPose = false;
-	heardJoinstState = false;
-	ros::Rate r(rate);
-	
-	while (ros::ok()){
-		ros::spinOnce();
-		
-		if (heardPose && heardJoinstState)
-			return;
-		
-		r.sleep();
-	}
-}
-
 void movePose(float d_z) {
   actionlib::SimpleActionClient<kinova_msgs::ArmPoseAction> ac("/m1n6s200_driver/pose_action/tool_pose", true);
 
@@ -169,15 +112,15 @@ void movePose(float d_z) {
 
   goalPose.pose.header.frame_id = "m1n6s200_link_base";
   
-  ROS_INFO_STREAM(current_pose);
+  ROS_INFO_STREAM(mico->current_pose);
 
-  goalPose.pose.pose.position.x = current_pose.pose.position.x;
-  goalPose.pose.pose.position.y = current_pose.pose.position.y;
-  goalPose.pose.pose.position.z = current_pose.pose.position.z + d_z;
-  goalPose.pose.pose.orientation.x = current_pose.pose.orientation.x;
-  goalPose.pose.pose.orientation.y = current_pose.pose.orientation.y;
-  goalPose.pose.pose.orientation.z = current_pose.pose.orientation.z;
-  goalPose.pose.pose.orientation.w = current_pose.pose.orientation.w;
+  goalPose.pose.pose.position.x = mico->current_pose.pose.position.x;
+  goalPose.pose.pose.position.y = mico->current_pose.pose.position.y;
+  goalPose.pose.pose.position.z = mico->current_pose.pose.position.z + d_z;
+  goalPose.pose.pose.orientation.x = mico->current_pose.pose.orientation.x;
+  goalPose.pose.pose.orientation.y = mico->current_pose.pose.orientation.y;
+  goalPose.pose.pose.orientation.z = mico->current_pose.pose.orientation.z;
+  goalPose.pose.pose.orientation.w = mico->current_pose.pose.orientation.w;
 
   ROS_INFO_STREAM(goalPose);
 
@@ -190,26 +133,7 @@ void movePose(float d_z) {
 
 }
 
-void moveToCurrentAngles(){
-	actionlib::SimpleActionClient<kinova_msgs::ArmJointAnglesAction> ac("/m1n6s200_driver/joint_angles/arm_joint_angles", true);
-	
-	kinova_msgs::ArmJointAnglesGoal goalJoints;
-	
-	listenForArmData(30.0);
-	
-	goalJoints.angles.joint1 = current_state.position[0];
-	goalJoints.angles.joint2 = current_state.position[1];
-	goalJoints.angles.joint3 = current_state.position[2];
-	goalJoints.angles.joint4 = current_state.position[3];
-	goalJoints.angles.joint5 = current_state.position[4];
-	goalJoints.angles.joint6 = current_state.position[5];
-	
-	ac.waitForServer();
 
-    ac.sendGoal(goalJoints);
-
-    ac.waitForResult();
-}
 
 // Range = [6, 7300] ([open, close])
 void moveFinger(int finger_value) {
@@ -242,47 +166,6 @@ double angular_difference(geometry_msgs::Quaternion c,geometry_msgs::Quaternion 
 }
 
 
-bool moveToPose(geometry_msgs::PoseStamped g){
-	actionlib::SimpleActionClient<kinova_msgs::ArmPoseAction> ac("/m1n6s200_driver/pose_action/tool_pose", true);
-
-	kinova_msgs::ArmPoseGoal goalPose;
-  
- 
-
-	goalPose.pose = g;
-
-
-	ROS_INFO_STREAM(goalPose);
-
-	  ac.waitForServer();
-	  ROS_DEBUG("Waiting for server.");
-	  //finally, send goal and wait
-	  ROS_INFO("Sending goal.");
-	  ac.sendGoal(goalPose);
-	  ac.waitForResult();
-		
-	return true;
-}
-
-moveit_msgs::GetPositionIK::Response computeIK(ros::NodeHandle n, geometry_msgs::PoseStamped p){
-	ros::ServiceClient ikine_client = n.serviceClient<moveit_msgs::GetPositionIK> ("/compute_ik");
-	
-	
-	moveit_msgs::GetPositionIK::Request ikine_request;
-	moveit_msgs::GetPositionIK::Response ikine_response;
-	ikine_request.ik_request.group_name = "arm";
-	ikine_request.ik_request.pose_stamped = p;
-	
-	/* Call the service */
-	if(ikine_client.call(ikine_request, ikine_response)){
-		ROS_INFO("IK service call success:");
-		ROS_INFO_STREAM(ikine_response);
-	} else {
-		ROS_INFO("IK service call FAILED. Exiting");
-	}
-	
-	return ikine_response;
-}
 
 void spinSleep(double duration){
 	int rateHertz = 40;
@@ -304,8 +187,8 @@ void updateFK(ros::NodeHandle n){
 
 	
 	//wait to get lates joint state values
-	listenForArmData(30.0);
-	sensor_msgs::JointState q_true = current_state;
+	mico->wait_for_data();
+	sensor_msgs::JointState q_true = mico->current_state;
 	
 	//Load request with the desired link
 	fkine_request.fk_link_names.push_back("mico_end_effector");
@@ -321,7 +204,6 @@ void updateFK(ros::NodeHandle n){
  	if(fkine_client.call(fkine_request, fkine_response)){
  		pose_fk_pub.publish(fkine_response.pose_stamped.at(0));
  		ros::spinOnce();
- 		current_moveit_pose = fkine_response.pose_stamped.at(0);
  		ROS_INFO("Call successful. Response:");
  		ROS_INFO_STREAM(fkine_response);
  	} else {
@@ -356,83 +238,6 @@ int selectObject(std::vector<PointCloudT::Ptr > candidates){
 	}
 	
 	return index;
-}
-
-void moveToJointState(ros::NodeHandle n, sensor_msgs::JointState target){
-	//check if this is specified just for the arm
-	sensor_msgs::JointState q_target;
-	if (target.position.size() != NUM_JOINTS_ARMONLY){
-		//in this case, the first four values are for the base joints
-		for (int i = 4; i < target.position.size(); i ++){
-			q_target.position.push_back(target.position.at(i));
-			q_target.name.push_back(target.name.at(i));
-		}
-		q_target.header = target.header;
-	}
-	else 
-		q_target = target;
-	
-	ROS_INFO("Target joint state:");
-	ROS_INFO_STREAM(q_target);
-	
-	bwi_moveit_utils::AngularVelCtrl::Request	req;
-	bwi_moveit_utils::AngularVelCtrl::Response	resp;
-	
-	ros::ServiceClient ikine_client = n.serviceClient<bwi_moveit_utils::AngularVelCtrl> ("/angular_vel_control");
-	
-	req.state = q_target;
-	
-	pressEnter();
-	
-	if(ikine_client.call(req, resp)){
- 		ROS_INFO("Call successful. Response:");
- 		ROS_INFO_STREAM(resp);
- 	} else {
- 		ROS_ERROR("Call failed. Terminating.");
- 		//ros::shutdown();
- 	}
-	
-}
-
-void moveToJointStateMoveIt(ros::NodeHandle n, geometry_msgs::PoseStamped p_target/*sensor_msgs::JointState q_target*/){
-	bwi_moveit_utils::MicoMoveitCartesianPose::Request 	req;
-	bwi_moveit_utils::MicoMoveitCartesianPose::Response res;
-	
-	req.target = p_target;
-	
-	ros::ServiceClient client = n.serviceClient<bwi_moveit_utils::MicoMoveitCartesianPose> ("/mico_cartesianpose_service");
-	if(client.call(req, res)){
- 		ROS_INFO("Call successful. Response:");
- 		ROS_INFO_STREAM(res);
- 	} else {
- 		ROS_ERROR("Call failed. Terminating.");
- 		//ros::shutdown();
- 	}
-	
-	
-}
-
-void cartesianVelocityMove(double dx, double dy, double dz, double duration){
-	int rateHertz = 40;
-	kinova_msgs::PoseVelocity velocityMsg;
-	
-	ros::Rate r(rateHertz);
-	for(int i = 0; i < (int)duration * rateHertz; i++) {
-		
-		
-		velocityMsg.twist_linear_x = dx;
-		velocityMsg.twist_linear_y = dy;
-		velocityMsg.twist_linear_z = dz;
-		
-		velocityMsg.twist_angular_x = 0.0;
-		velocityMsg.twist_angular_y = 0.0;
-		velocityMsg.twist_angular_z = 0.0;
-		
-		
-		pub_velocity.publish(velocityMsg);
-		ROS_INFO("Published cartesian vel. command");
-		r.sleep();
-	}
 }
 
 geometry_msgs::PoseStamped createTouchPose(PointCloudT::Ptr blob, Eigen::Vector4f plane_coefficients,std::string frame_id){
@@ -486,17 +291,17 @@ geometry_msgs::PoseStamped createTouchPose(PointCloudT::Ptr blob, Eigen::Vector4
 }
 
 void lift(ros::NodeHandle n, double x){
-	listenForArmData(30.0);
+	mico->wait_for_data();
 	
-	geometry_msgs::PoseStamped p_target = current_pose;
+	geometry_msgs::PoseStamped p_target = mico->current_pose;
 	
 	p_target.pose.position.z += x;
-	moveToJointStateMoveIt(n,p_target);
+	mico->move_to_pose_moveit(p_target);
 }
 
 
 void moveToPoseCarteseanVelocity(ros::NodeHandle n, geometry_msgs::PoseStamped pose_st){
-	listenForArmData(30.0);
+	mico->wait_for_data();
 	
 	int rateHertz = 40;
 	kinova_msgs::PoseVelocity velocityMsg;
@@ -511,9 +316,9 @@ void moveToPoseCarteseanVelocity(ros::NodeHandle n, geometry_msgs::PoseStamped p
 	
 	while (true){
 		
-		float dx = constant_m*( - current_pose.pose.position.x + pose_st.pose.position.x );
-		float dy = constant_m*(- current_pose.pose.position.y + pose_st.pose.position.y);
-		float dz = constant_m*(- current_pose.pose.position.z + pose_st.pose.position.z);
+		float dx = constant_m*( - mico->current_pose.pose.position.x + pose_st.pose.position.x );
+		float dy = constant_m*(- mico->current_pose.pose.position.y + pose_st.pose.position.y);
+		float dz = constant_m*(- mico->current_pose.pose.position.z + pose_st.pose.position.z);
 		
 		if (fabs(dx) < theta && fabs(dy) < theta && fabs(dz) < theta){
 			//we reached the position, exit
@@ -529,7 +334,7 @@ void moveToPoseCarteseanVelocity(ros::NodeHandle n, geometry_msgs::PoseStamped p
 		velocityMsg.twist_angular_z = 0.0;
 		
 		
-		pub_velocity.publish(velocityMsg);
+		mico->cartesian_velocity_pub.publish(velocityMsg);
 		ros::spinOnce();
 		ROS_INFO("Published cartesian vel. command");
 		r.sleep();
@@ -544,17 +349,7 @@ int main(int argc, char **argv) {
 	
 	ros::NodeHandle n;
 
-	//create subscriber to joint angles
-	ros::Subscriber sub_angles = n.subscribe ("/m1n6s200_driver/out/joint_state", 1, joint_state_cb);
-
-	//create subscriber to tool position topic
-	ros::Subscriber sub_tool = n.subscribe("/m1n6s200_driver/out/tool_pose", 1, toolpos_cb);
-
-	//subscriber for fingers
-	ros::Subscriber sub_finger = n.subscribe("/m1n6s200_driver/out/finger_position", 1, fingers_cb);
-	 
-	//publish velocities
-	pub_velocity = n.advertise<kinova_msgs::PoseVelocity>("/m1n6s200_driver/in/cartesian_velocity", 10);
+    mico = new segbot_arm_manipulation::Mico(n);
 	
 	//publish pose 
 	pose_pub = n.advertise<geometry_msgs::PoseStamped>("/agile_grasp_demo/pose_out", 10);
@@ -622,8 +417,8 @@ int main(int argc, char **argv) {
 	}
 	
 	//store current pose
-	listenForArmData(10.0);
-	geometry_msgs::PoseStamped start_pose = current_pose;
+	mico->wait_for_data();
+	geometry_msgs::PoseStamped start_pose = mico->current_pose;
 	
 	// now, touch each object
 	for (int i = 0; i < touch_poses.size(); i ++){

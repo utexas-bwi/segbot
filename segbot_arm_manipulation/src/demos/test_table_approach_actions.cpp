@@ -1,11 +1,11 @@
 #include <ros/ros.h>
 
 #include <signal.h>
+#include <actionlib/client/simple_action_client.h>
 
 //action for grasping
 #include "segbot_arm_manipulation/TabletopApproachAction.h"
 
-#include <segbot_arm_manipulation/arm_utils.h>
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;

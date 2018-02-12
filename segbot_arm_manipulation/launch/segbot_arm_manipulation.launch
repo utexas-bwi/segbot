@@ -1,20 +1,17 @@
 <launch>
 
-	<!-- launch tabletop detection service -->
-	<node name="segbot_table_approach_as" pkg="segbot_arm_manipulation" type="segbot_table_approach_as" output="screen">
-	</node>
-	
-	<!-- launch change detection service -->
-	<node name="segbot_tabletop_grasp_as" pkg="segbot_arm_manipulation" type="segbot_tabletop_grasp_as" output="screen">
-	</node>
-	
-	<!-- launch lift verification node -->
-	<node name="arm_lift_verify_as" pkg="segbot_arm_manipulation" type="arm_lift_verify_as" output="screen">
-	</node>
-	
-	<!-- launch replacement node -->
-	<node name="segbot_obj_replacement_as" pkg="segbot_arm_manipulation" type="segbot_obj_replacement_as" output="screen">
-	</node>
+    <node name="segbot_table_approach_as" pkg="segbot_arm_manipulation" type="segbot_table_approach_as"
+          output="screen"/>
+
+    <node name="segbot_tabletop_grasp_as" pkg="segbot_arm_manipulation" type="segbot_tabletop_grasp_as"
+          output="screen"/>
+
+    <node name="arm_lift_verify_as" pkg="segbot_arm_manipulation" type="arm_lift_verify_as" output="screen"/>
+
+    <node name="segbot_obj_replacement_as" pkg="segbot_arm_manipulation" type="segbot_obj_replacement_as"
+          output="screen"/>
+
+    <node name="segbot_handover_as" pkg="segbot_arm_manipulation" type="segbot_handover_as" output="screen"/>
 	
 	
 	<!-- launch agile grasp -->

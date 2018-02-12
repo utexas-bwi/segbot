@@ -18,7 +18,7 @@
  
 #include <sensor_msgs/Joy.h>
 #include <bwi_services/SpeakMessage.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 #include <iostream>
 using namespace std;
@@ -56,7 +56,7 @@ bool mode = ARM_MODE;
 
 bool base_allowed = true;
 
-MicoManager *mico;
+segbot_arm_manipulation::Mico *mico;
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -420,7 +420,7 @@ int main(int argc, char * *argv) {
   //register ctrl-c
   signal(SIGINT, sig_handler);
   
-  mico = new MicoManager(n);
+  mico = new segbot_arm_manipulation::Mico(n);
   mico->move_home();
   mico->move_fingers(finger_1, finger_2); //inital position = 7200
   

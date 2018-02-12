@@ -56,6 +56,3 @@ target_link_libraries(ex8_joint_angles_control ${catkin_LIBRARIES} )
 
 add_executable(ex9_waypoints src/ex9_waypoints.cpp)
 target_link_libraries(ex9_waypoints ${catkin_LIBRARIES} )
-
-add_executable(ex10_advanced_moveit src/ex10_advanced_moveit.cpp)
-target_link_libraries(ex10_advanced_moveit ${catkin_LIBRARIES} )

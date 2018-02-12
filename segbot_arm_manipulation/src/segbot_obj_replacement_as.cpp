@@ -1,8 +1,6 @@
 #include <ros/ros.h>
 #include <ros/package.h>
 
-#include <cstdlib>
-
 #include <geometry_msgs/TwistStamped.h>
 
 #include <actionlib/client/simple_action_client.h>
@@ -17,10 +15,6 @@
 #include <moveit_msgs/GetPositionFK.h>
 #include <moveit_msgs/GetPositionIK.h>
 
-#include <bwi_moveit_utils/AngularVelCtrl.h>
-#include <bwi_moveit_utils/MicoMoveitJointPose.h>
-#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
-
 #include <tf_conversions/tf_eigen.h>
 
 #include <sensor_msgs/PointCloud.h>
@@ -30,19 +24,22 @@
 #include <pcl/point_cloud.h>
 #include <pcl/common/common.h>
 #include <pcl_conversions/pcl_conversions.h>
-#include <pcl/point_types.h>
 
 #include <pcl_ros/impl/transforms.hpp>
 
 //the action definition
 #include "segbot_arm_manipulation/ObjReplacementAction.h"
+#include "segbot_arm_manipulation/Mico.h"
 
 //srv for talking to table_object_detection_node.cpp
 #include "bwi_perception/TabletopPerception.h"
+#include "bwi_perception/bwi_perception.h"
 
+
+#include <bwi_manipulation/grasp_utils.h>
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/grasp_utils.h>
-#include <segbot_arm_manipulation/arm_positions_db.h>
+#include <agile_grasp/Grasps.h>
+
 
 /* define what kind of point clouds we're using */
 typedef pcl::PointXYZRGB PointT;
@@ -69,12 +66,6 @@ protected:
 	segbot_arm_manipulation::ObjReplacementFeedback feedback_; 
 	segbot_arm_manipulation::ObjReplacementResult result_; 
 
-	sensor_msgs::JointState current_state;
-	sensor_msgs::JointState current_effort;
-	kinova_msgs::FingerPosition current_finger;
-	geometry_msgs::PoseStamped current_pose;
-	bool heardPose;
-	bool heardJoinstState; 
 
 	bool heardGrasps;
 	agile_grasp::Grasps current_grasps;
@@ -82,38 +73,22 @@ protected:
 	//used to compute transforms
 	tf::TransformListener listener;
 
-	ros::Subscriber sub_angles;
-	ros::Subscriber sub_torques;
-	ros::Subscriber sub_tool;
-	ros::Subscriber sub_finger;
-	ros::Subscriber sub_grasps;
 
 	ros::Publisher down_pub; 
     
-    std::vector<geometry_msgs::Quaternion> orientations; 
+    std::vector<geometry_msgs::Quaternion> orientations;
+    segbot_arm_manipulation::Mico mico;
 
 
 
 public:
-	ObjReplacementActionServer(std::string name) :
+	ObjReplacementActionServer(const std::string &name) :
 		as_(nh_, name, boost::bind(&ObjReplacementActionServer::executeCB, this, _1), false),
-    		action_name_(name)
+    		action_name_(name), mico(nh_)
     {
-    	heardPose = false;
-		heardJoinstState = false;
 		heardGrasps = false;
 
-		//create subscriber to joint angles
-		sub_angles = nh_.subscribe ("/joint_states", 1, &ObjReplacementActionServer::joint_state_cb, this);
 
-		//create subscriber to joint torques
-		sub_torques = nh_.subscribe ("/m1n6s200_driver/out/joint_efforts", 1, &ObjReplacementActionServer::joint_effort_cb,this);
-
-		//create subscriber to tool position topic
-		sub_tool = nh_.subscribe("/m1n6s200_driver/out/tool_position", 1, &ObjReplacementActionServer::toolpos_cb, this);
-
-		//subscriber for fingers
-		sub_finger = nh_.subscribe("/m1n6s200_driver/out/finger_position", 1, &ObjReplacementActionServer::fingers_cb, this);
 
 		//publisher for downsampled point cloud (used for debugging purposes)
 		down_pub = nh_.advertise<sensor_msgs::PointCloud2>("segbot_obj_replacement_as/down_cloud", 1);
@@ -122,61 +97,9 @@ public:
     	as_.start(); 
     }
 
-	~ObjReplacementActionServer(void)
-	{
-	}
-	
-	
-	//Joint state cb
-	void joint_state_cb (const sensor_msgs::JointStateConstPtr& input) {
-		if (input->position.size() == NUM_JOINTS){
-			current_state = *input;
-			heardJoinstState = true;
-		}
-	}
+	~ObjReplacementActionServer()
+    = default;
 
-	//Joint effort cb
-	void joint_effort_cb (const sensor_msgs::JointStateConstPtr& input) {
-		current_effort = *input;
-	}
-
-	//tool position cb
-	void toolpos_cb (const geometry_msgs::PoseStamped &msg) {
-		current_pose = msg;
-		heardPose = true;
-	}
-
-	//fingers state cb
-	void fingers_cb (const kinova_msgs::FingerPosition msg) {
-		current_finger = msg;
-	}
-		
-	//wait for updated arm information	
-	void listenForArmData(float rate){
-		heardPose = false;
-		heardJoinstState = false;
-		ros::Rate r(rate);
-		
-		while (ros::ok()){
-			ros::spinOnce();
-			
-			if (heardPose && heardJoinstState)
-				return;
-			
-			r.sleep();
-		}
-	}	
-	
-	/*Function to check the differences between the joint states*/
-	bool check_position(sensor_msgs::JointState goal_state, float threshold){
-		std::vector<double> joint_diffs = segbot_arm_manipulation::getJointAngleDifferences(current_state, goal_state);
-		for(int i = 0; i< joint_diffs.size(); i++){
-			if(joint_diffs[i] > threshold){
-				return false;
-			}
-		}
-		return true;
-	}
 
 	/*Function to downsample an input cloud using VoxelGrid filter*/
 	void downsample_clouds(PointCloudT::Ptr in_cloud, PointCloudT::Ptr out_cloud, float leaf_size){
@@ -200,14 +123,14 @@ public:
 	 * prior to sorting the pointcloud*/
 	static bool sort_hlp(const pcl::PointXYZRGB& p1, const pcl::PointXYZRGB& p2){
 		//sort by distance to camera sensor
-		float x_diff = (float) p1.x - sensor_origin.x;
-		float y_diff = (float) p1.y - sensor_origin.y;
-		float z_diff = (float) p1.z - sensor_origin.z;
+		float x_diff = p1.x - sensor_origin.x;
+		float y_diff = p1.y - sensor_origin.y;
+		float z_diff = p1.z - sensor_origin.z;
 		float p1_diff = (float) sqrt(pow(x_diff, 2) + pow(y_diff, 2) + pow (z_diff, 2));
 		
-		x_diff = (float) p2.x - sensor_origin.x;
-		y_diff = (float) p2.y - sensor_origin.y;
-		z_diff = (float) p2.z - sensor_origin.z;
+		x_diff = p2.x - sensor_origin.x;
+		y_diff = p2.y - sensor_origin.y;
+		z_diff = p2.z - sensor_origin.z;
 		float p2_diff = (float) sqrt(pow(x_diff, 2) + pow(y_diff, 2) + pow (z_diff, 2));
 		
 		return p1_diff < p2_diff;
@@ -223,20 +146,14 @@ public:
 		}
 		return true;
 	}
-	
-	void get_orientations(std::vector<geometry_msgs::Quaternion> orientations) {
-		orientations.push_back(current_pose.pose.orientation); 
-        orientations.push_back(tf::createQuaternionMsgFromRollPitchYaw(3.14/2, 0, 0)); 
-        orientations.push_back(tf::createQuaternionMsgFromRollPitchYaw(-3.14/2, 0, 0));
-        orientations.push_back(tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0));
-	}
+
 	
 	/*Assumptions: the robot has already approached the table, 
 	 * an object is in hand, the arm is currently still in safety mode,
 	 * cloud is organized and dense*/
 	void executeCB(const segbot_arm_manipulation::ObjReplacementGoalConstPtr &goal){
 		//step1: get the table scene, check validity
-		bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(nh_);
+		bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(nh_);
 		
 		if (!table_scene.is_plane_found){
 			ROS_ERROR("[segbot_arm_replacement_as] a table must be present");
@@ -295,7 +212,7 @@ public:
 			
 			//create the current goal for the arm to move to when resetting
 			geometry_msgs::PoseStamped current_goal;
-			current_goal.header.frame_id = current_pose.header.frame_id;
+			current_goal.header.frame_id = mico.current_pose.header.frame_id;
 			current_goal.pose.position.x = plane_down_sam->points[ind].x;
 			current_goal.pose.position.y = plane_down_sam->points[ind].y;
 			
@@ -305,13 +222,13 @@ public:
 			current_goal.pose.orientation =  tf::createQuaternionMsgFromRollPitchYaw(-3.14/2, 3.14, 0); 
 			
 			//check the inverse kinematics, if possible, move to the pose and drop object
-			moveit_msgs::GetPositionIK::Response ik_response_1 = segbot_arm_manipulation::computeIK(nh_,current_goal);
+			moveit_msgs::GetPositionIK::Response ik_response_1 = mico.compute_ik(current_goal);
 
 			if (ik_response_1.error_code.val == 1){
-				segbot_arm_manipulation::moveToPoseMoveIt(nh_, current_goal);
-				if(check_if_reached(current_goal, current_pose)){
+				mico.move_to_pose_moveit(current_goal);
+				if(check_if_reached(current_goal, mico.current_pose)){
 					//reached location, success
-					segbot_arm_manipulation::openHand();
+					mico.open_hand();
 					result_.success = true; 
 					break;
 				}
@@ -322,7 +239,7 @@ public:
 		}
 		
 		//step5: home arm 
-		segbot_arm_manipulation::homeArm(nh_);
+		mico.move_home();
 		
 		//step6: set success of the action
 		as_.setSucceeded(result_);

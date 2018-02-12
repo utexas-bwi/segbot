@@ -1,49 +1,24 @@
 #include <ros/ros.h>
-#include <signal.h>
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <cstdlib>
 
-#include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/grasp_utils.h>
+#include <bwi_manipulation/grasp_utils.h>
 
-#include <actionlib/client/simple_action_client.h>
 #include <actionlib/server/simple_action_server.h>
 
-#include "kinova_msgs/SetFingersPositionAction.h"
-#include "kinova_msgs/ArmPoseAction.h"
-#include "kinova_msgs/ArmJointAnglesAction.h"
-
-//srv for talking to table_object_detection_node.cpp
 #include "bwi_perception/TabletopPerception.h"
+#include "bwi_perception/bwi_perception.h"
 #include "segbot_arm_manipulation/LiftVerifyAction.h"
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 
 #include <moveit_msgs/DisplayRobotState.h>
 // Kinematics
 #include <moveit_msgs/GetPositionFK.h>
-#include <moveit_msgs/GetPositionIK.h>
 
-#include <bwi_moveit_utils/AngularVelCtrl.h>
-#include <bwi_moveit_utils/MicoMoveitJointPose.h>
-#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
-
-#include <geometry_msgs/TwistStamped.h>
 #include <geometry_msgs/PoseArray.h>
+#include <actionlib/client/simple_action_client.h>
+#include <segbot_arm_manipulation/Mico.h>
+#include <segbot_arm_manipulation/ObjReplacementGoal.h>
+#include <segbot_arm_manipulation/ObjReplacementAction.h>
 
-#include <tf/transform_datatypes.h>
-#include <tf_conversions/tf_eigen.h>
-#include <tf/transform_broadcaster.h>
-
-sensor_msgs::JointState current_state;
-bool heardState;
-
-geometry_msgs::PoseStamped current_pose;
-bool heardPose;
-
-#define NUM_JOINTS 8 //6+2 for the arm
-#define FINGER_FULLY_CLOSED 7300
 
 /*Blocking call for user input to ensure safety*/
 void pressEnter(std::string message){
@@ -59,34 +34,6 @@ void pressEnter(std::string message){
 		else {
 			std::cout <<  message;
 		}
-	}
-}
-
-void joint_state_cb(const sensor_msgs::JointStateConstPtr& input){
-	if(input->position.size() == NUM_JOINTS){
-		current_state = *input;
-		heardState = true;
-	}
-}
-
-void pose_stamped_cb(const geometry_msgs::PoseStamped &input){
-	current_pose = input;
-	heardPose = true;
-}
-
-/*Wait for up to date arm data */
-void listen_for_arm_data(float rate){
-	heardState = false;
-	heardPose = false;
-	ros::Rate r(rate);
-		
-	while (ros::ok()){
-		ros::spinOnce();
-		
-		if (heardPose && heardState)
-			return;
-		
-		r.sleep();
 	}
 }
 
@@ -117,26 +64,18 @@ int main(int argc, char** argv){
 	//initialize ros
 	ros::init(argc, argv, "test_grasp_replacement");
 	ros::NodeHandle nh;
-	
-	//initialize booleans
-	heardState = false;
-	heardPose = false;
-	
-	//subscribers
-	ros::Subscriber sub_angles = nh.subscribe ("/joint_states", 1, joint_state_cb);
 
-	//publishers
-	ros::Subscriber sub_tool = nh.subscribe("/m1n6s200_driver/out/tool_position", 1, pose_stamped_cb);
 
-	listen_for_arm_data(10);
+    segbot_arm_manipulation::Mico mico(nh);
+	mico.wait_for_data();
 	
 	//joint state for use in sending to replacement
-	sensor_msgs::JointState grasped_state = current_state;
+	sensor_msgs::JointState grasped_state = mico.current_state;
 	
 	/*Test the action*/
 	
 	//get table scene
-	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(nh);
+	bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(nh);
 				
 	int largest_index = find_largest_cloud(table_scene);
 				
@@ -147,7 +86,6 @@ int main(int argc, char** argv){
 				
 	//create and fill goal
 	segbot_arm_manipulation::TabletopGraspGoal grasp_goal;
-	grasp_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::GRASP;
 				
 				
 	//for that action, we have to specify the method used for picking the target grasp out of the candidates
@@ -171,8 +109,8 @@ int main(int argc, char** argv){
 	ac.waitForResult();
 	ROS_INFO("Action Finished...");
 
-	listen_for_arm_data(10);
-	grasped_state = current_state;
+	mico.wait_for_data();
+	grasped_state = mico.current_state;
 
 	/*Create action client for lift verification*/
 	actionlib::SimpleActionClient<segbot_arm_manipulation::LiftVerifyAction> lift_ac("arm_lift_verify_as", true);
@@ -202,24 +140,23 @@ int main(int argc, char** argv){
 		ROS_WARN("Verification failed");
 	}
 				
-	segbot_arm_manipulation::homeArm(nh);
+	mico.move_home();
 				
 	/*create action for replacement*/
-	actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopGraspAction> replacement_ac("segbot_tabletop_grasp_as",true);
+    actionlib::SimpleActionClient<segbot_arm_manipulation::ObjReplacementAction> replacement_ac(
+            "segbot_obj_replacement_as", true);
 	replacement_ac.waitForServer();
 	ROS_INFO("action server made...");
 				
 	//create goal for the replacement
-	segbot_arm_manipulation::TabletopGraspGoal replacement_goal;
-	replacement_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::REPLACEMENT;
-	replacement_goal.grasped_joint_state = grasped_state;
+    segbot_arm_manipulation::ObjReplacementGoal replacement_goal;
 			
 	ROS_INFO("Sending goal to action server...");
-	ac.sendGoal(replacement_goal);
+    replacement_ac.sendGoal(replacement_goal);
 				
 	//Wait for result
 	ROS_INFO("Waiting for result...");
-	ac.waitForResult();
+    replacement_ac.waitForResult();
 	ROS_INFO("Action Finished...");
 		
 		

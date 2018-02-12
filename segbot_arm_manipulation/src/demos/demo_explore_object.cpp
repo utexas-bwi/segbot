@@ -1,12 +1,7 @@
 #include <ros/ros.h>
-#include <signal.h>
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <cstdlib>
-#include <stdlib.h>
+
 #include <std_msgs/String.h>
-#include <stdio.h>
+
 
 #include <Eigen/Dense>
 #include <eigen_conversions/eigen_msg.h>
@@ -36,14 +31,7 @@
 #include <segbot_arm_manipulation/LiftVerifyAction.h>
 #include <segbot_arm_manipulation/ShakeAction.h>
 
-//pcl includes
-#include <pcl_conversions/pcl_conversions.h>
-#include <pcl/point_cloud.h>
-
-#include <pcl/common/time.h>
-#include <pcl/common/common.h>
-#include <pcl/common/centroid.h>
-#include <pcl/common/impl/centroid.hpp>
+#include <segbot_arm_manipulation/Mico.h>
 
 
 #define FINGER_FULLY_OPENED 6
@@ -57,46 +45,9 @@ typedef pcl::PointCloud<PointT> PointCloudT;
 
 
 ros::Publisher vis_pub;
-sensor_msgs::JointState current_state;
-geometry_msgs::PoseStamped current_pose;
-
-bool heardJoinstState;
-bool heardPose;
 
 
 using namespace std;
-
-//Joint state cb
-void joint_state_cb (const sensor_msgs::JointStateConstPtr& input) {
-	
-	if (input->position.size() == NUM_JOINTS){
-		current_state = *input;
-		heardJoinstState = true;
-	}
-}
-
-
-//Joint state cb
-void toolpos_cb (const geometry_msgs::PoseStamped &msg) {
-  current_pose = msg;
-  heardPose = true;
-}
-
-//wait for updated data
-void listenForArmData(){
-	
-	heardJoinstState = false;
-	heardPose = false;
-	ros::Rate r(10.0);
-
-	while (ros::ok()){
-		ros::spinOnce();
-		if (heardJoinstState && heardPose){
-			return;
-		}
-		r.sleep();
-	}
-}
 
 //finds the object on the table
 int largest_obj(bwi_perception::TabletopPerception::Response table_scene){
@@ -264,15 +215,7 @@ int main (int argc, char** argv){
 	ros::init(argc, argv, "demo_explore_object");
 	
 	ros::NodeHandle n;
-	
-	heardPose = false;
-	heardJoinstState = false;
-	
-	//create subscriber to joint angles
-	ros::Subscriber sub_angles = n.subscribe ("/m1n6s200_driver/out/joint_state", 1, joint_state_cb);
-	
-	//create subscriber to tool position topic
-	ros::Subscriber sub_tool = n.subscribe("/m1n6s200_driver/out/tool_pose", 1, toolpos_cb);
+    segbot_arm_manipulation::Mico mico(n);
 	
 	//create a publisher for rviz text markers
 	vis_pub = n.advertise<visualization_msgs::Marker>( "/visualization_marker", 0 );	
@@ -280,7 +223,7 @@ int main (int argc, char** argv){
 	pressEnter("Press enter to get table scene or q to quit");
 	
 	//get table scene and find all objects on table 
-	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
 	
 	if ((int)table_scene.cloud_clusters.size() == 0){
 			ROS_WARN("No objects found on table. The end...");
@@ -340,7 +283,7 @@ int main (int argc, char** argv){
 	pressEnter("Press enter to recheck table");
 	//the object has moved from the above actions, recheck table	
 	sensor_msgs::PointCloud2 tgt = table_scene.cloud_clusters[index];
-	table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	table_scene = bwi_perception::getTabletopScene(n);
 	
 	if ((int)table_scene.cloud_clusters.size() == 0){
 			ROS_WARN("No objects found on table. The end...");
@@ -360,10 +303,8 @@ int main (int argc, char** argv){
 		
 	//create and fill goal
 	segbot_arm_manipulation::TabletopGraspGoal grasp_goal;
-		
-	//we want the robot to execute the GRASP action
-	grasp_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::GRASP;
-	grasp_goal.grasp_selection_method=segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION;
+
+    grasp_goal.grasp_selection_method=segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION;
 	
 	//fill in the table scene
 	grasp_goal.cloud_plane = table_scene.cloud_plane;

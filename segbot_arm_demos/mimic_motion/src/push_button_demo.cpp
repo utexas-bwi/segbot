@@ -47,9 +47,8 @@
 #include <moveit_msgs/GetPositionFK.h>
 #include <moveit_msgs/GetPositionIK.h>
 
-#include <bwi_moveit_utils/AngularVelCtrl.h>
-#include <bwi_moveit_utils/MicoMoveitJointPose.h>
-#include <bwi_moveit_utils/MicoMoveitCartesianPose.h>
+#include <bwi_moveit_utils/MoveitJointPose.h>
+#include <bwi_moveit_utils/MoveitCartesianPose.h>
 
 #define PI 3.14159265
 
@@ -291,12 +290,12 @@ void waitForButtonPose(ros::NodeHandle n){
 
 
 void moveToPoseMoveIt(ros::NodeHandle n, geometry_msgs::PoseStamped p_target){
-	bwi_moveit_utils::MicoMoveitCartesianPose::Request 	req;
-	bwi_moveit_utils::MicoMoveitCartesianPose::Response res;
+	bwi_moveit_utils::MoveitCartesianPose::Request 	req;
+	bwi_moveit_utils::MoveitCartesianPose::Response res;
 	
 	req.target = p_target;
 	
-	ros::ServiceClient client = n.serviceClient<bwi_moveit_utils::MicoMoveitCartesianPose> ("/mico_cartesianpose_service");
+	ros::ServiceClient client = n.serviceClient<bwi_moveit_utils::MoveitCartesianPose> ("/mico_cartesianpose_service");
 	if(client.call(req, res)){
  		ROS_INFO("Call successful. Response:");
  		ROS_INFO_STREAM(res);

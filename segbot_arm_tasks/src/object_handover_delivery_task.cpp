@@ -7,41 +7,26 @@
 
 //srv for talking to table_object_detection_node.cpp
 #include "bwi_perception/TabletopPerception.h"
+#include "bwi_perception/bwi_perception.h"
 
 //action for grasping
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 #include "segbot_arm_manipulation/TabletopApproachAction.h"
-
-#include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/arm_positions_db.h>
-
-#include <bwi_perception/bwi_perception.h>
-
+#include "segbot_arm_manipulation/HandoverAction.h"
 
 #include "plan_execution/ExecutePlanAction.h"
 
 #include <move_base_msgs/MoveBaseAction.h>
 
-
-#include <bwi_moveit_utils/MicoNavSafety.h>
-
-#include <iostream>
-#include <string>
-
 //audio service
 #include "bwi_services/SpeakMessage.h"
 
 #include <bwi_msgs/QuestionDialog.h>
+#include <segbot_arm_manipulation/Mico.h>
 
-#define NUM_JOINTS 8 //6+2 for the arm
 
+segbot_arm_manipulation::Mico *mico;
 
-//global variables for storing data
-sensor_msgs::JointState current_state;
-bool heardJoinstState;
-
-geometry_msgs::PoseStamped current_pose;
-bool heardPose;
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -53,38 +38,6 @@ void sig_handler(int sig) {
   ros::shutdown();
   exit(1);
 };
-
-//Joint state cb
-void joint_state_cb (const sensor_msgs::JointStateConstPtr& input) {
-	
-	if (input->position.size() == NUM_JOINTS){
-		current_state = *input;
-		heardJoinstState = true;
-	}
-}
-
-//Joint state cb
-void toolpos_cb (const geometry_msgs::PoseStamped &msg) {
-  current_pose = msg;
-  heardPose = true;
-}
-
-//blocking call to listen for arm data (in this case, joint states)
-void listenForArmData(){
-	
-	heardJoinstState = false;
-	heardPose = false;
-	ros::Rate r(10.0);
-	
-	while (ros::ok()){
-		ros::spinOnce();	
-		
-		if (heardJoinstState && heardPose)
-			return;
-		
-		r.sleep();
-	}
-}
 
 
 // Blocking call for user input
@@ -204,9 +157,7 @@ int main(int argc, char **argv) {
 	std::vector<std::string> rooms = getRooms();
 	std::vector<std::string> doors = getDoors(); 
 
-	//create subscribers for arm topics
-	ros::Subscriber sub_angles = n.subscribe ("/m1n6s200_driver/out/joint_state", 1, joint_state_cb);
-	ros::Subscriber sub_tool = n.subscribe("/m1n6s200_driver/out/tool_pose", 1, toolpos_cb);
+    mico = new segbot_arm_manipulation::Mico(n);
 
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
@@ -214,28 +165,32 @@ int main(int argc, char **argv) {
 	//action clients
 	actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopGraspAction> ac_grasp("segbot_tabletop_grasp_as",true);
 	ac_grasp.waitForServer();
-	
+
+	actionlib::SimpleActionClient<segbot_arm_manipulation::HandoverAction> ac_handover("segbot_handover_as",true);
+	ac_grasp.waitForServer();
+
+
 	//move arm into the handover view
-	segbot_arm_manipulation::arm_handover_view(n);
+	mico->move_to_handover();
 
 	//now receive object
 	std::cout << "Please place an object in robot's hand\n"; 
-	segbot_arm_manipulation::TabletopGraspGoal receive_goal;
-	receive_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::HANDOVER_FROM_HUMAN;
+	segbot_arm_manipulation::HandoverGoal receive_goal;
+	receive_goal.type = segbot_arm_manipulation::HandoverGoal::RECEIVE;
 	receive_goal.timeout_seconds = -1.0;
 	
-	ac_grasp.sendGoal(receive_goal);
-	ac_grasp.waitForResult();
+	ac_handover.sendGoal(receive_goal);
+	ac_handover.waitForResult();
 	
-	if(ac_grasp.getResult()->success == false) {
+	if(ac_handover.getResult()->success == false) {
 		ROS_ERROR("HANDOVER_FROM_HUMAN grasp failed:"); 
 		return 1; 
 	}
 	
 	//now make safe
-	segbot_arm_manipulation::homeArm(n);
+	mico->move_home();
 	ROS_INFO("Making arm safe for travel"); 
-	bool safe = segbot_arm_manipulation::makeSafeForTravel(n);
+	bool safe = mico->make_safe_for_travel();
 	pressEnter("Press [Enter] to proceed with navigation");
 	
 		
@@ -295,10 +250,10 @@ int main(int argc, char **argv) {
     client_asp.sendGoalAndWait(goal_asp);	
 	
 	//now home and let go of object 
-	segbot_arm_manipulation::homeArm(n);
+	mico->move_home();
 	
 	//move arm to handover view
-	segbot_arm_manipulation::arm_handover_view(n);
+	mico->move_to_handover();
 	
 	//play audio message 
 	ros::ServiceClient speakMessageClient = n.serviceClient<bwi_services::SpeakMessage>("/speak_message_service/speak_message");  
@@ -308,22 +263,22 @@ int main(int argc, char **argv) {
 	
 	std::cout << "Please take the object from the robot's hand\n"; 
 	
-	segbot_arm_manipulation::TabletopGraspGoal handover_goal;
-	handover_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::HANDOVER;
+	segbot_arm_manipulation::HandoverGoal handover_goal;
+	handover_goal.type = segbot_arm_manipulation::HandoverGoal::GIVE;
 	handover_goal.timeout_seconds = -1.0;
 	
-	ac_grasp.sendGoal(handover_goal);
-	ac_grasp.waitForResult();
+	ac_handover.sendGoal(handover_goal);
+	ac_handover.waitForResult();
 	
-	if(ac_grasp.getResult()->success == false) {
+	if(ac_handover.getResult()->success == false) {
 		ROS_ERROR("HANDOVER grasp failed:"); 
 		return 1; 
 	}
 
 	// make ready for travel
-	segbot_arm_manipulation::homeArm(n);
-	segbot_arm_manipulation::closeHand();
-	segbot_arm_manipulation::makeSafeForTravel(n);
+	mico->move_home();
+	mico->close_hand();
+	mico->make_safe_for_travel();
 	
 	returnToHome(); 
 }

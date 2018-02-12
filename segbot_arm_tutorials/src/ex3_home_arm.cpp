@@ -16,7 +16,7 @@
 #include <kinova_msgs/HomeArm.h>
 
 //our own arm library
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 
 //true if Ctrl-C is pressed
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
 
-    MicoManager mico(n);
+    segbot_arm_manipulation::Mico mico(n);
 
 	//close fingers and "home" the arm
 	pressEnter("Press [Enter] to close the gripper and home the arm");

@@ -15,8 +15,9 @@
 
 
 #include <segbot_arm_manipulation/arm_utils.h>
+#include <segbot_arm_manipulation/Mico.h>
 
-#define NUM_JOINTS 8 //6+2 for the arm
+
 
 //some thresholds related to forces
 #define MIN_FORWARD_FORCE_THRESHOLD 2.0
@@ -27,16 +28,6 @@
 
 #define MAX_FORWARD_VEL 0.4
 #define MAX_TURN_VEL 0.25
-
-//global variables for storing data
-sensor_msgs::JointState current_state;
-bool heardJoinstState;
-
-geometry_msgs::PoseStamped current_pose;
-bool heardPose;
-
-geometry_msgs::WrenchStamped current_wrench;
-bool heardWrench;
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -49,46 +40,6 @@ void sig_handler(int sig) {
   ros::shutdown();
   exit(1);
 };
-
-//Joint state cb
-void joint_state_cb (const sensor_msgs::JointStateConstPtr& input) {
-	
-	if (input->position.size() == NUM_JOINTS){
-		current_state = *input;
-		heardJoinstState = true;
-	}
-}
-
-
-//Joint state cb
-void toolpos_cb (const geometry_msgs::PoseStamped &msg) {
-  current_pose = msg;
-  heardPose = true;
-}
-
-//Callback for toolwrench 
-void wrench_cb(const geometry_msgs::WrenchStamped &msg){ 
-	current_wrench = msg;
-	heardWrench = true;
-}
-
-//blocking call to listen for arm data (in this case, joint states)
-void listenForArmData(){
-	
-	heardJoinstState = false;
-	heardPose = false;
-	heardWrench = false;
-	ros::Rate r(10.0);
-	
-	while (ros::ok()){
-		ros::spinOnce();
-		
-		if (heardJoinstState && heardPose && heardWrench)
-			return;
-		
-		r.sleep();
-	}
-}
 
 
 // Blocking call for user input
@@ -114,31 +65,18 @@ int main(int argc, char **argv) {
 	ros::init(argc, argv, "demo_hand_lead");
 	
 	ros::NodeHandle n;
-
-	//create subscriber to joint angles
-	ros::Subscriber sub_angles = n.subscribe ("/m1n6s200_driver/out/joint_state", 1, joint_state_cb);
-	
-	//create subscriber to tool position topic
-	ros::Subscriber sub_tool = n.subscribe("/m1n6s200_driver/out/tool_pose", 1, toolpos_cb);
-
-	//subscriber for wrench
-	ros::Subscriber sub_wrench = n.subscribe("/m1n6s200_driver/out/tool_wrench", 1, wrench_cb);
+	segbot_arm_manipulation::Mico mico(n);
 	
 	//base velocity publisher
 	ros::Publisher pub_base_velocity = n.advertise<geometry_msgs::Twist>("/cmd_vel", 1);
-	
-	//hand velocity publisher
-	ros::Publisher pub_hand_velocity = n.advertise<kinova_msgs::PoseVelocity>("/m1n6s200_driver/in/cartesian_velocity", 1);
-	
-
 
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
 	
 	pressEnter("Demo starting. Position arm and press [Enter]");
 	
-	listenForArmData();
-	geometry_msgs::PoseStamped default_pose = current_pose;
+	mico.wait_for_data();
+	geometry_msgs::PoseStamped default_pose = mico.current_pose;
 	
 	
 	double rate = 40.0;
@@ -153,8 +91,9 @@ int main(int argc, char **argv) {
 	
 	while (elapsed_time < 1.0){
 		ros::spinOnce();
-		
-		if (heardWrench){
+
+        if (mico.heard_wrench) {
+			auto current_wrench = mico.current_wrench;
 			x_vals.push_back(current_wrench.wrench.force.x);
 			y_vals.push_back(current_wrench.wrench.force.y);
 			z_vals.push_back(current_wrench.wrench.force.z);	
@@ -186,11 +125,12 @@ int main(int argc, char **argv) {
 	while (ros::ok()){
 		
 		ros::spinOnce();
-		
-		if (heardWrench){
+
+        if (mico.heard_wrench) {
+			auto current_wrench = mico.current_wrench;
 			ROS_INFO("Current force: %f, %f, %f",
 			current_wrench.wrench.force.x,current_wrench.wrench.force.y,current_wrench.wrench.force.z);
-			
+
 			double forward_force = -1*(current_wrench.wrench.force.x - x_mean_zero);
 			double sideway_force = current_wrench.wrench.force.y - y_mean_zero;
 			
@@ -235,6 +175,7 @@ int main(int argc, char **argv) {
 				kinova_msgs::PoseVelocity velocityMsg; //vel command to hand
 				float theta = 0.075;
 				float constant_m = 3.0;
+				auto current_pose = mico.current_pose;
 				
 				//find out how far we are from the default position
 				float dx = constant_m*( - current_pose.pose.position.x + default_pose.pose.position.x );
@@ -252,10 +193,10 @@ int main(int argc, char **argv) {
 					
 				ROS_INFO("Publishing c.vels: %f, %f, %f",dx,dy,dz);
 				
-				pub_hand_velocity.publish(velocityMsg);
+				mico.cartesian_velocity_pub.publish(velocityMsg);
 			}
-			
-			heardWrench = false;
+
+            mico.heard_wrench = false;
 		}
 		
 		r.sleep();

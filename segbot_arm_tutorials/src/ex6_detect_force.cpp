@@ -8,7 +8,7 @@
 
 //our own arm library 
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <segbot_arm_manipulation/MicoManager.h>
+#include <segbot_arm_manipulation/Mico.h>
 
 
 //true if Ctrl-C is pressed
@@ -41,48 +41,6 @@ void pressEnter(std::string message){
 }
 
 
-/*
- * blocks until force of sufficient amount is detected or timeout is exceeded
- * returns true of force degected, false if timeout
- */
-bool waitForForce(MicoManager &mico, const double force_threshold, const double timeout){
-	double rate = 40.0;
-	ros::Rate r(rate);
-
-	double total_delta;
-
-	mico.wait_for_data();
-	//make a copy and store it as the previous effort state	
-	sensor_msgs::JointState prev_effort_state = mico.current_state;
-
-	double elapsed_time = 0;
-
-	while (ros::ok()){
-		
-		ros::spinOnce();
-				
-		total_delta=0.0;
-		for (int i = 0; i < 6; i ++){
-			total_delta += fabs(mico.current_state.effort[i]-prev_effort_state.effort[i]);
-		}
-		
-		//ROS_INFO("Total delta=%f",total_delta);
-				
-		if (total_delta > fabs(force_threshold)){
-			ROS_INFO("Force detected");
-			return true;	
-		}
-				
-		r.sleep();
-		elapsed_time+=(1.0)/rate;
-				
-		if (elapsed_time > timeout){		
-			ROS_WARN("Wait for force function timed out");
-			return false;
-		}
-	}
-}
-
 
 int main(int argc, char **argv) {
 	// Intialize ROS with this node name
@@ -90,7 +48,7 @@ int main(int argc, char **argv) {
 	
 	ros::NodeHandle n;
 
-	MicoManager mico(n);
+	segbot_arm_manipulation::Mico mico(n);
 	 
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
@@ -104,8 +62,8 @@ int main(int argc, char **argv) {
 	
 	while (ros::ok()){
 		ROS_INFO("Waiting for force...");
-		bool force_detected = waitForForce(mico, force_threshold, timeout);
-		
+		bool force_detected = mico.wait_for_force(force_threshold, timeout);
+
 		if (force_detected){
 			if (hand_state == 0){
 				mico.close_hand();

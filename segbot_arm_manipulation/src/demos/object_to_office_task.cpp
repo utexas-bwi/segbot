@@ -12,7 +12,6 @@
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 #include "segbot_arm_manipulation/TabletopApproachAction.h"
 
-#include <segbot_arm_manipulation/arm_utils.h>
 #include <segbot_arm_manipulation/arm_positions_db.h>
 
 #include <bwi_perception/bwi_perception.h>
@@ -25,40 +24,6 @@
 
 #define NUM_JOINTS 8 //6+2 for the arm
 
-//mico joint state safe
-//-2.3321322971114142, -1.6372086401627464, -0.28393691436045176, -2.164605083475533, 0.7496982226688764, 4.682638807847723
-
-/* tool pose side
-	position: 
-		x: 0.117240786552
-		y: -0.301719456911
-		z: 0.239926770329
-	  orientation: 
-		x: 0.51289595084
-		y: 0.484664185494
-		z: 0.517808228151
-		w: 0.483645541456
-
-	tool pose safe
-		
-	x: -0.157769784331
-    y: -0.136029005051
-    z: 0.376786500216
-  orientation: 
-    x: 0.994340247286
-    y: 0.0977247708014
-    z: 0.005313327657
-    w: 0.0413413878465
-
-
-*/
-
-//global variables for storing data
-sensor_msgs::JointState current_state;
-bool heardJoinstState;
-
-geometry_msgs::PoseStamped current_pose;
-bool heardPose;
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;
@@ -72,38 +37,6 @@ void sig_handler(int sig) {
   exit(1);
 };
 
-//Joint state cb
-void joint_state_cb (const sensor_msgs::JointStateConstPtr& input) {
-	
-	if (input->position.size() == NUM_JOINTS){
-		current_state = *input;
-		heardJoinstState = true;
-	}
-}
-
-
-//Joint state cb
-void toolpos_cb (const geometry_msgs::PoseStamped &msg) {
-  current_pose = msg;
-  heardPose = true;
-}
-
-//blocking call to listen for arm data (in this case, joint states)
-void listenForArmData(){
-	
-	heardJoinstState = false;
-	heardPose = false;
-	ros::Rate r(10.0);
-	
-	while (ros::ok()){
-		ros::spinOnce();
-		
-		if (heardJoinstState && heardPose)
-			return;
-		
-		r.sleep();
-	}
-}
 
 
 // Blocking call for user input
@@ -125,12 +58,12 @@ void pressEnter(std::string message){
 
 
 void lift(ros::NodeHandle n, double x){
-	listenForArmData();
+	mico->wait_for_data();
 	
 	geometry_msgs::PoseStamped p_target = current_pose;
 	
 	p_target.pose.position.z += x;
-	segbot_arm_manipulation::moveToPoseMoveIt(n,p_target);
+	mico->move_to_pose_moveit(p_target);
 }
 
 
@@ -161,12 +94,12 @@ int main(int argc, char **argv) {
 	pressEnter("Please move the arm to out of view position...");
 	
 	//store out of table view joint position -- this is the position in which the arm is not occluding objects on the table
-	listenForArmData();
+	mico->wait_for_data();
 	joint_state_outofview = current_state;
 	pose_outofview = current_pose;
 	
 	//Step 2: call safety service to make the arm safe for base movement -- TO DO
-	bool safe = segbot_arm_manipulation::makeSafeForTravel(n);
+	bool safe = mico->make_safe_for_travel();
 	if (!safe)
 		return 1;
 	
@@ -202,12 +135,12 @@ int main(int argc, char **argv) {
 	
 	
 	//Step 6: move the arm out of the way
-	segbot_arm_manipulation::homeArm(n);
-	segbot_arm_manipulation::moveToJointState(n,joint_state_outofview);
+	mico->move_home();
+	mico->move_to_joint_state(,joint_state_outofview);
 	
 	
 	//Step 7: get the table scene and select object to grasp
-	bwi_perception::TabletopPerception::Response table_scene = segbot_arm_manipulation::getTabletopScene(n);
+	bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
 		
 	if ((int)table_scene.cloud_clusters.size() == 0){
 		ROS_WARN("No objects found on table. The end...");
@@ -251,7 +184,7 @@ int main(int argc, char **argv) {
 
 	//next, lift and make arm safe again
 	lift(n,0.05);
-	safe = segbot_arm_manipulation::makeSafeForTravel(n);
+	safe = mico->make_safe_for_travel();
 	if (!safe)
 		return 1;
 		
@@ -265,7 +198,7 @@ int main(int argc, char **argv) {
 	
 	
 	//hand over object
-	segbot_arm_manipulation::moveToPoseMoveIt(n,pose_outofview);
+	mico->move_to_pose_moveit(pose_outofview);
 	
 	segbot_arm_manipulation::TabletopGraspGoal handover_goal;
 	handover_goal.action_name = segbot_arm_manipulation::TabletopGraspGoal::HANDOVER;
@@ -274,18 +207,6 @@ int main(int argc, char **argv) {
 	ac_grasp.sendGoal(grasp_goal);
 	ac_grasp.waitForResult();
 	
-	
-	
-		//lift and lower the object a bit, let it go and move back
-		/*lift(n,0.07);
-		lift(n,-0.07);
-		segbot_arm_manipulation::openHand();
-		lift(n,0.07);
-		
-		segbot_arm_manipulation::homeArm(n);
-		segbot_arm_manipulation::moveToJointState(n,joint_state_outofview);
-	
-	
-		pressEnter("Press 'Enter' to grasp again or 'q' to quit.");*/
+
 	
 }
