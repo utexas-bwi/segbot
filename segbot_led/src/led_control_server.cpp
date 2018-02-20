@@ -10,7 +10,7 @@
 #include <actionlib/server/simple_action_server.h>
 
 /*******************************************************
-*                   segbot_led Headers                    *
+*                   segbot_led Headers                 *
 ********************************************************/
 #include "ledcom.h"
 
@@ -18,7 +18,7 @@
 *                   Service Headers                    *
 ********************************************************/
 #include "bwi_msgs/LEDClear.h"
-#include "bwi_msgs/LEDSetCamera.h"
+#include "bwi_msgs/LEDSetStatus.h"
 #include "bwi_msgs/LEDTestStrip.h"
 
 /*******************************************************
@@ -31,7 +31,7 @@
 ********************************************************/
 #include "bwi_msgs/LEDActionResult.h"
 #include "bwi_msgs/LEDAnimations.h"
-#include "bwi_msgs/LEDCameraStatus.h"
+#include "bwi_msgs/LEDStatus.h"
 #include "bwi_msgs/LEDTestType.h"
 
 /*******************************************************
@@ -40,6 +40,7 @@
 LedCOM leds;
 int led_count;
 string serial_port;
+bool run_on = false;
 bool camera_on = false;
 bool connected = false;
 
@@ -85,6 +86,27 @@ int top_of_u_end;
 *                 Helper Functions                     *
 *                                                      *
 ********************************************************/
+void check_run_status()
+{
+  if(run_on)
+  {
+    leds.clear();
+    // Microseconds
+    usleep(100000);
+
+    for (int i = led_count; i >= 0; i--)
+    {
+        leds.setHSV(i, 120, 1, .05);
+    }
+
+    leds.flush();
+    // Microseconds
+    usleep(100000);
+
+    ROS_INFO("Set run indicator on strip");
+  }
+}
+
 void check_camera_status()
 {
   if(camera_on)
@@ -395,7 +417,7 @@ public:
 
           // Blinking Versions of Turn Signals
 
-/*          // Left Turn Blinking Animation
+          // Left Turn Blinking Animation
           case bwi_msgs::LEDAnimations::LEFT_TURN:
             {
               // Executes as long as timeout has not been reached, Goal is not Preempted, and ROS is OK
@@ -467,7 +489,7 @@ public:
                 usleep(100000);
               }
               break;
-            }*/
+            }
 
           // Circular Versions of Turn Signals [One Set]
 
@@ -689,7 +711,7 @@ public:
               break;
             }*/
 
-          // Circular Versions of Turn Signals [Four Sets]
+/*          // Circular Versions of Turn Signals [Four Sets]
 
           // Left Turn Circular Animation [Four  Sets]
           case bwi_msgs::LEDAnimations::LEFT_TURN:
@@ -906,7 +928,7 @@ public:
               }
               break;
             }
-
+*/
           // Reverse Animtion
           case bwi_msgs::LEDAnimations::REVERSE:
             {
@@ -1312,6 +1334,7 @@ public:
           timeout_timer.stop();
           leds.clear();
           ROS_INFO("Cleared LED Strip");
+          check_run_status();
           check_camera_status();
           timeout = false;
         }
@@ -1347,6 +1370,7 @@ bool clear_strip(bwi_msgs::LEDClear::Request  &req,
   {
     leds.clear();
     ROS_INFO("Cleared LED Strip");
+    check_run_status();
     check_camera_status();
     res.success = true;
     return true;
@@ -1458,15 +1482,32 @@ bool test_strip(bwi_msgs::LEDTestStrip::Request  &req,
   }
 }
 
-bool set_camera(bwi_msgs::LEDSetCamera::Request  &req,
-                bwi_msgs::LEDSetCamera::Response &res)
+bool set_status(bwi_msgs::LEDSetStatus::Request  &req,
+                bwi_msgs::LEDSetStatus::Response &res)
 {
   try
   {
-    switch(req.type.camera_status)
+    switch(req.type.status)
     {
+      // Run On
+      case bwi_msgs::LEDStatus::RUN_ON:
+        {
+          run_on = true;
+          check_run_status();
+          res.success = true;
+          return true;
+        }
+      // Run Off
+      case bwi_msgs::LEDStatus::RUN_OFF:
+        {
+          run_on = false;
+          leds.clear();
+          ROS_INFO("Set run indicator off and cleared LED strip");
+          res.success = true;
+          return true;
+        }
       // Camera On
-      case bwi_msgs::LEDCameraStatus::CAMERA_ON:
+      case bwi_msgs::LEDStatus::CAMERA_ON:
         {
           camera_on = true;
           check_camera_status();
@@ -1474,7 +1515,7 @@ bool set_camera(bwi_msgs::LEDSetCamera::Request  &req,
           return true;
         }
       // Camera Off
-      case bwi_msgs::LEDCameraStatus::CAMERA_OFF:
+      case bwi_msgs::LEDStatus::CAMERA_OFF:
         {
           camera_on = false;
           leds.clear();
@@ -1486,7 +1527,7 @@ bool set_camera(bwi_msgs::LEDSetCamera::Request  &req,
         {
           res.success = false;
           std::ostringstream stringStream;
-          stringStream << "Unknown type requested: " << req.type.camera_status;
+          stringStream << "Unknown type requested: " << req.type.status;
           res.success = false;
           res.status = stringStream.str();
           return false;
@@ -1570,7 +1611,7 @@ int main(int argc, char **argv)
   // Service Server advertisers
   ros::ServiceServer clear_service = n.advertiseService("led_clear", clear_strip);
   ros::ServiceServer test_strip_service = n.advertiseService("led_test", test_strip);
-  ros::ServiceServer set_camera_service = n.advertiseService("led_set_camera", set_camera);
+  ros::ServiceServer set_status_service = n.advertiseService("led_set_status", set_status);
 
   // Action Server advertisers
   LEDControlAction led_control_server(ros::this_node::getName());
