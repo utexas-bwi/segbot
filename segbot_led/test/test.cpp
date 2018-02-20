@@ -9,7 +9,7 @@
 *                   Service Headers                    *
 ********************************************************/
 #include "bwi_msgs/LEDClear.h"
-#include "bwi_msgs/LEDSetCamera.h"
+#include "bwi_msgs/LEDSetStatus.h"
 #include "bwi_msgs/LEDTestStrip.h"
 
 /*******************************************************
@@ -22,7 +22,7 @@
 ********************************************************/
 #include "bwi_msgs/LEDActionResult.h"
 #include "bwi_msgs/LEDAnimations.h"
-#include "bwi_msgs/LEDCameraStatus.h"
+#include "bwi_msgs/LEDStatus.h"
 #include "bwi_msgs/LEDTestType.h"
 
 using namespace std;
@@ -50,31 +50,31 @@ int main (int argc, char **argv)
 
   switch(type){
 
-    case 1: { 
+    case 1: {
               goal.type.led_animations = bwi_msgs::LEDAnimations::LEFT_TURN;
               break;
             }
-    case 2: { 
+    case 2: {
               goal.type.led_animations = bwi_msgs::LEDAnimations::RIGHT_TURN;
               break;
             }
-    case 3: { 
+    case 3: {
               goal.type.led_animations = bwi_msgs::LEDAnimations::REVERSE;
               break;
             }
-    case 4: { 
+    case 4: {
               goal.type.led_animations = bwi_msgs::LEDAnimations::BLOCKED;
               break;
             }
-    case 5: { 
+    case 5: {
               goal.type.led_animations = bwi_msgs::LEDAnimations::UP;
               break;
             }
-    case 6: { 
+    case 6: {
               goal.type.led_animations = bwi_msgs::LEDAnimations::DOWN;
               break;
             }
-    case 7: { 
+    case 7: {
               goal.type.led_animations = bwi_msgs::LEDAnimations::NEED_ASSIST;
               break;
             }
