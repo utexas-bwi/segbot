@@ -1,6 +1,16 @@
 #include <vector>
 #include <sensor_msgs/JointState.h>
 #include <segbot_arm_manipulation/arm_utils.h>
+#include <kinova_msgs/JointAngles.h>
+#include <geometry_msgs/Pose.h>
+#include <shape_msgs/SolidPrimitive.h>
+#include <Eigen/src/Core/Matrix.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <moveit_msgs/CollisionObject.h>
+#include <pcl/point_cloud.h>
+#include <pcl_ros/transforms.h>
+
+using namespace std;
 
 namespace segbot_arm_manipulation {
     std::vector<double> getJointAngleDifferences(sensor_msgs::JointState A, sensor_msgs::JointState B) {

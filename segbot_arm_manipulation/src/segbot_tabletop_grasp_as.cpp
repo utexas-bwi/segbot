@@ -23,7 +23,7 @@
 #define MIN_DISTANCE_TO_PLANE 0.05
 
 #define HAND_OFFSET_GRASP 0.02
-#define HAND_OFFSET_APPROACH 0.10
+#define HAND_OFFSET_APPROACH 0.05
 
 
 //used when deciding whether a pair of an approach pose and a grasp pose are good;
@@ -36,7 +36,9 @@
 typedef pcl::PointXYZRGB PointT;
 typedef pcl::PointCloud<PointT> PointCloudT;
 
+
 using namespace bwi_manipulation;
+using namespace std;
 
 class TabletopGraspActionServer {
 protected:
@@ -51,9 +53,9 @@ protected:
     segbot_arm_manipulation::TabletopGraspResult result_;
 
     agile_grasp::Grasps current_grasps;
-    
-    ros::Publisher cloud_pub;
-    ros::Publisher cloud_grasp_pub;
+
+    ros::Publisher agile_grasp_cloud_pub;
+    ros::Publisher target_cloud_pub;
     ros::Publisher pose_array_pub;
 
     std::vector<PointCloudT::Ptr> detected_objects;
@@ -81,8 +83,8 @@ public:
         pose_array_pub = pnh.advertise<geometry_msgs::PoseArray>("grasp_candidate", 10);
 
         //debugging publisher
-        cloud_pub = nh_.advertise<sensor_msgs::PointCloud2>("agile_grasp_demo/cloud_debug", 10);
-        cloud_grasp_pub = nh_.advertise<sensor_msgs::PointCloud2>("agile_grasp_demo/cloud", 10);
+        target_cloud_pub = pnh.advertise<sensor_msgs::PointCloud2>("target_cloud", 10);
+        agile_grasp_cloud_pub = nh_.advertise<sensor_msgs::PointCloud2>("agile_grasp_demo/cloud", 10);
 
         ROS_INFO("Starting grasp action server...");
 
@@ -124,22 +126,14 @@ public:
 
         if (filterName == segbot_arm_manipulation::TabletopGraspGoal::SIDEWAY_GRASP_FILTER) {
 
-            //ROS_INFO("%f, %f",fabs(p),fabs(3.14/2.0 - r) ); 
-
             //ideally roll should be PI/2, while pitch should be 0
 
-            if (r > 1.1 && r < 1.9 && p > -0.25 && p < 0.25)
-                return true;
-            else return false;
+            return r > 1.1 && r < 1.9 && p > -0.25 && p < 0.25;
 
         } else if (filterName == segbot_arm_manipulation::TabletopGraspGoal::TOPDOWN_GRASP_FILTER) {
             double roll_abs = fabs(r);
 
-            if (roll_abs < 3.3 && roll_abs > 2.6 && p > -0.3 && p < 0.3) {
-                return true;
-            } else {
-                return false;
-            }
+            return roll_abs < 3.3 && roll_abs > 2.6 && p > -0.3 && p < 0.3;
         }
 
         return true;
@@ -148,6 +142,14 @@ public:
 
     std::vector<GraspCartesianCommand>
     generate_agile_grasps(const PointCloudT::Ptr &target_cloud, const std::string &frame_id) {
+        ROS_INFO("[segbot_tabletop_grasp_as.cpp] Publishing point cloud...");
+        // This extra conversion here is a bit wasteful, but it the penalty is dwarfed
+        // by the publication, agile grasp overhead anyway
+        sensor_msgs::PointCloud2 target_object_pc2;
+        pcl::toROSMsg<PointT>(*target_cloud, target_object_pc2);
+        agile_grasp_cloud_pub.publish(target_object_pc2);
+
+
         //wait for response at 5 Hz
         listenForGrasps(40.0);
 
@@ -175,13 +177,15 @@ public:
     std::vector<GraspCartesianCommand>
     generate_heuristic_grasps(const PointCloudT::Ptr &target_cloud, const std::string &frame_id) {
 
-        std::vector<GraspCartesianCommand> grasp_commands;
-        auto boundingBox = bwi_perception::BoundingBox::from_cloud<PointT>(target_cloud);
+
+        vector<GraspCartesianCommand> grasp_commands;
+        PointCloudT::Ptr arm_frame(target_cloud);
+        pcl_ros::transformPointCloud("m1n6s200_link_base", *arm_frame, *arm_frame, listener);
+        auto boundingBox = bwi_perception::BoundingBox::from_cloud<PointT>(arm_frame);
         // Move from the sensor frame to the arm base frame
-        bwi_perception::BoundingBox::transform("m1n6s200_link_base", boundingBox, boundingBox);
         geometry_msgs::PoseStamped grasp_pose;
 
-        grasp_pose.header.frame_id = frame_id;
+        grasp_pose.header.frame_id = "m1n6s200_link_base";
         // Center along the Y and Z, but along the bounding edge for the X
         grasp_pose.pose.position.x = boundingBox.min.x();
         grasp_pose.pose.position.y = boundingBox.position.y();
@@ -202,6 +206,44 @@ public:
         auto gc = GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH);
         grasp_commands.push_back(gc);
 
+
+        grasp_pose.pose.position.x = boundingBox.position.x();
+        grasp_pose.pose.position.y = boundingBox.position.y();
+        grasp_pose.pose.position.z = boundingBox.max.z();
+        // Point down
+        quat.setRPY(0.0, M_PI, 0);
+        tf::quaternionStampedTFToMsg(quat, quat_stamped);
+        grasp_pose.pose.orientation = quat_stamped.quaternion;
+        gc = GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH);
+        grasp_commands.push_back(gc);
+
+        // Right side grasp
+        grasp_pose.pose.position.x = boundingBox.position.x();
+        grasp_pose.pose.position.y = boundingBox.min.y();
+        grasp_pose.pose.position.z = boundingBox.position.z();
+        // Point left
+        quat.setRPY(0.0, M_PI / 2, M_PI / 2);
+        tf::quaternionStampedTFToMsg(quat, quat_stamped);
+        grasp_pose.pose.orientation = quat_stamped.quaternion;
+        gc = GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH);
+        grasp_commands.push_back(gc);
+
+        // Left side grasp
+        grasp_pose.pose.position.x = boundingBox.position.x();
+        grasp_pose.pose.position.y = boundingBox.max.y();
+        grasp_pose.pose.position.z = boundingBox.position.z();
+        // Point left
+        quat.setRPY(0.0, M_PI / 2, -M_PI / 2);
+        tf::quaternionStampedTFToMsg(quat, quat_stamped);
+        grasp_pose.pose.orientation = quat_stamped.quaternion;
+        gc = GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH);
+        grasp_commands.push_back(gc);
+
+
+        for (auto &grasp: grasp_commands) {
+            listener.transformPose(frame_id, grasp.approach_pose, grasp.approach_pose);
+            listener.transformPose(frame_id, grasp.grasp_pose, grasp.grasp_pose);
+        }
         return grasp_commands;
 
     }
@@ -269,12 +311,8 @@ public:
         int selected_object = goal->target_object_cluster_index;
 
         PointCloudT::Ptr target_object(new PointCloudT);
-        pcl::PCLPointCloud2 target_object_pc2;
-        pcl_conversions::toPCL(goal->cloud_clusters.at(goal->target_object_cluster_index), target_object_pc2);
-        pcl::fromPCLPointCloud2(target_object_pc2, *target_object);
-
-        ROS_INFO("[segbot_tabletop_grasp_as.cpp] Publishing point cloud...");
-        cloud_grasp_pub.publish(target_object_pc2);
+        sensor_msgs::PointCloud2 target_object_pc2 = goal->cloud_clusters.at(goal->target_object_cluster_index);
+        pcl::fromROSMsg(target_object_pc2, *target_object);
 
         std::string sensor_frame_id = goal->cloud_clusters.at(
                 goal->target_object_cluster_index).header.frame_id;
@@ -282,6 +320,7 @@ public:
         std::vector<GraspCartesianCommand> candidate_grasps;
         if (goal->grasp_generation_method == segbot_arm_manipulation::TabletopGraspGoal::HEURISTIC) {
             candidate_grasps = generate_heuristic_grasps(target_object, sensor_frame_id);
+            target_cloud_pub.publish(target_object_pc2);
         } else {
             candidate_grasps = generate_agile_grasps(target_object, sensor_frame_id);
         }

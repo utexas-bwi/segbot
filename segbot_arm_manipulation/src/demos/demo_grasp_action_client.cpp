@@ -61,17 +61,11 @@ int main(int argc, char **argv) {
 
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
-	
-	//store out-of-view position here
-	sensor_msgs::JointState joint_state_outofview;
-	geometry_msgs::PoseStamped pose_outofview;
 
-	pressEnter("Demo starting...move the arm to a position where it is not occluding the table.");
 	
 	//store out of table joint position
 	mico->wait_for_data();
-	joint_state_outofview = mico->current_state;
-	pose_outofview = mico->current_pose;
+	mico->move_to_side_view();
 
 	while (ros::ok()){
 	
@@ -109,8 +103,12 @@ int main(int argc, char **argv) {
 		
 		//for that action, we have to specify the method used for picking the target grasp out of the candidates
 		//grasp_goal.grasp_selection_method=segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION;
-		grasp_goal.grasp_selection_method=segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_JOINTSPACE_SELECTION;
-		
+		grasp_goal.grasp_selection_method = segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_JOINTSPACE_SELECTION;
+
+        // Tries grasps based on canned offsets from the bounding box and the centroid
+        grasp_goal.grasp_generation_method = segbot_arm_manipulation::TabletopGraspGoal::HEURISTIC;
+        //grasp_goal.grasp_generation_method = segbot_arm_manipulation::TabletopGraspGoal::AGILE_GRASP;
+
 		
 		//grasp_goal.grasp_filter_method=segbot_arm_manipulation::TabletopGraspGoal::TOPDOWN_GRASP_FILTER;
 		//grasp_goal.grasp_filter_method=segbot_arm_manipulation::TabletopGraspGoal::SIDEWAY_GRASP_FILTER;
@@ -170,18 +168,9 @@ int main(int argc, char **argv) {
 			
 			//move out of view and try again
 			mico->move_home();
-			mico->move_to_joint_state_moveit(joint_state_outofview);
+			mico->move_to_side_view();
 		}
-		
-		/*sleep(2.0);
-		lift(n,-0.07);
-		mico->open_hand();
-		lift(n,0.07);
-		
-		mico->move_home();
-		mico->move_to_joint_state(,joint_state_outofview);
-		*/
-	
+
 		//return 1;
 		pressEnter("Press 'Enter' to grasp again or 'q' to quit.");
 	}
