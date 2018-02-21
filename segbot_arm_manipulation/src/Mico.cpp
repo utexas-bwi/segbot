@@ -38,9 +38,11 @@ namespace segbot_arm_manipulation {
     const string Mico::home_arm_service = "/m1n6s200_driver/in/home_arm";
 
 
-    const string j_pos_filename = ros::package::getPath("segbot_arm_manipulation") + "/data/jointspace_position_db.txt";
-    const string c_pos_filename = ros::package::getPath("segbot_arm_manipulation") + "/data/toolspace_position_db.txt";
-    const double arm_poll_rate = 100.0;
+    const string Mico::j_pos_filename =
+            ros::package::getPath("segbot_arm_manipulation") + "/data/jointspace_position_db.txt";
+    const string Mico::c_pos_filename =
+            ros::package::getPath("segbot_arm_manipulation") + "/data/toolspace_position_db.txt";
+    const double Mico::arm_poll_rate = 100.0;
 
     Mico::Mico(ros::NodeHandle n) : pose_action(pose_action_topic, true),
                                     fingers_action(finger_action_topic, true),
