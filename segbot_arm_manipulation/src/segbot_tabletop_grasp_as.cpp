@@ -23,7 +23,7 @@
 #define MIN_DISTANCE_TO_PLANE 0.05
 
 #define HAND_OFFSET_GRASP 0.02
-#define HAND_OFFSET_APPROACH 0.05
+#define HAND_OFFSET_APPROACH 0.07
 
 
 //used when deciding whether a pair of an approach pose and a grasp pose are good;
@@ -174,22 +174,84 @@ public:
 
     }
 
+    void generate_grasps_along_bounding_box_side(const bwi_perception::BoundingBox &box, ulong varying_dimension,
+                                                 const Eigen::Vector4f &varied_min, const Eigen::Vector4f &varied_max,
+                                                 const Eigen::Vector4f &fixed, vector<GraspCartesianCommand> &grasps,
+                                                 const geometry_msgs::Quaternion &orientation) {
+        int steps = 10;
+        double range = varied_max(varying_dimension) - varied_min(varying_dimension);
+        double step_size = range / steps;
+
+        geometry_msgs::PoseStamped grasp_pose;
+
+        grasp_pose.header.frame_id = box.frame_id;
+        grasp_pose.pose.orientation = orientation;
+
+        for (int i = 0; i < steps; ++i) {
+            Eigen::Vector4f position = fixed;
+            position(varying_dimension) = varied_min(varying_dimension) + step_size * i;
+            grasp_pose.pose.position.x = position.x();
+            grasp_pose.pose.position.y = position.y();
+            grasp_pose.pose.position.z = position.z();
+            grasps.push_back(GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH));
+        }
+    }
+
+
+    void generate_grasps_varying_orientation(const bwi_perception::BoundingBox &box,
+                                             const geometry_msgs::Quaternion &center_orientation,
+                                             const double angle_radius, const Eigen::Vector4f &position,
+                                             vector<GraspCartesianCommand> &grasps) {
+        tf::Quaternion q;
+        tf::quaternionMsgToTF(center_orientation, q);
+        tf::Matrix3x3 m(q);
+
+        // Get the min RPY values
+        double b_r, b_p, b_y;
+        m.getRPY(b_r, b_p, b_y);
+        b_r -= angle_radius;
+        b_p -= angle_radius;
+        b_y -= angle_radius;
+
+        int steps = 3;
+
+        double step_size = angle_radius * 2.0 / steps;
+
+        geometry_msgs::PoseStamped grasp_pose;
+
+        grasp_pose.header.frame_id = box.frame_id;
+        grasp_pose.pose.position.x = position.x();
+        grasp_pose.pose.position.y = position.y();
+        grasp_pose.pose.position.z = position.z();
+
+        tf::Stamped<tf::Quaternion> quat;
+        quat.frame_id_ = box.frame_id;
+
+        geometry_msgs::QuaternionStamped quat_stamped;
+
+        for (int i = 0; i < steps; ++i) {
+            for (int j = 0; j < steps; ++j) {
+                for (int k = 0; k < steps; ++k) {
+                    quat.setRPY(b_r + i * step_size, b_p * j * step_size, b_y * step_size);
+                    tf::quaternionStampedTFToMsg(quat, quat_stamped);
+                    grasp_pose.pose.orientation = quat_stamped.quaternion;
+                    grasps.push_back(GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH));
+                }
+            }
+
+        }
+    }
+
     std::vector<GraspCartesianCommand>
     generate_heuristic_grasps(const PointCloudT::Ptr &target_cloud, const std::string &frame_id) {
 
 
         vector<GraspCartesianCommand> grasp_commands;
-        PointCloudT::Ptr arm_frame(target_cloud);
+        // Move from the sensor frame to the arm base frame
+        const PointCloudT::Ptr &arm_frame(target_cloud);
         pcl_ros::transformPointCloud("m1n6s200_link_base", *arm_frame, *arm_frame, listener);
         auto boundingBox = bwi_perception::BoundingBox::from_cloud<PointT>(arm_frame);
-        // Move from the sensor frame to the arm base frame
-        geometry_msgs::PoseStamped grasp_pose;
 
-        grasp_pose.header.frame_id = "m1n6s200_link_base";
-        // Center along the Y and Z, but along the bounding edge for the X
-        grasp_pose.pose.position.x = boundingBox.min.x();
-        grasp_pose.pose.position.y = boundingBox.position.y();
-        grasp_pose.pose.position.z = boundingBox.position.z();
 
         // The end effector frame has z extending along the finger tips. Here
         // we set roll pitch yaw with respect to the link base axes, which have the x axis extending
@@ -201,43 +263,40 @@ public:
 
         geometry_msgs::QuaternionStamped quat_stamped;
         tf::quaternionStampedTFToMsg(quat, quat_stamped);
-        grasp_pose.pose.orientation = quat_stamped.quaternion;
 
-        auto gc = GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH);
-        grasp_commands.push_back(gc);
+        // Center of the object, but the minimum along the X axis
+        Eigen::Vector4f fixed = boundingBox.position;
+        fixed.x() = boundingBox.min.x();
 
+        // Vary along Z axis between object min and max
+        generate_grasps_along_bounding_box_side(boundingBox, 2, boundingBox.min, boundingBox.max, fixed, grasp_commands,
+                                                quat_stamped.quaternion);
 
-        grasp_pose.pose.position.x = boundingBox.position.x();
-        grasp_pose.pose.position.y = boundingBox.position.y();
-        grasp_pose.pose.position.z = boundingBox.max.z();
+        fixed = boundingBox.position;
+        fixed.z() = boundingBox.max.z();
         // Point down
         quat.setRPY(0.0, M_PI, 0);
         tf::quaternionStampedTFToMsg(quat, quat_stamped);
-        grasp_pose.pose.orientation = quat_stamped.quaternion;
-        gc = GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH);
-        grasp_commands.push_back(gc);
+
+        generate_grasps_varying_orientation(boundingBox, quat_stamped.quaternion, 0.25, fixed, grasp_commands);
 
         // Right side grasp
-        grasp_pose.pose.position.x = boundingBox.position.x();
-        grasp_pose.pose.position.y = boundingBox.min.y();
-        grasp_pose.pose.position.z = boundingBox.position.z();
+        fixed = boundingBox.position;
+        fixed.y() = boundingBox.min.y();
         // Point left
         quat.setRPY(0.0, M_PI / 2, M_PI / 2);
         tf::quaternionStampedTFToMsg(quat, quat_stamped);
-        grasp_pose.pose.orientation = quat_stamped.quaternion;
-        gc = GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH);
-        grasp_commands.push_back(gc);
+        generate_grasps_along_bounding_box_side(boundingBox, 2, boundingBox.min, boundingBox.max, fixed, grasp_commands,
+                                                quat_stamped.quaternion);
 
         // Left side grasp
-        grasp_pose.pose.position.x = boundingBox.position.x();
-        grasp_pose.pose.position.y = boundingBox.max.y();
-        grasp_pose.pose.position.z = boundingBox.position.z();
-        // Point left
-        quat.setRPY(0.0, M_PI / 2, -M_PI / 2);
+        fixed = boundingBox.position;
+        fixed.y() = boundingBox.max.y();
+        // Point right
+        quat.setRPY(0.0, -M_PI / 2, M_PI / 2);
         tf::quaternionStampedTFToMsg(quat, quat_stamped);
-        grasp_pose.pose.orientation = quat_stamped.quaternion;
-        gc = GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH);
-        grasp_commands.push_back(gc);
+        generate_grasps_along_bounding_box_side(boundingBox, 2, boundingBox.min, boundingBox.max, fixed, grasp_commands,
+                                                quat_stamped.quaternion);
 
 
         for (auto &grasp: grasp_commands) {
