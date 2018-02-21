@@ -42,12 +42,18 @@ void pressEnter(std::string message){
 }
 
 
-void lift(double x){
+void lift_moveit(double x) {
 	mico->wait_for_data();
 	
 	geometry_msgs::PoseStamped p_target = mico->current_pose;
 	p_target.pose.position.z += x;
 	mico->move_to_pose_moveit(p_target);
+}
+
+void lift(double x) {
+    kinova_msgs::PoseVelocity velocity;
+    velocity.twist_linear_z = x;
+    mico->move_with_cartesian_velocities(velocity, 0.3);
 }
 
 

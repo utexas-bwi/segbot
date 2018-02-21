@@ -29,17 +29,6 @@
 
 using namespace std;
 
-const string jointNames[] = {"m1n6s200_joint_1", "m1n6s200_joint_2", "m1n6s200_joint_3", "m1n6s200_joint_4",
-                       "m1n6s200_joint_5", "m1n6s200_joint_6", "m1n6s200_joint_finger_1",
-                       "m1n6s200_joint_finger_2"};
-const string finger_action_topic = "/m1n6s200_driver/fingers_action/finger_positions";
-const string pose_action_topic = "/m1n6s200_driver/pose_action/tool_pose";
-const string joint_state_action_topic = "/m1n6s200_driver/joints_action/joint_angles";
-const string joint_state_topic = "/m1n6s200_driver/out/joint_state";
-const string tool_pose_topic = "/m1n6s200_driver/out/tool_pose";
-const string finger_position_topic = "/m1n6s200_driver/out/finger_position";
-const string home_arm_service = "/m1n6s200_driver/in/home_arm";
-
 
 namespace segbot_arm_manipulation {
     using namespace pcl;

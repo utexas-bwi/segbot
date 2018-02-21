@@ -12,9 +12,11 @@
           output="screen"/>
 
     <node name="segbot_handover_as" pkg="segbot_arm_manipulation" type="segbot_handover_as" output="screen"/>
-	
-	
-	<!-- launch agile grasp -->
+
+    <!-- safety service -->
+    <node name="nav_safety_service" pkg="segbot_arm_manipulation" type="nav_safety_service" output="screen"/>
+
+    <!-- launch agile grasp -->
 	<node name="find_grasps" pkg="agile_grasp" type="find_grasps" output="screen">
   	<param name="cloud_topic" value="/agile_grasp_demo/cloud" />
     <param name="cloud_frame" value="/xtion_camera_rgb_optical_frame" />

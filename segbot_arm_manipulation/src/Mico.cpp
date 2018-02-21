@@ -19,10 +19,29 @@
 #include <bwi_moveit_utils/MoveitCartesianPose.h>
 #include <bwi_moveit_utils/MoveitJointPose.h>
 #include <bwi_moveit_utils/MoveitWaypoint.h>
+#include <moveit_msgs/GetPositionFK.h>
 
 using namespace std;
 
+
 namespace segbot_arm_manipulation {
+
+    const string Mico::jointNames[] = {"m1n6s200_joint_1", "m1n6s200_joint_2", "m1n6s200_joint_3", "m1n6s200_joint_4",
+                                       "m1n6s200_joint_5", "m1n6s200_joint_6", "m1n6s200_joint_finger_1",
+                                       "m1n6s200_joint_finger_2"};
+    const string Mico::finger_action_topic = "/m1n6s200_driver/fingers_action/finger_positions";
+    const string Mico::pose_action_topic = "/m1n6s200_driver/pose_action/tool_pose";
+    const string Mico::joint_state_action_topic = "/m1n6s200_driver/joints_action/joint_angles";
+    const string Mico::joint_state_topic = "/m1n6s200_driver/out/joint_state";
+    const string Mico::tool_pose_topic = "/m1n6s200_driver/out/tool_pose";
+    const string Mico::finger_position_topic = "/m1n6s200_driver/out/finger_position";
+    const string Mico::home_arm_service = "/m1n6s200_driver/in/home_arm";
+
+
+    const string j_pos_filename = ros::package::getPath("segbot_arm_manipulation") + "/data/jointspace_position_db.txt";
+    const string c_pos_filename = ros::package::getPath("segbot_arm_manipulation") + "/data/toolspace_position_db.txt";
+    const double arm_poll_rate = 100.0;
+
     Mico::Mico(ros::NodeHandle n) : pose_action(pose_action_topic, true),
                                     fingers_action(finger_action_topic, true),
                                     joint_state_action(joint_state_action_topic, true) {
@@ -34,12 +53,13 @@ namespace segbot_arm_manipulation {
         //finger positions
         finger_sub = n.subscribe(finger_position_topic, 1, &Mico::fingers_cb, this);
         home_client = n.serviceClient<kinova_msgs::HomeArm>(home_arm_service);
-        safety_client = n.serviceClient<bwi_moveit_utils::NavSafety>("/nav_safety");
+        safety_client = n.serviceClient<bwi_moveit_utils::NavSafety>("/make_safe_for_travel");
         pose_moveit_client = n.serviceClient<bwi_moveit_utils::MoveitCartesianPose>("/cartesian_pose_service");
         joint_angles_moveit_client = n.serviceClient<bwi_moveit_utils::MoveitJointPose>("/joint_pose_service");
         waypoint_moveit_client = n.serviceClient<bwi_moveit_utils::MoveitWaypoint>("/waypoint_service");
         wrench_sub = n.subscribe("/m1n6s200_driver/out/tool_wrench", 1, &Mico::wrench_cb, this);
         ik_client = n.serviceClient<moveit_msgs::GetPositionIK>("/compute_ik");
+        fk_client = n.serviceClient<moveit_msgs::GetPositionFK>("/compute_fk");
         add_waypoint_client = n.serviceClient<kinova_msgs::AddPoseToCartesianTrajectory>(
                 "/m1n6s200_driver/in/add_pose_to_Cartesian_trajectory");
         clear_waypoints_client = n.serviceClient<kinova_msgs::ClearTrajectories>(
@@ -233,6 +253,26 @@ namespace segbot_arm_manipulation {
 
     }
 
+    moveit_msgs::GetPositionFK::Response Mico::compute_fk() {
+
+        moveit_msgs::GetPositionFK::Request req;
+        moveit_msgs::GetPositionFK::Response res;
+
+        //Load request with the desired link
+        for (auto &joint_name: jointNames) {
+            req.fk_link_names.push_back(joint_name);
+        }
+
+        if (fk_client.call(req, res)) {
+            ros::spinOnce();
+            ROS_DEBUG("FK call successful.");
+        } else {
+            ROS_ERROR("FK call failed. Moveit! probably can't be contacted. Preempting movement.");
+
+        }
+        return res;
+
+    }
 
     bool Mico::move_to_pose_moveit(const geometry_msgs::PoseStamped &target,
                                    const vector<sensor_msgs::PointCloud2> &obstacles,
@@ -363,8 +403,8 @@ namespace segbot_arm_manipulation {
     }
 
     bool Mico::move_through_waypoints(const vector<geometry_msgs::Pose> &waypoints) {
-        for (int i = 0; i < waypoints.size(); i++) {
-            kinova_msgs::KinovaPose next = kinova::KinovaPose(waypoints.at(i)).constructKinovaPoseMsg();
+        for (const auto &waypoint : waypoints) {
+            kinova_msgs::KinovaPose next = kinova::KinovaPose(waypoint).constructKinovaPoseMsg();
             kinova_msgs::AddPoseToCartesianTrajectory::Request req;
             kinova_msgs::AddPoseToCartesianTrajectory::Response res;
             req.ThetaX = next.ThetaX;

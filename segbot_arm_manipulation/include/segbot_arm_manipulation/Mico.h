@@ -19,6 +19,7 @@
 #include <kinova_msgs/PoseVelocity.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <bwi_manipulation/arm.h>
+#include <moveit_msgs/GetPositionFK.h>
 #include "Mico.h"
 
 #define OPEN_FINGER_VALUE 100
@@ -26,13 +27,9 @@
 
 class ArmPositionDB;
 
-const std::string moveit_cartesian_pose_service = "";
-
-const std::string j_pos_filename = ros::package::getPath("segbot_arm_manipulation")+"/data/jointspace_position_db.txt";
-const std::string c_pos_filename = ros::package::getPath("segbot_arm_manipulation")+"/data/toolspace_position_db.txt";
-const double arm_poll_rate = 100.0;
 
 namespace segbot_arm_manipulation {
+
     class Mico : bwi_manipulation::Arm {
         ros::Subscriber joint_state_sub;
         ros::Subscriber tool_sub;
@@ -51,6 +48,7 @@ namespace segbot_arm_manipulation {
         ros::ServiceClient waypoint_moveit_client;
         ros::ServiceClient joint_pose_client_old;
         ros::ServiceClient ik_client;
+        ros::ServiceClient fk_client;
         ros::ServiceClient add_waypoint_client;
         ros::ServiceClient clear_waypoints_client;
         ros::Publisher angular_velocity_pub;
@@ -64,6 +62,19 @@ namespace segbot_arm_manipulation {
         bool heard_tool;
         bool heard_fingers;
         bool heard_wrench;
+
+        static const std::string jointNames[];
+        static const std::string finger_action_topic;
+        static const std::string pose_action_topic;
+        static const std::string joint_state_action_topic;
+        static const std::string joint_state_topic;
+        static const std::string tool_pose_topic;
+        static const std::string finger_position_topic;
+        static const std::string home_arm_service;
+
+        static const std::string j_pos_filename;
+        static const std::string c_pos_filename;
+        static const double arm_poll_rate;
 
         explicit Mico(ros::NodeHandle n);
 
@@ -116,6 +127,8 @@ namespace segbot_arm_manipulation {
 
         moveit_msgs::GetPositionIK::Response compute_ik(const geometry_msgs::PoseStamped &p);
 
+        moveit_msgs::GetPositionFK::Response compute_fk();
+
         bool open_hand();
 
         bool close_hand();
@@ -127,8 +140,6 @@ namespace segbot_arm_manipulation {
         bool move_to_side_view();
 
         bool move_to_handover();
-
-        bool move_to_joint_state_old(const sensor_msgs::JointState &target);
 
     };
 }

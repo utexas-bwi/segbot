@@ -15,6 +15,7 @@
   <depend>agile_grasp</depend>
   <depend>bwi_manipulation</depend>
   <depend>bwi_moveit_utils</depend>
+  <depend>bwi_msgs</depend>
   <depend>bwi_perception</depend>
   <depend>geometry_msgs</depend>
   <depend>kinova_msgs</depend>

@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
         agile_grasp
         bwi_manipulation
         bwi_moveit_utils
+        bwi_msgs
         bwi_perception
         geometry_msgs
         kinova_driver
@@ -59,6 +60,7 @@ add_service_files(
         iSpyTouch.srv
         iSpyDetectTouch.srv
         iSpyFaceTable.srv
+        NavSafety.srv
 )
 
 generate_messages(
@@ -127,10 +129,6 @@ add_executable(demo_explore_object src/demos/demo_explore_object.cpp)
 target_link_libraries(demo_explore_object arm_utilities ${catkin_LIBRARIES})
 add_dependencies(demo_explore_object  segbot_arm_manipulation_gencpp ${catkin_EXPORTED_TARGETS})
 
-add_executable(test_table_approach_actions src/demos/test_table_approach_actions.cpp)
-target_link_libraries(test_table_approach_actions arm_utilities ${catkin_LIBRARIES} )
-add_dependencies(test_table_approach_actions arm_utilities segbot_arm_manipulation_gencpp)
-
 add_executable(demo_hand_lead src/demos/demo_hand_lead.cpp)
 target_link_libraries(demo_hand_lead arm_utilities ${catkin_LIBRARIES} )
 add_dependencies(demo_hand_lead arm_utilities segbot_arm_manipulation_gencpp)
@@ -139,29 +137,39 @@ add_executable(test_grasp_replacement src/demos/test_grasp_replacement.cpp)
 target_link_libraries(test_grasp_replacement arm_utilities ${catkin_LIBRARIES} )
 add_dependencies(test_grasp_replacement arm_utilities segbot_arm_manipulation_gencpp)
 
-add_executable(segbot_obj_replacement_as src/segbot_obj_replacement_as.cpp)
-add_dependencies(segbot_obj_replacement_as arm_utilities segbot_arm_manipulation_gencpp)
-target_link_libraries(segbot_obj_replacement_as arm_utilities ${catkin_LIBRARIES} )
-
 add_executable(test_handover_replacement src/demos/test_handover_replacement.cpp)
 target_link_libraries(test_handover_replacement arm_utilities ${catkin_LIBRARIES} )
 add_dependencies(test_handover_replacement arm_utilities segbot_arm_manipulation_gencpp)
+
+add_executable(test_table_approach_actions src/demos/test_table_approach_actions.cpp)
+target_link_libraries(test_table_approach_actions arm_utilities ${catkin_LIBRARIES})
+add_dependencies(test_table_approach_actions arm_utilities segbot_arm_manipulation_gencpp)
+
+add_executable(test_ispy src/demos/test_ispy.cpp)
+target_link_libraries(test_ispy arm_utilities ${catkin_LIBRARIES})
+add_dependencies(test_ispy arm_utilities segbot_arm_manipulation_gencpp)
 
 add_executable(trajectory_record src/trajectory_record.cpp)
 add_dependencies(trajectory_record segbot_arm_manipulation_gencpp)
 target_link_libraries(trajectory_record ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+add_executable(nav_safety_service src/nav_safety_service.cpp)
+add_dependencies(nav_safety_service arm_utilities segbot_arm_manipulation_gencpp ${catkin_EXPORTED_TARGETS})
+target_link_libraries(nav_safety_service arm_utilities ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
 add_executable(position_record src/position_record.cpp)
 add_dependencies(position_record segbot_arm_manipulation_gencpp)
 target_link_libraries(position_record ${catkin_LIBRARIES} ${Boost_LIBRARIES})
+
+add_executable(segbot_obj_replacement_as src/segbot_obj_replacement_as.cpp)
+add_dependencies(segbot_obj_replacement_as arm_utilities segbot_arm_manipulation_gencpp)
+target_link_libraries(segbot_obj_replacement_as arm_utilities ${catkin_LIBRARIES})
+
 
 install(PROGRAMS
         scripts/arm_actions.py
         DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
-add_executable(test_ispy src/demos/test_ispy.cpp)
-target_link_libraries(test_ispy arm_utilities ${catkin_LIBRARIES})
-add_dependencies(test_ispy arm_utilities segbot_arm_manipulation_gencpp)
 
 add_executable(demo_press_button src/demos/demo_press_button.cpp)
 target_link_libraries(demo_press_button arm_utilities ${catkin_LIBRARIES})
