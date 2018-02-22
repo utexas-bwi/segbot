@@ -22,8 +22,8 @@
 //some defines related to filtering candidate grasps
 #define MIN_DISTANCE_TO_PLANE 0.05
 
-#define HAND_OFFSET_GRASP 0.02
-#define HAND_OFFSET_APPROACH 0.07
+#define HAND_OFFSET_GRASP 0.06
+#define HAND_OFFSET_APPROACH 0.1
 
 
 //used when deciding whether a pair of an approach pose and a grasp pose are good;
@@ -266,14 +266,14 @@ public:
 
         // Center of the object, but the minimum along the X axis
         Eigen::Vector4f fixed = boundingBox.position;
-        fixed.x() = boundingBox.min.x();
+        fixed.x() = boundingBox.min.x()+HAND_OFFSET_GRASP;
 
         // Vary along Z axis between object min and max
         generate_grasps_along_bounding_box_side(boundingBox, 2, boundingBox.min, boundingBox.max, fixed, grasp_commands,
                                                 quat_stamped.quaternion);
 
         fixed = boundingBox.position;
-        fixed.z() = boundingBox.max.z();
+        fixed.z() = boundingBox.max.z()-HAND_OFFSET_GRASP;
         // Point down
         quat.setRPY(0.0, M_PI, 0);
         tf::quaternionStampedTFToMsg(quat, quat_stamped);
@@ -282,7 +282,7 @@ public:
 
         // Right side grasp
         fixed = boundingBox.position;
-        fixed.y() = boundingBox.min.y();
+        fixed.y() = boundingBox.min.y()+HAND_OFFSET_GRASP;
         // Point left
         quat.setRPY(0.0, M_PI / 2, M_PI / 2);
         tf::quaternionStampedTFToMsg(quat, quat_stamped);
@@ -291,7 +291,7 @@ public:
 
         // Left side grasp
         fixed = boundingBox.position;
-        fixed.y() = boundingBox.max.y();
+        fixed.y() = boundingBox.max.y()-HAND_OFFSET_GRASP;
         // Point right
         quat.setRPY(0.0, -M_PI / 2, M_PI / 2);
         tf::quaternionStampedTFToMsg(quat, quat_stamped);
@@ -477,8 +477,9 @@ public:
         mico.close_hand();
 
         //move to approach pose -- do it twice to correct
-        mico.move_to_pose_moveit(surviving_grasps.at(selected_grasp_index).approach_pose);
-        mico.move_to_pose_moveit(surviving_grasps.at(selected_grasp_index).approach_pose);
+        mico.move_to_pose_moveit(surviving_grasps.at(selected_grasp_index).approach_pose, goal->cloud_clusters
+        );
+        mico.move_to_pose_moveit(surviving_grasps.at(selected_grasp_index).approach_pose, goal->cloud_clusters );
 
         //open fingers
         mico.open_hand();
