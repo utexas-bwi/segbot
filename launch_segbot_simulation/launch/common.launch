@@ -1,0 +1,84 @@
+<launch>
+
+  <!-- common simulation for all segbot models -->
+
+  <arg name="localization_scan_topic" default="scan_filtered" />
+  <arg name="move_base_config" default="segbotv2" />
+  <arg name="multimap_file" default="$(find utexas_gdc)/maps/simulation/multimap2/combined.yaml" />
+  <arg name="robot_configuration" 
+       default="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v2.launch.xml" />
+  <arg name="x" default="0" />
+  <arg name="y" default="0" />
+  <arg name="yaw" default="0" />
+
+  <!-- start the UTexas GDC simulation environment -->
+  <include file="$(find utexas_gdc)/launch/simulation_multimap.launch" />
+
+  <!-- launch a multi map server for the simulated world -->
+  <node name="multi_level_map_server" pkg="multi_level_map_server" type="multi_level_map_server">
+    <param name="map_file" value="$(arg multimap_file)" />
+  </node>
+
+  <!-- Set the default level this robot starts on -->
+  <param name="level_mux/default_current_level" value="3rdFloor" />
+
+  <!-- also launch the level multiplexer and the level selector GUI -->
+  <node name="level_mux" pkg="multi_level_map_utils" type="level_mux">
+    <param name="global_frame_id" value="level_mux_map" />
+  </node>
+  <node name="level_selector" pkg="multi_level_map_utils" type="level_selector" />
+
+  <!-- Add simulation helpers for opening and closing doors, and
+       teleporting the robot through elevators. -->
+  <include file="$(find segbot_simulation_apps)/launch/door_handler.launch" />
+  <node name="robot_teleporter" pkg="segbot_simulation_apps" type="robot_teleporter">
+    <param name="robotid" value="segbot" />
+  </node>
+
+  <!-- launch the interruptable action server -->
+  <node name="move_base_interruptable" pkg="segbot_navigation" 
+        type="move_base_interruptable_server" />
+  <node name="move_base_interruptable_simple" pkg="segbot_navigation" 
+        type="move_base_interruptable_simple" />
+
+  <!-- start the gazebo simulator -->
+  <include file="$(find segbot_gazebo)/launch/segbot_mobile_base.launch">
+    <arg name="configuration_file" value="$(arg robot_configuration)" />
+    <arg name="x" value="$(arg x)" />
+    <arg name="y" value="$(arg y)" />
+    <arg name="yaw" value="$(arg yaw)" />
+    <arg name="robotid" value="segbot" />
+    <arg name="map_frame" value="level_mux_map" />
+    <arg name="map_service" value="level_mux/static_map" />
+    <arg name="map_topic" value="level_mux/map" />
+    <arg name="navigation_map_topic" value="bwi_logical_navigator/map" />
+    <arg name="launch_localization" value="true" />
+    <arg name="localization_scan_topic" default="$(arg localization_scan_topic)" />
+    <arg name="use_fake_localization" value="false" />
+    <arg name="move_base_server" value="move_base_interruptable" />
+    <arg name="move_base_config" value="$(arg move_base_config)" />
+    <arg name="launch_move_base" value="true" />
+    <arg name="use_full_gazebo_model" value="false" />
+  </include>
+
+  <!-- Finally, launch the bwi_logical_navigator to do low-level logical navigation. -->
+  <node name="bwi_logical_navigator" pkg="bwi_logical_translator" type="bwi_logical_navigator">
+    <param name="global_frame_id" value="level_mux_map" />
+    <remap from="move_base" to="move_base_interruptable" />
+  </node>
+
+  <!-- launch the planner and reasoner -->
+  <include file="$(find bwi_kr_execution)/launch/bwi_kr_execution.launch">
+    <arg name="domain" value="$(find bwi_kr_execution)/domain_simulation/" />
+    <arg name="simulation" value="true" />
+  </include>
+
+  <!-- Graphical user interface components -->
+
+  <!-- vizualization -->
+  <node name="rviz" type="rviz_runner" pkg="segbot_navigation" />
+  <!-- question dialog gui -->
+  <node name="gui" type="question_dialog_plugin" pkg="bwi_rqt_plugins" />
+
+</launch>
+

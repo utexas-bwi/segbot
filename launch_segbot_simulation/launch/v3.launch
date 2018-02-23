@@ -1,0 +1,13 @@
+<launch>
+
+  <!-- segbot_v3 simulation -->
+  <include file="$(find launch_segbot_simulation)/launch/common.launch">
+    <arg name="localization_scan_topic" value="velodyne/scan_filtered" />
+    <arg name="move_base_config" value="segbotv3" />
+    <arg name="robot_configuration" 
+         value="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v3.launch.xml" />
+    <arg name="x" value="15.0" />
+    <arg name="y" value="110.0" />
+  </include>
+
+</launch>

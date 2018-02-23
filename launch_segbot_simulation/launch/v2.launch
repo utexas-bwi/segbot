@@ -1,0 +1,10 @@
+<launch>
+
+  <!-- segbot_v2 simulation -->
+  <include file="$(find launch_segbot_simulation)/launch/common.launch">
+    <arg name="move_base_config" default="segbotv2" />
+    <arg name="x" value="15.0" />
+    <arg name="y" value="110.0" />
+  </include>
+
+</launch>
