@@ -78,6 +78,7 @@ catkin_package(
 )
 
 add_library(arm_utilities src/Mico.cpp src/arm_utils.cpp)
+add_dependencies(arm_utilities segbot_arm_manipulation_gencpp)
 target_link_libraries(arm_utilities ${catkin_LIBRARIES})
 
 
