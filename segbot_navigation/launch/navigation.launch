@@ -1,3 +1,4 @@
+<!-- this does not seem to be used anymore -->
 <launch>
 
   <arg name="map_file" default="$(find utexas_gdc)/maps/real/3ne/3ne.yaml" />

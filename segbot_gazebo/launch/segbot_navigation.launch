@@ -1,3 +1,4 @@
+<!-- this does not seem to be used anymore -->
 <launch>
 
   <arg name="robot_configuration" default="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v1.hokuyo_only.launch.xml" />

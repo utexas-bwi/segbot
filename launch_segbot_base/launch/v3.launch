@@ -1,0 +1,17 @@
+<!-- segbot_v3 base -->
+<launch>
+
+  <!-- common components -->
+  <include file="$(find launch_segbot_base)/launch/common.launch">
+    <arg name="move_base_config" value="segbotv3" />
+  </include>
+
+  <!-- robot base driver -->
+  <include file="$(find segbot_bringup)/launch/segbot_v3.launch">
+    <arg name="gui" value="$(arg gui)" />
+  </include>
+
+  <!-- other devices -->
+  <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v3.launch.xml"/>
+
+</launch>

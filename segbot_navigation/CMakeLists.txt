@@ -39,6 +39,4 @@ if (CATKIN_ENABLE_TESTING)
   roslaunch_add_file_check(launch/gmapping.launch)
   roslaunch_add_file_check(launch/move_base_eband.launch)
   roslaunch_add_file_check(launch/rviz.launch)
-  ## launch/navigation.launch not tested until
-  ## ros-drivers/openni_launch#10 is fixed.
 endif ()

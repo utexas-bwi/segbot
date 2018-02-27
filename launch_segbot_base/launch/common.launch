@@ -1,0 +1,69 @@
+<!-- common launch for all segbot bases -->
+<launch>
+
+  <arg name="global_frame" default="level_mux_map" />
+  <arg name="gui" default="true" />
+  <arg name="laser_max_range" default="4.0" />  <!-- ??? -->
+  <arg name="localization_scan_topic" default="scan_filtered" />
+  <arg name="move_base_config" default="segbotv2" />
+  <arg name="multimap_file"
+       default="$(find utexas_gdc)/maps/real/multimap/multimap.yaml" />
+  <arg name="rviz" default="true" />
+
+  <!-- ********* multi-level maps ******** -->
+
+  <node name="multi_level_map_server" pkg="multi_level_map_server"
+        type="multi_level_map_server">
+    <param name="map_file" value="$(arg multimap_file)" />
+  </node>
+
+  <!-- Set the default level this robot starts on -->
+  <param name="level_mux/default_current_level" value="3rdFloor" />
+
+  <!-- also launch the level multiplexer and the level selector GUI -->
+  <node name="level_mux" pkg="multi_level_map_utils" type="level_mux">
+    <param name="global_frame_id" value="$(arg global_frame)" />
+  </node>
+  <node name="level_selector" pkg="multi_level_map_utils" type="level_selector" />
+
+  <!-- launch passive (no tours enabled) virtour -->
+  <include file="$(find bwi_virtour)/launch/virtour_passive.launch"/>
+
+  <!-- Start logging selected topics -->
+  <include file="$(find bwi_logging)/launch/record.launch" />
+
+  <!-- localization -->
+  <include file="$(find segbot_navigation)/launch/amcl.launch">
+    <arg name="map_service" value="level_mux/static_map" />
+    <arg name="map_topic" value="level_mux/map" />
+    <arg name="map_frame_id" value="level_mux_map" />
+    <arg name="base_frame_id" value="base_footprint" />
+    <arg name="odom_frame_id" value="odom" />
+    <arg name="laser_max_range" value="$(arg laser_max_range)" />
+    <arg name="scan_topic" value="$(arg localization_scan_topic)" />
+  </include>
+
+  <!-- interruptable physical and logical navigation -->
+  <include file="$(find segbot_navigation)/launch/interruptable_navigation.launch">
+    <arg name="global_frame" value="$(arg global_frame)" />
+    <arg name="config" default="$(arg move_base_config)" />
+  </include>
+
+  <!-- knowledge representation, reasoning, and planing -->
+  <include file="$(find bwi_kr_execution)/launch/bwi_kr_execution.launch">
+    <arg name="domain" value="$(find bwi_kr_execution)/domain/" />
+    <arg name="simulation" value="false" />
+  </include>
+
+  <!-- ******* graphical user interface ********* -->
+
+  <!-- vizualization -->
+  <node name="rviz" type="rviz_runner" pkg="segbot_navigation" 
+        if="$(arg rviz)" />
+
+  <!-- question dialog gui -->
+  <node name="gui" type="question_dialog_plugin" pkg="bwi_rqt_plugins" 
+        if="$(arg gui)" />
+
+</launch>
+

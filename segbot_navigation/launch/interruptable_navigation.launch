@@ -1,0 +1,28 @@
+<!-- interruptable physical and logical navigation -->
+<launch>
+
+  <arg name="global_frame" default="level_mux_map" />
+  <arg name="move_base_config" default="segbotv2" />
+
+  <!-- interruptable action server -->
+  <node name="move_base_interruptable" pkg="segbot_navigation" 
+        type="move_base_interruptable_server" />
+  <node name="move_base_interruptable_simple" pkg="segbot_navigation" 
+        type="move_base_interruptable_simple" />
+
+  <!-- move_base with elastic band local planner -->
+  <include file="$(find segbot_navigation)/launch/move_base_eband.launch">
+    <arg name="map_topic" value="bwi_logical_navigator/map" />
+    <arg name="move_base_server" value="move_base_interruptable" />
+    <arg name="global_frame" value="$(arg global_frame)" />
+    <arg name="config" default="$(arg move_base_config)" />
+  </include>
+
+  <!-- logical navigation. -->
+  <node name="bwi_logical_navigator" pkg="bwi_logical_translator" 
+        type="bwi_logical_navigator">
+    <param name="global_frame_id" value="$(arg global_frame)" />
+    <remap from="move_base" to="move_base_interruptable" />
+  </node>
+
+</launch>
