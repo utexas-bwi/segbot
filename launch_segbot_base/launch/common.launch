@@ -46,7 +46,7 @@
   <!-- interruptable physical and logical navigation -->
   <include file="$(find segbot_navigation)/launch/interruptable_navigation.launch">
     <arg name="global_frame" value="$(arg global_frame)" />
-    <arg name="config" default="$(arg move_base_config)" />
+    <arg name="move_base_config" value="$(arg move_base_config)" />
   </include>
 
   <!-- knowledge representation, reasoning, and planing -->

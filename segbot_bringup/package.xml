@@ -27,9 +27,8 @@
   <exec_depend>segbot_description</exec_depend>
   <exec_depend>segbot_sensors</exec_depend>
   <exec_depend>segway_rmp</exec_depend>
-  <!-- segway_v3 packages commented out until released publicly -->
-  <!-- <exec_depend>segway_msgs</exec_depend> -->
-  <!-- <exec_depend>segway_ros</exec_depend> -->
+  <exec_depend>segway_msgs</exec_depend>
+  <exec_depend>segway_ros</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>stop_base</exec_depend>
   <exec_depend>tf</exec_depend>

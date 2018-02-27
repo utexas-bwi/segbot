@@ -21,11 +21,13 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <exec_depend>bwi_kr_execution</exec_depend>
+  <exec_depend>bwi_logging</exec_depend>
   <exec_depend>bwi_rqt_plugins</exec_depend>
   <exec_depend>bwi_virtour</exec_depend>
   <exec_depend>multi_level_map_server</exec_depend>
   <exec_depend>multi_level_map_utils</exec_depend>
-  <exec_depend>segbot_bringup</exec_depend> <!-- eliminate this depend -->
+  <exec_depend>segbot_bringup</exec_depend>
+  <exec_depend>segbot_led</exec_depend>
   <exec_depend>segbot_navigation</exec_depend>
   <exec_depend>utexas_gdc</exec_depend>
 
