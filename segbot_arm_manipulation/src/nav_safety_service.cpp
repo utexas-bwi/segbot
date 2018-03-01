@@ -8,7 +8,7 @@
 //services
 #include "bwi_moveit_utils/MoveitJointPose.h"
 
-#include "bwi_moveit_utils/NavSafety.h"
+#include "segbot_arm_manipulation/NavSafety.h"
 #include <moveit_msgs/GetPositionFK.h>
 #include <bwi_msgs/StopBaseStatus.h>
 #include <bwi_msgs/StopBase.h>
@@ -106,7 +106,7 @@ void joint_state_cb(const sensor_msgs::JointStateConstPtr &js) {
 
 };
 
-bool service_cb(bwi_moveit_utils::NavSafety::Request &req, bwi_moveit_utils::NavSafety::Response &res) {
+bool service_cb(segbot_arm_manipulation::NavSafety::Request &req, segbot_arm_manipulation::NavSafety::Response &res) {
     vector<float> as_floats;
     for (auto &value: q_safe) {
         as_floats.push_back(value);

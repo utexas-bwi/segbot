@@ -9,7 +9,7 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
     actionlib
     actionlib_msgs
-    bwi_kr_execution
+    plan_execution
     bwi_moveit_utils
     bwi_msgs
     bwi_perception

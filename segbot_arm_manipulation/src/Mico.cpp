@@ -15,7 +15,7 @@
 #include <moveit/robot_state/conversions.h>
 #include <geometry_msgs/WrenchStamped.h>
 
-#include <bwi_moveit_utils/NavSafety.h>
+#include <segbot_arm_manipulation/NavSafety.h>
 #include <bwi_moveit_utils/MoveitCartesianPose.h>
 #include <bwi_moveit_utils/MoveitJointPose.h>
 #include <bwi_moveit_utils/MoveitWaypoint.h>
@@ -55,7 +55,7 @@ namespace segbot_arm_manipulation {
         //finger positions
         finger_sub = n.subscribe(finger_position_topic, 1, &Mico::fingers_cb, this);
         home_client = n.serviceClient<kinova_msgs::HomeArm>(home_arm_service);
-        safety_client = n.serviceClient<bwi_moveit_utils::NavSafety>("/make_safe_for_travel");
+        safety_client = n.serviceClient<segbot_arm_manipulation::NavSafety>("/make_safe_for_travel");
         pose_moveit_client = n.serviceClient<bwi_moveit_utils::MoveitCartesianPose>("/cartesian_pose_service");
         joint_angles_moveit_client = n.serviceClient<bwi_moveit_utils::MoveitJointPose>("/joint_pose_service");
         waypoint_moveit_client = n.serviceClient<bwi_moveit_utils::MoveitWaypoint>("/waypoint_service");
@@ -218,7 +218,7 @@ namespace segbot_arm_manipulation {
 
     bool Mico::make_safe_for_travel() {
         safety_client.waitForExistence();
-        bwi_moveit_utils::NavSafety srv_safety;
+        segbot_arm_manipulation::NavSafety srv_safety;
         srv_safety.request.getSafe = true;
 
         if (safety_client.call(srv_safety)) {

@@ -19,7 +19,7 @@
 #include <bwi_perception/bwi_perception.h>
 
 
-#include "bwi_kr_execution/ExecutePlanAction.h"
+#include "plan_execution/ExecutePlanAction.h"
 
 #include <move_base_msgs/MoveBaseAction.h>
 
@@ -81,9 +81,9 @@ void pressEnter(std::string message){
 }
 
 void go_to_place(std::string table){
-	bwi_kr_execution::ExecutePlanGoal table_goal;
-    bwi_kr_execution::AspRule table_rule;
-    bwi_kr_execution::AspFluent table_fluent;
+	plan_execution::ExecutePlanGoal table_goal;
+    plan_execution::AspRule table_rule;
+    plan_execution::AspFluent table_fluent;
     
     table_fluent.name = "not facing";
     table_fluent.variables.push_back(table);
@@ -92,7 +92,7 @@ void go_to_place(std::string table){
     
     table_goal.aspGoal.push_back(table_rule);
 	
-	actionlib::SimpleActionClient<bwi_kr_execution::ExecutePlanAction> table_asp("/action_executor/execute_plan", true);
+	actionlib::SimpleActionClient<plan_execution::ExecutePlanAction> table_asp("/action_executor/execute_plan", true);
 	table_asp.waitForServer();
 	
 	ROS_INFO("finished waiting for server");
