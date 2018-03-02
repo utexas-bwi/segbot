@@ -20,8 +20,8 @@
     <param name="serial_port" value="/dev/hokuyo" />
     <param name="serial_baud" value="115200" />
     <param name="frame_id" value="$(arg tf_prefix)/$(arg name)_laser_link" />
-    <param name="min_ang" value="-1.309" /> <!-- -5pi/12-->
-    <param name="max_ang" value="1.309" /> <!-- 5pi/12 -->
+    <param name="angle_min" value="-1.309" /> <!-- -5pi/12-->
+    <param name="angle_max" value="1.309" /> <!-- 5pi/12 -->
     <remap from="scan" to="$(arg topic)" />
   </node>
   
