@@ -14,10 +14,6 @@
     local-name: libsegwayrmp
     uri: https://github.com/utexas-bwi/libsegwayrmp.git
 - git:
-    local-name: segbot
-    uri: https://github.com/utexas-bwi/segbot.git
-    version: master
-- git:
     local-name: segway_rmp
     uri: https://github.com/segwayrmp/segway_rmp.git
 - git:
