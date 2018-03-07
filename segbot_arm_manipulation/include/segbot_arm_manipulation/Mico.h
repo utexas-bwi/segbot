@@ -20,12 +20,8 @@
 #include <geometry_msgs/WrenchStamped.h>
 #include <bwi_manipulation/arm.h>
 #include <moveit_msgs/GetPositionFK.h>
+#include <bwi_manipulation/ArmPositionDB.h>
 #include "Mico.h"
-
-#define OPEN_FINGER_VALUE 100
-#define CLOSED_FINGER_VALUE 7200
-
-class ArmPositionDB;
 
 
 namespace segbot_arm_manipulation {
@@ -35,7 +31,6 @@ namespace segbot_arm_manipulation {
         ros::Subscriber tool_sub;
         ros::Subscriber finger_sub;
         ros::Subscriber wrench_sub;
-        ArmPositionDB *position_db;
 
     public:
         actionlib::SimpleActionClient<kinova_msgs::ArmPoseAction> pose_action;
@@ -57,6 +52,7 @@ namespace segbot_arm_manipulation {
         geometry_msgs::PoseStamped current_pose;
         kinova_msgs::FingerPosition current_finger;
         geometry_msgs::WrenchStamped current_wrench;
+        std::unique_ptr<bwi_manipulation::ArmPositionDB> position_db;
 
         bool heard_joint_state;
         bool heard_tool;
@@ -75,6 +71,11 @@ namespace segbot_arm_manipulation {
         static const std::string j_pos_filename;
         static const std::string c_pos_filename;
         static const double arm_poll_rate;
+        static const std::string side_view_position_name;
+        static const std::string handover_position_name;
+
+        static const uint OPEN_FINGER_VALUE;
+        static const uint CLOSED_FINGER_VALUE;
 
         explicit Mico(ros::NodeHandle n);
 
@@ -137,9 +138,14 @@ namespace segbot_arm_manipulation {
 
         bool move_home();
 
+        bool move_to_named_joint_position(const std::string &name);
+        bool move_to_named_tool_position(const std::string &name);
+
         bool move_to_side_view();
 
         bool move_to_handover();
+
+
 
     };
 }

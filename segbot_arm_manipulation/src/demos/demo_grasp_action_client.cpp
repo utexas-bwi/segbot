@@ -68,13 +68,12 @@ int main(int argc, char **argv) {
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
 
-	
-	//store out of table joint position
 	mico->wait_for_data();
 	mico->move_to_side_view();
 
 	while (ros::ok()){
-	
+
+        ROS_INFO("Perceiving tabletop scene...");
 		//get the table scene
 		bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
 		
