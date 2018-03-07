@@ -20,11 +20,9 @@
 #include <pcl_ros/impl/transforms.hpp>
 #include <pcl/common/common.h>
 
-#include "arm_positions_db.h"
+#include "bwi_manipulation/ArmPositionDB.h"
 
 
-#define OPEN_FINGER_VALUE 100
-#define CLOSED_FINGER_VALUE 7200
 #define NUM_JOINTS 8
 
 using namespace std;

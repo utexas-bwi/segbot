@@ -242,6 +242,7 @@ public:
         }
     }
 
+    //TODO: Break this into a class and move it to bwi_manipulation
     std::vector<GraspCartesianCommand>
     generate_heuristic_grasps(const PointCloudT::Ptr &target_cloud, const std::string &frame_id) {
 

@@ -102,14 +102,14 @@ int main(int argc, char **argv) {
 		while (!perception_success){
 			
 			ROS_INFO("Waiting for service...");
-			ros::service::waitForService("tabletop_object_detection_service");
+			ros::service::waitForService("perceive_tabletop_scene");
 			ROS_INFO("...done!");
 			ROS_INFO("Waiting for service existg...");
-			bool result = ros::service::exists("tabletop_object_detection_service",true);
+			bool result = ros::service::exists("perceive_tabletop_scene",true);
 			ROS_INFO("...done!");
 			std::cout << result << "\n";
 			
-			ros::ServiceClient client_tabletop_perception = n.serviceClient<bwi_perception::TabletopPerception>("tabletop_object_detection_service");
+			ros::ServiceClient client_tabletop_perception = n.serviceClient<bwi_perception::TabletopPerception>("perceive_tabletop_scene");
 				
 				
 			bwi_perception::TabletopPerception srv_perception;
