@@ -1,15 +1,8 @@
 #include <vector>
 #include <sensor_msgs/JointState.h>
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <kinova_msgs/JointAngles.h>
-#include <geometry_msgs/Pose.h>
-#include <shape_msgs/SolidPrimitive.h>
-#include <Eigen/src/Core/Matrix.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <moveit_msgs/CollisionObject.h>
-#include <pcl/point_cloud.h>
-#include <pcl_ros/transforms.h>
 #include <segbot_arm_manipulation/Mico.h>
+#include <math.h>
 
 using namespace std;
 namespace segbot_arm_manipulation {
@@ -45,13 +38,13 @@ namespace segbot_arm_manipulation {
                 d = fabs(a_p - b_p);
             else {
                 if (b_p > a_p) {
-                    if (b_p - a_p < a_p + 2 * PI - b_p)
+                    if (b_p - a_p < a_p + 2 * M_PI - b_p)
                         d = fabs(b_p - a_p);
                     else
-                        d = fabs(2 * PI - b_p + a_p);
+                        d = fabs(2 * M_PI - b_p + a_p);
                 } else {
-                    if (a_p - b_p > b_p + 2 * PI - a_p)
-                        d = fabs(b_p + 2 * PI - a_p);
+                    if (a_p - b_p > b_p + 2 * M_PI - a_p)
+                        d = fabs(b_p + 2 * M_PI - a_p);
                     else
                         d = fabs(a_p - b_p);
                 }
