@@ -14,19 +14,19 @@ namespace segbot_arm_manipulation {
         vector<double> result;
         map<string, double> a_pos;
         map<string, double> b_pos;
-        a_pos.insert(pair<string, double>(Mico::jointNames[0], A.joint1));
-        a_pos.insert(pair<string, double>(Mico::jointNames[1], A.joint2));
-        a_pos.insert(pair<string, double>(Mico::jointNames[2], A.joint3));
-        a_pos.insert(pair<string, double>(Mico::jointNames[3], A.joint4));
-        a_pos.insert(pair<string, double>(Mico::jointNames[4], A.joint5));
-        a_pos.insert(pair<string, double>(Mico::jointNames[5], A.joint6));
+        a_pos.emplace(Mico::jointNames[0], A.joint1);
+        a_pos.emplace(Mico::jointNames[1], A.joint2);
+        a_pos.emplace(Mico::jointNames[2], A.joint3);
+        a_pos.emplace(Mico::jointNames[3], A.joint4);
+        a_pos.emplace(Mico::jointNames[4], A.joint5);
+        a_pos.emplace(Mico::jointNames[5], A.joint6);
 
-        b_pos.insert(pair<string, double>(Mico::jointNames[0], B.joint1));
-        b_pos.insert(pair<string, double>(Mico::jointNames[1], B.joint2));
-        b_pos.insert(pair<string, double>(Mico::jointNames[2], B.joint3));
-        b_pos.insert(pair<string, double>(Mico::jointNames[3], B.joint4));
-        b_pos.insert(pair<string, double>(Mico::jointNames[4], B.joint5));
-        b_pos.insert(pair<string, double>(Mico::jointNames[5], B.joint6));
+        b_pos.emplace(Mico::jointNames[0], B.joint1);
+        b_pos.emplace(Mico::jointNames[1], B.joint2);
+        b_pos.emplace(Mico::jointNames[2], B.joint3);
+        b_pos.emplace(Mico::jointNames[3], B.joint4);
+        b_pos.emplace(Mico::jointNames[4], B.joint5);
+        b_pos.emplace(Mico::jointNames[5], B.joint6);
 
         for (unsigned int i = 0; i < Mico::jointNames->length(); i++) {
             string name = Mico::jointNames[i];

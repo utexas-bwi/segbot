@@ -7,7 +7,7 @@
 #include <segbot_arm_manipulation/Mico.h>
 
 //srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
+#include "bwi_perception/PerceiveTabletopScene.h"
 
 //srvs for ispy
 #include "segbot_arm_manipulation/iSpyTouch.h"
@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
 	while (ros::ok()){
 	
 		//get the table scene
-		bwi_perception::TabletopPerception::Response table_scene;
+		bwi_perception::PerceiveTabletopScene::Response table_scene;
 		bool perception_success = false;
 		
 		
@@ -109,10 +109,10 @@ int main(int argc, char **argv) {
 			ROS_INFO("...done!");
 			std::cout << result << "\n";
 			
-			ros::ServiceClient client_tabletop_perception = n.serviceClient<bwi_perception::TabletopPerception>("perceive_tabletop_scene");
+			ros::ServiceClient client_tabletop_perception = n.serviceClient<bwi_perception::PerceiveTabletopScene>("perceive_tabletop_scene");
 				
 				
-			bwi_perception::TabletopPerception srv_perception;
+			bwi_perception::PerceiveTabletopScene srv_perception;
 				
 			//to make sure we only see objects on the table in front of us
 			srv_perception.request.apply_x_box_filter = true;

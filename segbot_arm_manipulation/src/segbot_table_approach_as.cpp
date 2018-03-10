@@ -16,9 +16,6 @@
 #include <tf_conversions/tf_eigen.h>
 #include <tf/transform_broadcaster.h>
 
-//srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
-
 // PCL specific includes
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
@@ -58,6 +55,7 @@
 #include <sound_play/sound_play.h>
 #include <sound_play/SoundRequest.h>
 #include <bwi_perception/BoundingBox.h>
+#include <bwi_perception/PerceiveTabletopScene.h>
 
 /* define what kind of point clouds we're using */
 typedef pcl::PointXYZRGB PointT;
@@ -295,8 +293,8 @@ public:
             mico.move_to_named_joint_position(segbot_arm_manipulation::Mico::side_view_position_name);
 			
 			
-			ros::ServiceClient client_tabletop_perception = nh_.serviceClient<bwi_perception::TabletopPerception>("perceive_tabletop_scene");
-			bwi_perception::TabletopPerception srv; //the srv request is just empty
+			ros::ServiceClient client_tabletop_perception = nh_.serviceClient<bwi_perception::PerceiveTabletopScene>("perceive_tabletop_scene");
+			bwi_perception::PerceiveTabletopScene srv; //the srv request is just empty
 			
 			srv.request.override_filter_z = true;
 			srv.request.max_z_value = FILTER_Z_VALUE;

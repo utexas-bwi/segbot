@@ -6,7 +6,7 @@
 #include <sensor_msgs/JointState.h>
 
 //srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
+#include <bwi_perception/PerceiveTabletopScene.h>
 #include <bwi_perception/bwi_perception.h>
 
 //action for grasping
@@ -69,7 +69,7 @@ void go_to_place(const std::string &table){
 	}
 }
 
-int find_largest_obj(bwi_perception::TabletopPerception::Response table_scene){
+int find_largest_obj(bwi_perception::PerceiveTabletopScene::Response table_scene) {
 	int largest_pc_index = -1;
 	int largest_num_points = -1;
 	for (unsigned int i = 0; i < table_scene.cloud_clusters.size(); i++){
@@ -106,7 +106,7 @@ void call_approach(std::string command){
 	}
 }
 
-void grasp_largest_object(bwi_perception::TabletopPerception::Response table_scene, int largest_pc_index){
+void grasp_largest_object(bwi_perception::PerceiveTabletopScene::Response table_scene, int largest_pc_index) {
 
 	
 	actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopGraspAction> ac_grasp("segbot_tabletop_grasp_as",true);
@@ -129,7 +129,7 @@ void grasp_largest_object(bwi_perception::TabletopPerception::Response table_sce
 	ROS_INFO("Grasp action Finished...");
 }
 
-void lift_object(bwi_perception::TabletopPerception::Response table_scene, int largest_pc_index){
+void lift_object(bwi_perception::PerceiveTabletopScene::Response table_scene, int largest_pc_index) {
 	actionlib::SimpleActionClient<segbot_arm_manipulation::LiftVerifyAction> lift_ac("arm_lift_verify_as", true);
 	lift_ac.waitForServer();
 	ROS_INFO("lift and verify action server made...");
@@ -188,8 +188,8 @@ int main(int argc, char **argv) {
 	//Step 3: get the table scene and target object
 	mico->move_home();
 	mico->move_to_side_view();
-	
-	bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
+
+    bwi_perception::PerceiveTabletopScene::Response table_scene = bwi_perception::getTabletopScene(n);
 	if (!table_scene.is_plane_found){
 		ROS_WARN("No plane found. Exiting...");
 		exit(1);

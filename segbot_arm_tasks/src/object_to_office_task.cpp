@@ -6,7 +6,7 @@
 #include <sensor_msgs/JointState.h>
 
 //srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
+#include <bwi_perception/PerceiveTabletopScene.h>
 
 //actions
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
@@ -48,7 +48,7 @@ void sig_handler(int sig) {
 
 
 /* Function to find the largest object on a table*/
-int find_largest_obj(bwi_perception::TabletopPerception::Response table_scene){
+int find_largest_obj(bwi_perception::PerceiveTabletopScene::Response table_scene) {
 	int largest_pc_index = -1;
 	int largest_num_points = -1;
 	for (unsigned int i = 0; i < table_scene.cloud_clusters.size(); i++){
@@ -133,7 +133,8 @@ void call_approach(std::string command){
 }
 
 
-void grasp_largest_object(ros::NodeHandle n, bwi_perception::TabletopPerception::Response table_scene, int largest_pc_index){
+void grasp_largest_object(ros::NodeHandle n, bwi_perception::PerceiveTabletopScene::Response table_scene,
+                          int largest_pc_index) {
 
 	
 	actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopGraspAction> ac_grasp("segbot_tabletop_grasp_as",true);
@@ -170,7 +171,7 @@ void handover_object(){
 	ac.waitForResult();
 }
 
-void lift_object(ros::NodeHandle n, bwi_perception::TabletopPerception::Response table_scene, int largest_pc_index){
+void lift_object(ros::NodeHandle n, bwi_perception::PerceiveTabletopScene::Response table_scene, int largest_pc_index) {
 	actionlib::SimpleActionClient<segbot_arm_manipulation::LiftVerifyAction> lift_ac("arm_lift_verify_as", true);
 	lift_ac.waitForServer();
 	ROS_INFO("lift and verify action server made...");
@@ -245,7 +246,7 @@ int main(int argc, char **argv) {
 	pressEnter("Press [ENTER] to proceed");
 	
 	//Step 5: get the table scene and select object to grasp
-	bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
+    bwi_perception::PerceiveTabletopScene::Response table_scene = bwi_perception::getTabletopScene(n);
 	
 	//ensure the plane is found and there are clusters on the table	
 	if (!table_scene.is_plane_found){

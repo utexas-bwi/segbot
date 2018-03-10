@@ -80,7 +80,7 @@
 #define TOUCH_POSE_HEIGHT 0.095
 #define TIMEOUT_THRESHOLD 30.0 //30 seconds
 
-#define PI 3.14159265
+
 
 //threshold used to determine if detect change indicates 
 //a contact with the object
@@ -274,8 +274,8 @@ std::vector<PointCloudT::Ptr > computeClusters(PointCloudT::Ptr in){
 	for (std::vector<pcl::PointIndices>::const_iterator it = cluster_indices.begin (); it != cluster_indices.end (); ++it)
 	{
 		PointCloudT::Ptr cloud_cluster (new PointCloudT);
-		for (std::vector<int>::const_iterator pit = it->indices.begin (); pit != it->indices.end (); pit++)
-			cloud_cluster->points.push_back (in->points[*pit]); 
+		for (int indice : it->indices)
+			cloud_cluster->points.push_back (in->points[indice]);
 		cloud_cluster->width = cloud_cluster->points.size ();
 		cloud_cluster->height = 1;
 		cloud_cluster->is_dense = true;
@@ -329,7 +329,7 @@ geometry_msgs::PoseStamped createTouchPose(PointCloudT::Ptr blob,
 	pose_st.pose.position.x = pose_st.pose.position.x - 0.075;	
 			
 	//decide on orientation (horizontal palm)
-	pose_st.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(PI/2,0,PI/2);
+	pose_st.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(M_PI/2,0,M_PI/2);
 	
 	
 	if (!transform_into_mico){
@@ -853,7 +853,7 @@ bool face_table_cb(segbot_arm_manipulation::iSpyFaceTable::Request &req,
 	
 	//compute the target amount to turn: 90% to get to the neighboring table
 	int table_diff = (current_table - target_table);
-	double target_turn_angle = (PI / 2.0) * table_diff;
+	double target_turn_angle = (M_PI / 2.0) * table_diff;
 	
 	ROS_INFO("[ispy_arm_server.cpp] Target turn angle: %f",target_turn_angle);
 	
@@ -876,7 +876,7 @@ bool face_table_cb(segbot_arm_manipulation::iSpyFaceTable::Request &req,
 	//angular turn velocity
 	double max_turn_velocity = 0.25;
 	double min_turn_velocity = 0.05;
-	double velocity_threshold = PI/6;
+	double velocity_threshold = M_PI/6;
 	
 	double turn_velocity = max_turn_velocity;
 	double turn_direction = -1.0; //-1 is right
@@ -1057,7 +1057,7 @@ int main (int argc, char** argv)
 		//check if we're supposed to be moving as an indicator that the robot is listening
 		if (is_listening){
 			//update angle
-			theta_angle += (2*PI)/(cycle_length * ros_rate);
+			theta_angle += (2*M_PI)/(cycle_length * ros_rate);
 
 			//compute z velocity and publish
 			v_msg.twist_linear_z = z_vel_magnitude * cos(theta_angle);

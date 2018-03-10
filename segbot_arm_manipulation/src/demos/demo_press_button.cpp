@@ -3,7 +3,6 @@
 #include <sensor_msgs/JointState.h>
 
 //srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
 #include "bwi_perception/bwi_perception.h"
 
 //action for grasping
@@ -121,7 +120,7 @@ int main(int argc, char**argv){
 	if(ros::ok()){
 		
 		//get the table scene (from demo grasp action client)
-		bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
+		bwi_perception::PerceiveTabletopScene::Response table_scene = bwi_perception::getTabletopScene(n);
 		
 		if ((int)table_scene.cloud_clusters.size() == 0){
 			ROS_WARN("No objects found on table. The end...");

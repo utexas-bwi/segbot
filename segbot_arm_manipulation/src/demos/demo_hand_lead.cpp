@@ -7,9 +7,6 @@
 #include <kinova_msgs/PoseVelocity.h>
 
 
-//srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
-
 //action for grasping
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 

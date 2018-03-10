@@ -13,8 +13,6 @@
 #include <segbot_arm_manipulation/PushAction.h>
 
 
-//srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
 
 #include <moveit_msgs/DisplayRobotState.h>
 // Kinematics
