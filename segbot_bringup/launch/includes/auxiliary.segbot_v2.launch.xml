@@ -11,7 +11,7 @@
 
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
   <param name="robot_description" 
-    command="$(find xacro)/xacro '$(arg urdf_file)' use_full_gazebo_model:=$(arg use_full_gazebo_model)" />
+    command="$(find xacro)/xacro '$(arg urdf_file)' --inorder use_full_gazebo_model:=$(arg use_full_gazebo_model)" />
 
   <!-- launch the tf tree -->
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
@@ -24,8 +24,8 @@
            and the topic on which the driver will publish their state.
        -->
 	  <param name="robot_description"
-		command="$(find xacro)/xacro '$(arg urdf_file)' use_full_gazebo_model:=$(arg use_full_gazebo_model)" if="$(arg use_arm)"/>
-      <rosparam param="source_list" if="$(arg use_arm)">["m1n6s200_driver/out/joint_state"]</rosparam>
+		command="$(find xacro)/xacro '$(arg urdf_file)' --inorder use_full_gazebo_model:=$(arg use_full_gazebo_model)" if="$(arg use_arm)"/>
+      <rosparam param="source_list" if="$(arg use_arm)">["m1n6s200_driver/out/joint_state", "m1n6s200/joint_states"]</rosparam>
 
   </node>
 
