@@ -24,6 +24,7 @@ find_package(catkin REQUIRED COMPONENTS
         roscpp
         rospy
         std_msgs
+        std_srvs
         sensor_msgs
         sound_play
         tf_conversions
@@ -57,9 +58,10 @@ add_action_files(
 
 add_service_files(
         FILES
-        iSpyTouch.srv
         iSpyDetectTouch.srv
         iSpyFaceTable.srv
+        iSpyReorderClouds.srv
+        iSpyTouch.srv
         NavSafety.srv
 )
 
@@ -116,6 +118,10 @@ target_link_libraries(ispy_arm_server arm_utilities ${catkin_LIBRARIES})
 add_executable(demo_obstacle_avoidance src/demos/demo_obstacle_avoidance.cpp)
 add_dependencies(demo_obstacle_avoidance  arm_utilities segbot_arm_manipulation_gencpp)
 target_link_libraries(demo_obstacle_avoidance arm_utilities arm_utilities ${catkin_LIBRARIES})
+
+add_executable(demo_grasp_and_lay_down src/demos/demo_grasp_and_lay_down.cpp)
+add_dependencies(demo_grasp_and_lay_down segbot_arm_manipulation_gencpp arm_utilities)
+target_link_libraries(demo_grasp_and_lay_down arm_utilities ${catkin_LIBRARIES} )
 
 add_executable(demo_grasp_action_client src/demos/demo_grasp_action_client.cpp)
 add_dependencies(demo_grasp_action_client segbot_arm_manipulation_gencpp arm_utilities)

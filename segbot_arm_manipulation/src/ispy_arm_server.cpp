@@ -71,6 +71,13 @@
 //some message used for publishing or in the callbacks
 #include <nav_msgs/Odometry.h>
 #include <kinova_msgs/JointVelocity.h>
+#include <bwi_perception/bwi_perception.h>
+#include <pcl_ros/transforms.h>
+
+#include <segbot_arm_manipulation/iSpyReorderClouds.h>
+#include <segbot_arm_manipulation/Mico.h>
+
+#include <std_srvs/Trigger.h>
 
 #define NUM_JOINTS 8 //6+2 for the arm
 #define FINGER_FULLY_OPENED 6
@@ -97,7 +104,6 @@ kinova_msgs::FingerPosition current_finger;
 geometry_msgs::PoseStamped current_pose;
 bool heardPose = false;
 bool heardJoinstState = false;
-geometry_msgs::PoseStamped home_pose;
 
 
 nav_msgs::Odometry current_odom;
@@ -137,11 +143,7 @@ ros::Publisher pub_angular_velocity;
 //original studey
 //const float home_position [] = {-1.9461704803383473, -0.39558648095261406, -0.6342860089305954, -1.7290658598495474, 1.4053863262257316, 3.039252699220428};
 
-//closer to laptop so robot can turn
-const float home_position [] = {-2.104982765623053, -0.45429879666061385, -0.04619985280042514, -1.5303365182500774, 1.1245469345291512, 2.8024433498261305};
-
-const float home_position_approach [] = {-1.9480954131742567, -0.9028227948134995, -0.6467984718381701, -1.4125267937404524, 0.8651278801122975, 3.73659131064558};
-const float safe_position [] = {-2.0905452367215145, -1.6631960323958503, 0.14437462322511263, -2.626324245881435, 1.3756366863206724, 4.141190461359241};
+segbot_arm_manipulation::Mico *mico;
 
 //which table we currently face (from  1 to 3)
 int current_table = 2;
@@ -721,6 +723,17 @@ bool detect_touch_cb(segbot_arm_manipulation::iSpyDetectTouch::Request &req,
 	return true;
 }
 
+bool retract_arm_cb(std_srvs::Trigger::Request &req,
+					 std_srvs::Trigger::Response &res) {
+	mico->wait_for_data();
+
+	//moveToPoseCarteseanVelocity(home_pose,false);
+	//finally call move it to get into the precise joint configuration as the start
+	bool success = mico->move_to_named_joint_position("off_to_right");
+	res.success = success;
+	return true;
+
+}
 
 
 bool touch_object_cb(segbot_arm_manipulation::iSpyTouch::Request &req, 
@@ -729,10 +742,10 @@ bool touch_object_cb(segbot_arm_manipulation::iSpyTouch::Request &req,
 	
 	//convert object clouds to PCL format
 	std::vector<PointCloudT::Ptr > detected_objects;
-	for (unsigned int i = 0; i <req.objects.size(); i++){
+	for (const auto &object : req.objects) {
 		PointCloudT::Ptr object_i (new PointCloudT);
 		pcl::PCLPointCloud2 pc_i;
-		pcl_conversions::toPCL(req.objects.at(i),pc_i);
+		pcl_conversions::toPCL(object,pc_i);
 		pcl::fromPCLPointCloud2(pc_i,*object_i);
 		detected_objects.push_back(object_i);
 	}
@@ -787,18 +800,16 @@ bool touch_object_cb(segbot_arm_manipulation::iSpyTouch::Request &req,
 		moveToPoseCarteseanVelocity(touch_pose_i,true,4.0);
 	}
 	else { //retract
-		//store current pose
-		listenForArmData(30.0,2.0);
+		mico->wait_for_data();
 		
-		geometry_msgs::PoseStamped touch_approach = current_pose;
+		geometry_msgs::PoseStamped touch_approach = mico->current_pose;
 		touch_approach.pose.position.z = highest_z+0.2;
 		//touch_approach.pose.position.x -= 0.2;
 		
 		moveToPoseCarteseanVelocity(touch_approach,false,5.0);
 		//moveToPoseCarteseanVelocity(home_pose,false);
 		//finally call move it to get into the precise joint configuration as the start
-		moveToJointState(home_position_approach);
-		moveToJointState(home_position);
+		mico->move_to_named_joint_position("off_to_right");
 	}
 	
 	ROS_INFO("Finished touch object request for object %i",req.touch_index);
@@ -834,6 +845,56 @@ bool listen_mode_cb(std_srvs::Empty::Request &req, std_srvs::Empty::Response &re
 	return true;
 }
 
+bool reorder_objects_cb(segbot_arm_manipulation::iSpyReorderClouds::Request &req,
+				   segbot_arm_manipulation::iSpyReorderClouds::Response &res) {
+
+    string sensor_frame = req.clouds.at(0).header.frame_id;
+	vector<PointCloudT::Ptr> as_pcl_clouds;
+	/*transform(table_scene.cloud_clusters.begin(), table_scene.cloud_clusters.end(), as_pcl_clouds.begin(), [](sensor_msgs::PointCloud2 as_msg){
+        PointCloudT::Ptr converted(new PointCloudT);
+        pcl::fromROSMsg(as_msg, *converted);
+        return converted;
+    });*/
+	tf::TransformListener listener;
+	listener.waitForTransform("arm_link", sensor_frame, ros::Time::now(), ros::Duration(130));
+	for (auto as_msg: req.clouds) {
+		PointCloudT::Ptr converted(new PointCloudT);
+		pcl::fromROSMsg(as_msg, *converted);
+		pcl_ros::transformPointCloud(req.frame_id, *converted, *converted, listener);
+		as_pcl_clouds.emplace_back(converted);
+	}
+
+	bwi_perception::Axis axis;
+	if (req.axis == "x") {
+		axis = bwi_perception::Axis::X;
+ 	} else if (req.axis == "y") {
+		axis = bwi_perception::Axis::Y;
+	} else if (req.axis == "z") {
+		axis = bwi_perception::Axis::Z;
+	} else {
+		ROS_ERROR("Set the axis parameter");
+		return false;
+	}
+
+	bwi_perception::order_clouds<PointT>(as_pcl_clouds, axis);
+
+	/*transform(as_pcl_clouds.begin(), as_pcl_clouds.end(), table_scene.cloud_clusters.begin(), [](PointCloudT::Ptr as_pcl){
+        sensor_msgs::PointCloud2 converted;
+        pcl::toROSMsg(*as_pcl, converted);
+        return converted;
+    });*/
+
+    listener.waitForTransform(sensor_frame, "arm_link", ros::Time::now(), ros::Duration(130));
+    for (auto as_pcl: as_pcl_clouds) {
+		sensor_msgs::PointCloud2 converted;
+        pcl_ros::transformPointCloud(sensor_frame, *as_pcl, *as_pcl, listener);
+		pcl::toROSMsg(*as_pcl, converted);
+		res.ordered_clouds.emplace_back(converted);
+	}
+    return true;
+
+}
+
 bool face_table_cb(segbot_arm_manipulation::iSpyFaceTable::Request &req,
 					segbot_arm_manipulation::iSpyFaceTable::Response &res){
 	
@@ -849,7 +910,7 @@ bool face_table_cb(segbot_arm_manipulation::iSpyFaceTable::Request &req,
 	num_turns_taken ++;
 	
 	//else turn but first make arm safe
-	moveToJointState(home_position);
+	mico->move_to_side_view_approach();
 	
 	//compute the target amount to turn: 90% to get to the neighboring table
 	int table_diff = (current_table - target_table);
@@ -923,7 +984,7 @@ bool face_table_cb(segbot_arm_manipulation::iSpyFaceTable::Request &req,
 	pub_base_velocity.publish(v_i);
 	
 	//else turn but first make arm safe
-	moveToJointState(home_position);
+	mico->move_to_side_view_approach();
 	
 	
 	current_table = target_table;
@@ -971,6 +1032,7 @@ int main (int argc, char** argv)
 	// Initialize ROS
 	ros::init (argc, argv, "ispy_arm_server");
 	ros::NodeHandle n;
+    mico = new segbot_arm_manipulation::Mico(n);
 	
 	//create subscriber to joint angles
 	ros::Subscriber sub_angles = n.subscribe ("/m1n6s200_driver/out/joint_state", 10, joint_state_cb);
@@ -1007,7 +1069,9 @@ int main (int argc, char** argv)
 	
 	//declare service for touching objects
 	ros::ServiceServer service_touch = n.advertiseService("ispy/touch_object_service", touch_object_cb);
-	
+
+	ros::ServiceServer service_retract = n.advertiseService("ispy/retract_arm", retract_arm_cb);
+
 	//service for detecting when a human touches an object
 	ros::ServiceServer service_detect = n.advertiseService("ispy/human_detect_touch_object_service", detect_touch_cb);
 	
@@ -1019,20 +1083,17 @@ int main (int argc, char** argv)
 	
 	//service to toggle waiting for touch mode
 	ros::ServiceServer service_wait_touch = n.advertiseService("ispy/touch_waiting_mode_toggle", touch_wait_mode_cb);
-	
+
+	ros::ServiceServer reorder_clouds = n.advertiseService("ispy/reorder_clouds", reorder_objects_cb);
+
 	
 	//clients
 	client_start_change = n.serviceClient<std_srvs::Empty> ("/segbot_arm_table_change_detector/start");
 	client_stop_change = n.serviceClient<std_srvs::Empty> ("/segbot_arm_table_change_detector/stop");
 	client_joint_command = n.serviceClient<bwi_moveit_utils::MoveitJointPose> ("/joint_pose_service");
-	
-	//store the home arm pose
-	listenForArmData(40.0,2.0);
-	home_pose = current_pose;
-	
-	
+
 	//test moving to home
-	moveToJointState(home_position);
+	mico->move_to_named_joint_position("off_to_right");
 	
 	//register ctrl-c
 	signal(SIGINT, sig_handler);

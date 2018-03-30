@@ -32,6 +32,7 @@ namespace segbot_arm_manipulation {
         ros::Subscriber finger_sub;
         ros::Subscriber wrench_sub;
 
+
     public:
         actionlib::SimpleActionClient<kinova_msgs::ArmPoseAction> pose_action;
         actionlib::SimpleActionClient<kinova_msgs::ArmJointAnglesAction> joint_state_action;
@@ -72,6 +73,7 @@ namespace segbot_arm_manipulation {
         static const std::string c_pos_filename;
         static const double arm_poll_rate;
         static const std::string side_view_position_name;
+        static const std::string side_view_approach_position_name;
         static const std::string handover_position_name;
 
         static const uint OPEN_FINGER_VALUE;
@@ -139,13 +141,14 @@ namespace segbot_arm_manipulation {
         bool move_home();
 
         bool move_to_named_joint_position(const std::string &name);
+
         bool move_to_named_tool_position(const std::string &name);
 
         bool move_to_side_view();
 
+        bool move_to_side_view_approach();
+
         bool move_to_handover();
-
-
 
     };
 }

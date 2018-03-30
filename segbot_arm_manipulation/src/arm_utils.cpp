@@ -9,7 +9,9 @@ namespace segbot_arm_manipulation {
     vector<double> getJointAngleDifferences(sensor_msgs::JointState A, sensor_msgs::JointState B) {
         return segbot_arm_manipulation::getJointAngleDifferences(segbot_arm_manipulation::state_to_angles(A), segbot_arm_manipulation::state_to_angles(B));
     }
-
+    double getDistanceDifferences(geometry_msgs::Pose A, Eigen::Vector4f B) {
+        return std::sqrt(std::pow(A.position.x-B.x(),2)+ std::pow(A.position.y-B.y(),2));
+    }
     vector<double> getJointAngleDifferences(kinova_msgs::JointAngles A, kinova_msgs::JointAngles B) {
         vector<double> result;
         map<string, double> a_pos;

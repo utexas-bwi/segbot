@@ -27,6 +27,7 @@ using namespace std;
 
 namespace segbot_arm_manipulation {
     const string Mico::side_view_position_name = "side_view";
+    const string Mico::side_view_approach_position_name = "side_view_approach";
     const string Mico::handover_position_name = "handover_front";
 
     const uint Mico::OPEN_FINGER_VALUE = 100;
@@ -290,6 +291,31 @@ namespace segbot_arm_manipulation {
 
         vector<moveit_msgs::CollisionObject> moveit_obstacles = segbot_arm_manipulation::get_collision_boxes(obstacles);
 
+        geometry_msgs::Pose pose;
+        pose.orientation.w = 1.0;
+        shape_msgs::SolidPrimitive primitive;
+        primitive.type = primitive.BOX;
+        primitive.dimensions.resize(3);
+        primitive.dimensions[0] = 0.0762;
+        primitive.dimensions[1] = 0.0762;
+        primitive.dimensions[2] = 0.762;
+
+        moveit_msgs::CollisionObject left_beam;
+        left_beam.header.frame_id = "left_sensor_beam_link";
+        left_beam.id = "fat_left_sensor_beam";
+        left_beam.primitives.push_back(primitive);
+        left_beam.primitive_poses.push_back(pose);
+
+        moveit_msgs::CollisionObject right_beam;
+        right_beam.header.frame_id = "right_sensor_beam_link";
+        right_beam.id = "fat_right_sensor_beam";
+        right_beam.primitives.push_back(primitive);
+        right_beam.primitive_poses.push_back(pose);
+        right_beam.primitive_poses.push_back(pose);
+
+        moveit_obstacles.push_back(left_beam);
+        moveit_obstacles.push_back(right_beam);
+
         req.target = target;
         req.collision_objects = moveit_obstacles;
         req.constraints = constraints;
@@ -304,6 +330,32 @@ namespace segbot_arm_manipulation {
         bwi_moveit_utils::MoveitJointPose::Response res;
 
         vector<moveit_msgs::CollisionObject> moveit_obstacles = segbot_arm_manipulation::get_collision_boxes(obstacles);
+
+        // HACK: Put collision boxes around the robot's beams to make self collision less probable
+        geometry_msgs::Pose pose;
+        pose.orientation.w = 1.0;
+        shape_msgs::SolidPrimitive primitive;
+        primitive.type = primitive.BOX;
+        primitive.dimensions.resize(3);
+        primitive.dimensions[0] = 0.0762;
+        primitive.dimensions[1] = 0.0762;
+        primitive.dimensions[2] = 0.762;
+
+        moveit_msgs::CollisionObject left_beam;
+        left_beam.header.frame_id = "left_sensor_beam_link";
+        left_beam.id = "fat_left_sensor_beam";
+        left_beam.primitives.push_back(primitive);
+        left_beam.primitive_poses.push_back(pose);
+
+        moveit_msgs::CollisionObject right_beam;
+        right_beam.header.frame_id = "right_sensor_beam_link";
+        right_beam.id = "fat_right_sensor_beam";
+        right_beam.primitives.push_back(primitive);
+        right_beam.primitive_poses.push_back(pose);
+        right_beam.primitive_poses.push_back(pose);
+
+        moveit_obstacles.push_back(left_beam);
+        moveit_obstacles.push_back(right_beam);
 
         vector<double> target_values;
         target_values.push_back(target.joint1);
@@ -346,8 +398,8 @@ namespace segbot_arm_manipulation {
         if (!position_db->has_tool_position(name)) {
             return false;
         }
-        geometry_msgs::PoseStamped pose = position_db->get_tool_position_stamped("side_view",
-                                                                                          "/m1n6s200_link_base");
+        geometry_msgs::PoseStamped pose = position_db->get_tool_position_stamped(name,
+                                                                                 "/m1n6s200_link_base");
         return move_to_pose_moveit(pose);
 
     }
@@ -356,7 +408,7 @@ namespace segbot_arm_manipulation {
         if (!position_db->has_joint_position(name)) {
             return false;
         }
-        auto joint_values = position_db->get_joint_position("side_view");
+        auto joint_values = position_db->get_joint_position(name);
         return move_to_joint_state_moveit(values_to_joint_state(joint_values));
 
     }
@@ -430,5 +482,10 @@ namespace segbot_arm_manipulation {
 
     bool Mico::move_to_handover() {
         return move_to_named_joint_position(handover_position_name);
+    }
+
+    bool Mico::move_to_side_view_approach() {
+        return move_to_named_joint_position(side_view_approach_position_name);
+
     }
 }

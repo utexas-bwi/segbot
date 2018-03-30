@@ -40,6 +40,8 @@ namespace segbot_arm_manipulation {
 
     std::vector<double> getJointAngleDifferences(kinova_msgs::JointAngles A, kinova_msgs::JointAngles B);
 
+    double getDistanceDifferences(geometry_msgs::Pose A, Eigen::Vector4f B);
+
     // put the boxes around the collision objects
     std::vector<moveit_msgs::CollisionObject>
     get_collision_boxes(std::vector<sensor_msgs::PointCloud2> obstacles);
