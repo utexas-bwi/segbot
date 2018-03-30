@@ -57,8 +57,6 @@ protected:
     ros::Publisher target_cloud_pub;
     ros::Publisher pose_array_pub;
 
-    std::vector<PointCloudT::Ptr> detected_objects;
-
     //used to compute transforms
     tf::TransformListener listener;
 
@@ -173,146 +171,13 @@ public:
 
     }
 
-    void generate_grasps_along_bounding_box_side(const bwi_perception::BoundingBox &box, ulong varying_dimension,
-                                                 const Eigen::Vector4f &varied_min, const Eigen::Vector4f &varied_max,
-                                                 const Eigen::Vector4f &fixed, vector<GraspCartesianCommand> &grasps,
-                                                 const geometry_msgs::Quaternion &orientation) {
-        int steps = 10;
-        double range = varied_max(varying_dimension) - varied_min(varying_dimension);
-        double step_size = range / steps;
-
-        geometry_msgs::PoseStamped grasp_pose;
-
-        grasp_pose.header.frame_id = box.frame_id;
-        grasp_pose.pose.orientation = orientation;
-
-        for (int i = 0; i < steps; ++i) {
-            Eigen::Vector4f position = fixed;
-            position(varying_dimension) = varied_min(varying_dimension) + step_size * i;
-            grasp_pose.pose.position.x = position.x();
-            grasp_pose.pose.position.y = position.y();
-            grasp_pose.pose.position.z = position.z();
-            grasps.push_back(GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH));
-        }
-    }
-
-
-    void generate_grasps_varying_orientation(const bwi_perception::BoundingBox &box,
-                                             const geometry_msgs::Quaternion &center_orientation,
-                                             const double angle_radius, const Eigen::Vector4f &position,
-                                             vector<GraspCartesianCommand> &grasps) {
-        tf::Quaternion q;
-        tf::quaternionMsgToTF(center_orientation, q);
-        tf::Matrix3x3 m(q);
-
-        // Get the min RPY values
-        double b_r, b_p, b_y;
-        m.getRPY(b_r, b_p, b_y);
-        b_r -= angle_radius;
-        b_p -= angle_radius;
-        b_y -= angle_radius;
-
-        int steps = 3;
-
-        double step_size = angle_radius * 2.0 / steps;
-
-        geometry_msgs::PoseStamped grasp_pose;
-
-        grasp_pose.header.frame_id = box.frame_id;
-        grasp_pose.pose.position.x = position.x();
-        grasp_pose.pose.position.y = position.y();
-        grasp_pose.pose.position.z = position.z();
-
-        tf::Stamped<tf::Quaternion> quat;
-        quat.frame_id_ = box.frame_id;
-
-        geometry_msgs::QuaternionStamped quat_stamped;
-
-        for (int i = 0; i < steps; ++i) {
-            for (int j = 0; j < steps; ++j) {
-                for (int k = 0; k < steps; ++k) {
-                    quat.setRPY(b_r + i * step_size, b_p * j * step_size, b_y * step_size);
-                    tf::quaternionStampedTFToMsg(quat, quat_stamped);
-                    grasp_pose.pose.orientation = quat_stamped.quaternion;
-                    grasps.push_back(GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH));
-                }
-            }
-
-        }
-    }
-
-    //TODO: Break this into a class and move it to bwi_manipulation
-    std::vector<GraspCartesianCommand>
-    generate_heuristic_grasps(const PointCloudT::Ptr &target_cloud, const std::string &frame_id) {
-
-
-        vector<GraspCartesianCommand> grasp_commands;
-        // Move from the sensor frame to the arm base frame
-        const PointCloudT::Ptr &arm_frame(target_cloud);
-        pcl_ros::transformPointCloud("m1n6s200_link_base", *arm_frame, *arm_frame, listener);
-        auto boundingBox = bwi_perception::BoundingBox::from_cloud<PointT>(arm_frame);
-
-
-        // The end effector frame has z extending along the finger tips. Here
-        // we set roll pitch yaw with respect to the link base axes, which have the x axis extending
-        // forward from the base of the robot. We pitch by 90 degrees to point the hands along the base's x axis
-        // (point forward).
-        tf::Stamped<tf::Quaternion> quat;
-        quat.setRPY(0.0, M_PI / 2, 0);
-        quat.frame_id_ = "m1n6s200_link_base";
-
-        geometry_msgs::QuaternionStamped quat_stamped;
-        tf::quaternionStampedTFToMsg(quat, quat_stamped);
-
-        // Center of the object, but the minimum along the X axis
-        Eigen::Vector4f fixed = boundingBox.position;
-        fixed.x() = boundingBox.min.x()+HAND_OFFSET_GRASP;
-
-        // Vary along Z axis between object min and max
-        generate_grasps_along_bounding_box_side(boundingBox, 2, boundingBox.min, boundingBox.max, fixed, grasp_commands,
-                                                quat_stamped.quaternion);
-
-        fixed = boundingBox.position;
-        fixed.z() = boundingBox.max.z()-HAND_OFFSET_GRASP;
-        // Point down
-        quat.setRPY(0.0, M_PI, 0);
-        tf::quaternionStampedTFToMsg(quat, quat_stamped);
-
-        generate_grasps_varying_orientation(boundingBox, quat_stamped.quaternion, 0.25, fixed, grasp_commands);
-
-        // Right side grasp
-        fixed = boundingBox.position;
-        fixed.y() = boundingBox.min.y()+HAND_OFFSET_GRASP;
-        // Point left
-        quat.setRPY(0.0, M_PI / 2, M_PI / 2);
-        tf::quaternionStampedTFToMsg(quat, quat_stamped);
-        generate_grasps_along_bounding_box_side(boundingBox, 2, boundingBox.min, boundingBox.max, fixed, grasp_commands,
-                                                quat_stamped.quaternion);
-
-        // Left side grasp
-        fixed = boundingBox.position;
-        fixed.y() = boundingBox.max.y()-HAND_OFFSET_GRASP;
-        // Point right
-        quat.setRPY(0.0, -M_PI / 2, M_PI / 2);
-        tf::quaternionStampedTFToMsg(quat, quat_stamped);
-        generate_grasps_along_bounding_box_side(boundingBox, 2, boundingBox.min, boundingBox.max, fixed, grasp_commands,
-                                                quat_stamped.quaternion);
-
-
-        for (auto &grasp: grasp_commands) {
-            listener.transformPose(frame_id, grasp.approach_pose, grasp.approach_pose);
-            listener.transformPose(frame_id, grasp.grasp_pose, grasp.grasp_pose);
-        }
-        return grasp_commands;
-
-    }
 
     ulong select_grasp(vector<GraspCartesianCommand> grasps, const std::string &selection_method) {
         ulong selected_grasp_index;
         if (selection_method ==
             segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION) {
             //find the grasp with closest orientation to current pose
-            double min_diff = std::numeric_limits<double>::max();
+            double min_diff = numeric_limits<double>::max();
             for (unsigned int i = 0; i < grasps.size(); i++) {
                 double d_i = segbot_arm_manipulation::quat_angular_difference(
                         grasps.at(i).approach_pose.pose.orientation, mico.current_pose.pose.orientation);
@@ -378,7 +243,17 @@ public:
 
         std::vector<GraspCartesianCommand> candidate_grasps;
         if (goal->grasp_generation_method == segbot_arm_manipulation::TabletopGraspGoal::HEURISTIC) {
-            candidate_grasps = generate_heuristic_grasps(target_object, sensor_frame_id);
+            tf::Stamped<tf::Quaternion> quat;
+            quat.setRPY(0.0, M_PI / 2, 0);
+            quat.frame_id_ = "m1n6s200_link_base";
+
+            geometry_msgs::QuaternionStamped quat_stamped;
+            tf::quaternionStampedTFToMsg(quat, quat_stamped);
+            candidate_grasps = bwi_manipulation::grasp_utils::generate_heuristic_grasps<PointT>(target_object,
+                                                                                                quat_stamped,
+                                                                                                HAND_OFFSET_GRASP,
+                                                                                                HAND_OFFSET_APPROACH,
+                                                                                                listener);
             target_cloud_pub.publish(target_object_pc2);
         } else {
             candidate_grasps = generate_agile_grasps(target_object, sensor_frame_id);
