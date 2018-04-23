@@ -14,6 +14,7 @@
   <xacro:include filename="$(find segbot_description)/urdf/mounts/kinect_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/sensor_plate_mount.urdf.xacro" />
   <xacro:include filename="$(find kinova_description)/urdf/m1n6s200.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/fat_beam_8020.urdf.xacro" />
 
   <!-- Add the segbot base -->
   <xacro:segbot />

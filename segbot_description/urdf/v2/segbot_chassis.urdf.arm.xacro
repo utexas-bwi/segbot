@@ -6,7 +6,7 @@
   <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/battery_box.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/beam_8020.urdf.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/components/alienware_alpha.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/box_laptop.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
 
   <xacro:macro name="segbot_chassis_parametrized" params="parent *origin front_vertical_beam_length back_vertical_beam_length laptop_plate_length laptop_plate_width">
@@ -81,10 +81,10 @@
         rpy="${M_PI} -${M_PI/2} 0" />
     </xacro:aluminium_sheet>
 
-    <!-- computer -->
-    <xacro:alienware_alpha name="alienware_alpha" parent="laptop_base_plate"> 
+    <!-- laptop -->
+    <xacro:laptop name="laptop" parent="laptop_base_plate"> 
       <origin xyz="-${3.0*INCH_TO_M} 0 ${0.125*INCH_TO_M}" rpy="0 0 0" />
-    </xacro:alienware_alpha>
+    </xacro:laptop>
 
   </xacro:macro>
 

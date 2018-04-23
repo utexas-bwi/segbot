@@ -56,6 +56,7 @@
 #include <sound_play/SoundRequest.h>
 #include <bwi_perception/BoundingBox.h>
 #include <bwi_perception/PerceiveTabletopScene.h>
+#include <bwi_perception/PerceiveLargestHorizontalPlane.h>
 
 /* define what kind of point clouds we're using */
 typedef pcl::PointXYZRGB PointT;
@@ -233,7 +234,8 @@ public:
         pose_pub.publish(pose_debug);
 
 
-        //next, make arm safe to move again
+		// Arm is assumed to be safe
+/*        //next, make arm safe to move again
         mico.move_home();
         bool safe = mico.make_safe_for_travel();
         if (!safe) {
@@ -243,7 +245,7 @@ public:
             as_.setAborted(result_);
             return;
         }
-
+*/
 
         //calculate turn angle
         double target_turn_angle = atan2( cloud_plane->points.at(closest_point_index).y, cloud_plane->points.at(closest_point_index).x);
@@ -257,7 +259,7 @@ public:
 
 
         //now, approach table
-        double distance_to_travel = closest_point_distance - 0.25;
+        double distance_to_travel = closest_point_distance - 0.35;
         servo_linear(distance_to_travel);
     }
 
@@ -280,25 +282,18 @@ public:
 	}
 
 	void executeCB(const segbot_arm_manipulation::TabletopApproachGoalConstPtr &goal)
-	{
+    {
 		if (goal->command == "approach"){
 		
 			//step 1: query table_object_detection_node to segment the blobs on the table
 
-			//home the arm
-			mico.move_home();
-			mico.close_hand();
-	
-
-            mico.move_to_named_joint_position(segbot_arm_manipulation::Mico::side_view_position_name);
-			
-			
 			ros::ServiceClient client_tabletop_perception = nh_.serviceClient<bwi_perception::PerceiveTabletopScene>("perceive_tabletop_scene");
 			bwi_perception::PerceiveTabletopScene srv; //the srv request is just empty
-			
+
 			srv.request.override_filter_z = true;
 			srv.request.max_z_value = FILTER_Z_VALUE;
-			
+            ROS_INFO("Perceiving the table ...");
+
 			if (client_tabletop_perception.call(srv))
 			{
 				ROS_INFO("Received Response from tabletop_object_detection_service");
@@ -353,7 +348,7 @@ public:
 			}
 
 
-			
+
 			result_.success = true;
 			as_.setSucceeded(result_);
 		}
@@ -370,14 +365,11 @@ public:
 			nav_msgs::Odometry start_odom = current_odom;
 			
 			float distance_to_travel = 0.25;
-			
 			double start_odom_x = current_odom.pose.pose.position.x;
 			double start_odom_y = current_odom.pose.pose.position.y;
 			
 			double x_vel = -0.15;
-			
-			
-			
+
 			geometry_msgs::Twist v_i;
 			v_i.linear.x = 0; v_i.linear.y = 0; v_i.linear.z = 0;
 			v_i.angular.x = 0; v_i.angular.y = 0;
@@ -445,5 +437,4 @@ int main(int argc, char** argv)
 
   return 0;
 }
-
 

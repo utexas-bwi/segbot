@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
     bwi_msgs
     bwi_perception
     bwi_services
+    grounded_dialogue_agent_ros
     kinova_msgs
     pcl_ros
     pcl_conversions

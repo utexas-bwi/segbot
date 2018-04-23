@@ -21,7 +21,7 @@
 //some defines related to filtering candidate grasps
 #define MIN_DISTANCE_TO_PLANE 0.05
 
-#define HAND_OFFSET_GRASP 0.06
+#define HAND_OFFSET_GRASP 0.03
 #define HAND_OFFSET_APPROACH 0.1
 
 
@@ -142,8 +142,16 @@ public:
         ROS_INFO("[segbot_tabletop_grasp_as.cpp] Publishing point cloud...");
         // This extra conversion here is a bit wasteful, but it the penalty is dwarfed
         // by the publication, agile grasp overhead anyway
+        string target_frame;
+        nh_.getParam("find_grasps/cloud_frame",target_frame);
+
+        PointCloudT::Ptr target_cloud_transformed(new PointCloudT);
+        pcl_ros::transformPointCloud(target_frame, *target_cloud, *target_cloud_transformed, listener);
+
         sensor_msgs::PointCloud2 target_object_pc2;
-        pcl::toROSMsg<PointT>(*target_cloud, target_object_pc2);
+        pcl::toROSMsg<PointT>(*target_cloud_transformed, target_object_pc2);
+
+
         agile_grasp_cloud_pub.publish(target_object_pc2);
 
 
@@ -172,8 +180,148 @@ public:
     }
 
 
-    ulong select_grasp(vector<GraspCartesianCommand> grasps, const std::string &selection_method) {
+    void generate_grasps_along_bounding_box_side(const bwi_perception::BoundingBox &box, ulong varying_dimension,
+                                                 const Eigen::Vector4f &varied_min, const Eigen::Vector4f &varied_max,
+                                                 const Eigen::Vector4f &fixed, vector<GraspCartesianCommand> &grasps,
+                                                 const geometry_msgs::Quaternion &orientation) {
+        int steps = 10;
+        double range = varied_max(varying_dimension) - varied_min(varying_dimension);
+        double step_size = range / steps;
+
+        geometry_msgs::PoseStamped grasp_pose;
+
+        grasp_pose.header.frame_id = box.frame_id;
+        grasp_pose.pose.orientation = orientation;
+
+        for (int i = 0; i < steps; ++i) {
+            Eigen::Vector4f position = fixed;
+            position(varying_dimension) = varied_min(varying_dimension) + step_size * i;
+            grasp_pose.pose.position.x = position.x();
+            grasp_pose.pose.position.y = position.y();
+            grasp_pose.pose.position.z = position.z();
+            grasps.push_back(GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH));
+        }
+    }
+
+
+    void generate_grasps_varying_orientation(const bwi_perception::BoundingBox &box,
+                                             const geometry_msgs::Quaternion &center_orientation,
+                                             const double angle_radius, const Eigen::Vector4f &position,
+                                             vector<GraspCartesianCommand> &grasps) {
+        tf::Quaternion q;
+        tf::quaternionMsgToTF(center_orientation, q);
+        tf::Matrix3x3 m(q);
+
+        // Get the min RPY values
+        double b_r, b_p, b_y;
+        m.getRPY(b_r, b_p, b_y);
+        b_r -= angle_radius;
+        b_p -= angle_radius;
+        b_y -= angle_radius;
+
+        int steps = 3;
+
+        double step_size = angle_radius * 2.0 / steps;
+
+        geometry_msgs::PoseStamped grasp_pose;
+
+        grasp_pose.header.frame_id = box.frame_id;
+        grasp_pose.pose.position.x = position.x();
+        grasp_pose.pose.position.y = position.y();
+        grasp_pose.pose.position.z = position.z();
+
+        tf::Stamped<tf::Quaternion> quat;
+        quat.frame_id_ = box.frame_id;
+
+        geometry_msgs::QuaternionStamped quat_stamped;
+
+        for (int i = 0; i < steps; ++i) {
+            for (int j = 0; j < steps; ++j) {
+                for (int k = 0; k < steps; ++k) {
+                    quat.setRPY(b_r + i * step_size, b_p * j * step_size, b_y * step_size);
+                    tf::quaternionStampedTFToMsg(quat, quat_stamped);
+                    grasp_pose.pose.orientation = quat_stamped.quaternion;
+                    grasps.push_back(GraspCartesianCommand::from_grasp_pose(grasp_pose, HAND_OFFSET_APPROACH));
+                }
+            }
+
+        }
+    }
+
+    //TODO: Break this into a class and move it to bwi_manipulation
+    std::vector<GraspCartesianCommand>
+    generate_heuristic_grasps(const PointCloudT::Ptr &target_cloud, const std::string &frame_id) {
+
+
+        vector<GraspCartesianCommand> grasp_commands;
+        // Move from the sensor frame to the arm base frame
+        const PointCloudT::Ptr &arm_frame(target_cloud);
+        pcl_ros::transformPointCloud("m1n6s200_link_base", *arm_frame, *arm_frame, listener);
+        auto boundingBox = bwi_perception::BoundingBox::from_cloud<PointT>(arm_frame);
+
+
+        // The end effector frame has z extending along the finger tips. Here
+        // we set roll pitch yaw with respect to the link base axes, which have the x axis extending
+        // forward from the base of the robot. We pitch by 90 degrees to point the hands along the base's x axis
+
+        // (point forward).
+        tf::Stamped<tf::Quaternion> quat;
+        quat.setRPY(0.0, M_PI / 2, 0);
+        quat.frame_id_ = "m1n6s200_link_base";
+
+        geometry_msgs::QuaternionStamped quat_stamped;
+        tf::quaternionStampedTFToMsg(quat, quat_stamped);
+
+        // Center of the object, but the minimum along the X axis
+        Eigen::Vector4f fixed = boundingBox.position;
+        fixed.x() = boundingBox.min.x()+HAND_OFFSET_GRASP;
+
+        // Vary along Z axis between object min and max
+        generate_grasps_along_bounding_box_side(boundingBox, 2, boundingBox.min, boundingBox.max, fixed, grasp_commands,
+                                                quat_stamped.quaternion);
+
+        fixed = boundingBox.position;
+        fixed.z() = boundingBox.max.z()-HAND_OFFSET_GRASP;
+
+        // Point down
+        quat.setRPY(0.0, M_PI, 0);
+        tf::quaternionStampedTFToMsg(quat, quat_stamped);
+
+    //    generate_grasps_varying_orientation(boundingBox, quat_stamped.quaternion, 0.25, fixed, grasp_commands);
+
+        // Right side grasp
+        fixed = boundingBox.position;
+        fixed.y() = boundingBox.min.y()+HAND_OFFSET_GRASP;
+
+        // Point left
+        quat.setRPY(0.0, M_PI / 2, M_PI / 2);
+        tf::quaternionStampedTFToMsg(quat, quat_stamped);
+        generate_grasps_along_bounding_box_side(boundingBox, 2, boundingBox.min, boundingBox.max, fixed, grasp_commands,
+                                                quat_stamped.quaternion);
+
+        // Left side grasp
+        fixed = boundingBox.position;
+        fixed.y() = boundingBox.max.y()-HAND_OFFSET_GRASP;
+
+        // Point right
+        quat.setRPY(0.0, M_PI / 2, -M_PI / 2);
+        tf::quaternionStampedTFToMsg(quat, quat_stamped);
+        generate_grasps_along_bounding_box_side(boundingBox, 2, boundingBox.min, boundingBox.max, fixed, grasp_commands,
+                                                quat_stamped.quaternion);
+
+
+        for (auto &grasp: grasp_commands) {
+            listener.transformPose(frame_id, grasp.approach_pose, grasp.approach_pose);
+            listener.transformPose(frame_id, grasp.grasp_pose, grasp.grasp_pose);
+        }
+        return grasp_commands;
+
+    }
+
+
+    ulong select_grasp(vector<GraspCartesianCommand> grasps, const std::string &selection_method, const bwi_perception::BoundingBox &boundingBox) {
         ulong selected_grasp_index;
+
         if (selection_method ==
             segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_ORIENTATION_SELECTION) {
             //find the grasp with closest orientation to current pose
@@ -210,10 +358,25 @@ public:
                 }
             }
         }
+
+    else if (selection_method == segbot_arm_manipulation::TabletopGraspGoal::CLOSEST_TO_CENTROID_SELECTION) {
+        double min_diff = std::numeric_limits<double>::max();
+        for (unsigned int i = 0; i < grasps.size(); i++) {
+            double dist = segbot_arm_manipulation::getDistanceDifferences(
+                    grasps.at(i).grasp_pose.pose, boundingBox.centroid);
+
+            if (dist < min_diff) {
+                selected_grasp_index = (int) i;
+                min_diff = dist;
+            }
+        }
+    }
         return selected_grasp_index;
     }
 
     void executeCB(const segbot_arm_manipulation::TabletopGraspGoalConstPtr &goal) {
+
+        GraspCartesianCommand final_pose;
 
         if (goal->cloud_clusters.empty()) {
             ROS_INFO("[segbot_tabletop_grap_as.cpp] No object point clouds received...aborting");
@@ -260,14 +423,14 @@ public:
         }
         std::vector<GraspCartesianCommand> surviving_grasps;
 
-
+        ROS_INFO("[segbot_tabletop_grap_as.cpp] found %lu possible grasps",candidate_grasps.size());
         for (const auto &grasp : candidate_grasps) {
 
-            geometry_msgs::PoseArray pa;
-            pa.header = grasp.approach_pose.header;
-            pa.poses.push_back(grasp.approach_pose.pose);
-            pa.poses.push_back(grasp.grasp_pose.pose);
-            pose_array_pub.publish(pa);
+            //geometry_msgs::PoseArray pa;
+            //pa.header = grasp.approach_pose.header;
+            //pa.poses.push_back(grasp.approach_pose.pose);
+            //pa.poses.push_back(grasp.grasp_pose.pose);
+            //pose_array_pub.publish(pa);
             ros::spinOnce();
             //filter 1: if the grasp is too close to plane, reject it
             bool ok_with_plane = bwi_manipulation::grasp_utils::checkPlaneConflict(grasp, plane_coef_vector,
@@ -318,8 +481,7 @@ public:
 
 
             if (sum_d >= ANGULAR_DIFF_THRESHOLD) {
-                ROS_INFO("Approach and grasp configurations too different");
-                continue;
+                ROS_INFO("Approach and grasp configurations too different") ; continue;
             }
 
             //store the IK results
@@ -341,32 +503,48 @@ public:
         //make sure we're working with the correct tool pose
         mico.wait_for_data();
 
-        ulong selected_grasp_index = select_grasp(surviving_grasps, goal->grasp_selection_method);
+        // Move from the sensor frame to the arm base frame
+        const PointCloudT::Ptr &arm_frame(target_object);
+        pcl_ros::transformPointCloud("m1n6s200_link_base", *arm_frame, *arm_frame, listener);
+        bwi_perception::BoundingBox boundingBox = bwi_perception::BoundingBox::from_cloud<PointT>(arm_frame);
 
+        ulong selected_grasp_index = select_grasp(surviving_grasps, goal->grasp_selection_method,boundingBox);
+        final_pose=surviving_grasps.at(selected_grasp_index);
         //compute RPY for target pose
         ROS_INFO("Selected approach pose:");
-        ROS_INFO_STREAM(surviving_grasps.at(selected_grasp_index).approach_pose);
+        ROS_INFO_STREAM(final_pose.approach_pose);
 
-
+        geometry_msgs::PoseArray pa;
+        pa.header = final_pose.approach_pose.header;
+        pa.poses.push_back(final_pose.approach_pose.pose);
+        pa.poses.push_back(final_pose.grasp_pose.pose);
+        pose_array_pub.publish(pa);
         //close fingers while moving
         mico.close_hand();
 
         //move to approach pose -- do it twice to correct
-        mico.move_to_pose_moveit(surviving_grasps.at(selected_grasp_index).approach_pose, goal->cloud_clusters
-        );
-        mico.move_to_pose_moveit(surviving_grasps.at(selected_grasp_index).approach_pose, goal->cloud_clusters );
+        mico.move_to_pose_moveit(final_pose.approach_pose, goal->cloud_clusters );
+        mico.move_to_pose_moveit(final_pose.approach_pose, goal->cloud_clusters );
 
         //open fingers
         mico.open_hand();
 
         //move to grasp pose
-        mico.move_to_pose_moveit(surviving_grasps.at(selected_grasp_index).grasp_pose);
+        mico.move_to_pose_moveit(final_pose.grasp_pose);
+        mico.move_to_pose_moveit(final_pose.grasp_pose);
 
         //close hand
         mico.close_hand();
 
+        result_.approach_joint_state=final_pose.approach_joint_state;
+        result_.approach_pose=final_pose.approach_pose;
+        result_.grasp_joint_state=final_pose.grasp_joint_state;
+        result_.grasp_pose=final_pose.grasp_pose;
+
+
         result_.success = true;
         as_.setSucceeded(result_);
+        return;
     }
 
 };
