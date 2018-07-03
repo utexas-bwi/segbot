@@ -23,6 +23,7 @@
 
 
 #include <segbot_arm_manipulation/HandoverAction.h>
+#include <bwi_perception/convenience.h>
 
 
 typedef pcl::PointXYZRGB PointT;

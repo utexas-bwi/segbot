@@ -6,6 +6,7 @@
 #include <segbot_arm_manipulation/Mico.h>
 #include <bwi_perception/bwi_perception.h>
 #include <segbot_arm_manipulation/HandoverAction.h>
+#include <bwi_perception/convenience.h>
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
 
 segbot_arm_manipulation::Mico *mico;

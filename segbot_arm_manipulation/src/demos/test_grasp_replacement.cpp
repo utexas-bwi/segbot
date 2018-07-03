@@ -1,5 +1,5 @@
 #include <ros/ros.h>
-
+#include <bwi_perception/convenience.h>
 #include <bwi_manipulation/grasp_utils.h>
 
 #include <actionlib/server/simple_action_server.h>
