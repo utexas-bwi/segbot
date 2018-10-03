@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(segbot_arm_manipulation)
 
-add_compile_options(-std=c++11)
+set(CMAKE_CXX_STANDARD 11)
 
-find_package(catkin REQUIRED COMPONENTS
+find_package(catkin QUIET COMPONENTS
         actionlib
         actionlib_msgs
         agile_grasp
@@ -30,6 +30,11 @@ find_package(catkin REQUIRED COMPONENTS
         tf_conversions
         )
 
+if (agile_grasp_FOUND)
+    # Set a compile define to turn on agile grasp helpers
+    message("Found agile_grasp. Additional helpers will be compiled.")
+    add_definitions(-DAGILE_GRASP_AVAILABLE)
+endif()
 
 find_package(PCL 1.7 REQUIRED)
 
@@ -82,10 +87,6 @@ catkin_package(
 add_library(arm_utilities src/Mico.cpp src/arm_utils.cpp)
 add_dependencies(arm_utilities segbot_arm_manipulation_gencpp)
 target_link_libraries(arm_utilities ${catkin_LIBRARIES})
-
-add_executable(segbot_tabletop_grasp_as src/segbot_tabletop_grasp_as.cpp)
-add_dependencies(segbot_tabletop_grasp_as segbot_arm_manipulation_gencpp ${catkin_EXPORTED_TARGETS})
-target_link_libraries(segbot_tabletop_grasp_as arm_utilities ${catkin_LIBRARIES})
 
 add_executable(arm_lift_verify_as src/arm_lift_verify_as.cpp)
 add_dependencies(arm_lift_verify_as segbot_arm_manipulation_gencpp ${catkin_EXPORTED_TARGETS})
@@ -167,10 +168,17 @@ add_executable(position_record src/position_record.cpp)
 add_dependencies(position_record segbot_arm_manipulation_gencpp)
 target_link_libraries(position_record ${catkin_LIBRARIES} ${Boost_LIBRARIES})
 
+if (agile_grasp_FOUND)
 add_executable(segbot_obj_replacement_as src/segbot_obj_replacement_as.cpp)
 add_dependencies(segbot_obj_replacement_as arm_utilities segbot_arm_manipulation_gencpp)
 target_link_libraries(segbot_obj_replacement_as arm_utilities ${catkin_LIBRARIES})
 
+add_executable(segbot_tabletop_grasp_as src/segbot_tabletop_grasp_as.cpp)
+add_dependencies(segbot_tabletop_grasp_as segbot_arm_manipulation_gencpp ${catkin_EXPORTED_TARGETS})
+target_link_libraries(segbot_tabletop_grasp_as arm_utilities ${catkin_LIBRARIES})
+
+
+endif()
 
 install(PROGRAMS
         scripts/arm_actions.py
