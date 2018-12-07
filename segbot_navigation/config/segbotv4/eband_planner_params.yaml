@@ -17,3 +17,7 @@ EBandPlannerROS:
   k_prop: 0.75
 
   #eband parameters
+  eband_internal_force_gain: 3.0
+  #eband_external_force_gain: 1.0
+
+  costmap_weight: 15.0
