@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+
+<robot name="segbot"
+       xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Included URDF Files -->
+  <xacro:include filename="$(find segbot_description)/urdf/segway_110_base.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/v3/common.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/v3/segbot_chassis.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/velodyne_mount.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/gazebo/segbot.gazebo.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/kinect_mount.urdf.xacro" />   
+  
+  <xacro:property name="SENSOR_BEAM_LENGTH" value="10.75" /> <!-- inches -->
+ 
+   
+  <!-- Add the segbot base -->
+  <xacro:segway_robot />
+  <xacro:segbot_chassis parent="base">
+    <origin xyz="${BASE_PLATE_X_OFFSET*INCH_TO_M} 0 ${BASE_PLATE_Z_OFFSET*INCH_TO_M}"/>
+  </xacro:segbot_chassis>
+
+  <!-- Add the velodyne -->
+  <xacro:velodyne_mount name="velodyne" parent="back_left_vertical_beam">
+    <origin xyz="0 0 ${14*INCH_TO_M}" rpy="${M_PI} 0 -${M_PI/2}" />
+  </xacro:velodyne_mount>
+
+  <!-- Add the forward facing kinect sensor for navigation -->
+  <xacro:kinect_mount name="nav_kinect" parent="back_right_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}">
+    <!--
+    <origin xyz="${1*INCH_TO_M} -${0.5*INCH_TO_M} ${11.5*INCH_TO_M}" rpy="-${M_PI/2} -${M_PI/2} 0" />
+    -->
+    <origin xyz="${15*INCH_TO_M} -${0.5*INCH_TO_M} ${31.5*INCH_TO_M}" rpy="-${M_PI/2} -${M_PI/2} 0" />
+  </xacro:kinect_mount>
+
+  <xacro:hokuyo_mount 
+    name="nav_hokuyo" 
+    parent="front_left_vertical_beam" 
+    length="${12*INCH_TO_M}" 
+    ros_topic="nav_hokuyo/scan" 
+    update_rate="10" 
+    min_angle="${-(5 * M_PI)/12}" 
+    max_angle="${(5 * M_PI)/12}" 
+    range="4.1">
+     <!--   <origin xyz="${1*INCH_TO_M} ${0.5*INCH_TO_M} ${3.0*INCH_TO_M}" rpy="${M_PI/2} ${M_PI/2} 0" />      -->
+     <!--   Lowered the Hukuyo by 0.75inch to see benches    
+Also changed segbot/segbot_bringup/launch/includes/auxiliary.segbot_v4.launch.xml to call this file instead of v3 -->
+    <origin xyz="${1*INCH_TO_M} ${0.5*INCH_TO_M} ${3.75*INCH_TO_M}" rpy="${M_PI/2} ${M_PI/2} 0" />
+  </xacro:hokuyo_mount>
+
+  <gazebo>
+    <!-- <plugin name="object_controller" filename="libgazebo_ros_planar_move.so"> -->
+    <!--   <commandTopic>cmd_vel</commandTopic> -->
+    <!--   <odometryTopic>odom</odometryTopic> -->
+    <!--   <odometryFrame>odom</odometryFrame> -->
+    <!--   <robotBaseFrame>base_footprint</robotBaseFrame> -->
+    <!--   <odometryRate>100</odometryRate> -->
+    <!-- </plugin> -->
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <updateRate>100</updateRate>
+      <leftJoint>right_wheel</leftJoint>
+      <rightJoint>left_wheel</rightJoint>
+      <wheelSeparation>0.479111</wheelSeparation>
+      <wheelDiameter>0.46228</wheelDiameter>
+      <wheelTorque>13</wheelTorque>
+      <commandTopic>cmd_vel</commandTopic>
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <robotBaseFrame>base_footprint</robotBaseFrame>
+    </plugin>
+  </gazebo>
+
+</robot>
