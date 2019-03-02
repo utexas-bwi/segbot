@@ -406,17 +406,18 @@ public:
 
         std::vector<GraspCartesianCommand> candidate_grasps;
         if (goal->grasp_generation_method == segbot_arm_manipulation::TabletopGraspGoal::HEURISTIC) {
-            tf::Stamped<tf::Quaternion> quat;
-            quat.setRPY(0.0, M_PI / 2, 0);
-            quat.frame_id_ = "m1n6s200_link_base";
+            //tf::Stamped<tf::Quaternion> quat;
+            //quat.setRPY(-M_PI/2, 0.0, -M_PI/2);
+            //quat.frame_id_ = "m1n6s200_link_base";
 
-            geometry_msgs::QuaternionStamped quat_stamped;
-            tf::quaternionStampedTFToMsg(quat, quat_stamped);
-            candidate_grasps = bwi_manipulation::grasp_utils::generate_heuristic_grasps<PointT>(target_object,
-                                                                                                quat_stamped,
-                                                                                                HAND_OFFSET_GRASP,
-                                                                                                HAND_OFFSET_APPROACH,
-                                                                                                listener);
+            //geometry_msgs::QuaternionStamped quat_stamped;
+            //tf::quaternionStampedTFToMsg(quat, quat_stamped);
+            //candidate_grasps = generate_heuristic_grasps<PointT>(target_object,
+            //                                                    quat_stamped,
+            //                                                    HAND_OFFSET_GRASP,
+            //                                                    HAND_OFFSET_APPROACH,
+            //                                                    listener);
+	    candidate_grasps = generate_heuristic_grasps(target_object, sensor_frame_id);
             target_cloud_pub.publish(target_object_pc2);
         } else {
             candidate_grasps = generate_agile_grasps(target_object, sensor_frame_id);
