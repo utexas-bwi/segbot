@@ -124,6 +124,11 @@ add_executable(demo_grasp_and_lay_down src/demos/demo_grasp_and_lay_down.cpp)
 add_dependencies(demo_grasp_and_lay_down segbot_arm_manipulation_gencpp arm_utilities)
 target_link_libraries(demo_grasp_and_lay_down arm_utilities ${catkin_LIBRARIES} )
 
+add_executable(demo_gestures src/demos/demo_gestures.cpp)
+add_dependencies(demo_gestures segbot_arm_manipulation_gencpp arm_utilities)
+target_link_libraries(demo_gestures arm_utilities ${catkin_LIBRARIES} )
+
+
 add_executable(demo_grasp_action_client src/demos/demo_grasp_action_client.cpp)
 add_dependencies(demo_grasp_action_client segbot_arm_manipulation_gencpp arm_utilities)
 target_link_libraries(demo_grasp_action_client arm_utilities ${catkin_LIBRARIES} )

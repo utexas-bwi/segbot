@@ -75,6 +75,10 @@ namespace segbot_arm_manipulation {
         static const std::string side_view_position_name;
         static const std::string side_view_approach_position_name;
         static const std::string handover_position_name;
+        static const std::string point_straight_name;
+        static const std::string point_right_name;
+        static const std::string point_left_name;
+
 
         static const uint OPEN_FINGER_VALUE;
         static const uint CLOSED_FINGER_VALUE;
@@ -149,6 +153,12 @@ namespace segbot_arm_manipulation {
         bool move_to_side_view_approach();
 
         bool move_to_handover();
+ 	
+	bool point_straight();
+
+        bool point_right();
+
+        bool point_left();
 
     };
 }

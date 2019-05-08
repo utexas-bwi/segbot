@@ -30,6 +30,11 @@ namespace segbot_arm_manipulation {
     const string Mico::side_view_approach_position_name = "side_view_approach";
     const string Mico::handover_position_name = "handover_front";
 
+    const string Mico::point_straight_name = "point_straight";
+    const string Mico::point_right_name = "point_right";
+    const string Mico::point_left_name = "point_left";
+
+
     const uint Mico::OPEN_FINGER_VALUE = 100;
     const uint Mico::CLOSED_FINGER_VALUE = 7200;
     const string Mico::jointNames[] = {"m1n6s200_joint_1", "m1n6s200_joint_2", "m1n6s200_joint_3", "m1n6s200_joint_4",
@@ -405,6 +410,11 @@ namespace segbot_arm_manipulation {
     }
 
     bool Mico::move_to_named_joint_position(const string &name) {
+	ROS_INFO("move_to_named_joint_position got position name = %s",name.c_str());
+
+	bool success=position_db->has_joint_position(name);
+	ROS_INFO("position_db->has_joint_position(name)= %d",success);
+	//return success;
         if (!position_db->has_joint_position(name)) {
             return false;
         }
@@ -477,6 +487,7 @@ namespace segbot_arm_manipulation {
     }
 
     bool Mico::move_to_side_view() {
+	ROS_INFO("in Mico.cpp move_to_side_view");
         return move_to_named_joint_position(side_view_position_name);
     }
 
@@ -488,4 +499,32 @@ namespace segbot_arm_manipulation {
         return move_to_named_joint_position(side_view_approach_position_name);
 
     }
+
+
+	bool Mico::point_straight() {
+	ROS_INFO("in Mico.cpp point_straight");
+	bool success=move_to_named_joint_position(point_straight_name);
+	ROS_INFO("success= %d",success);
+	return success;
+  //      return move_to_named_joint_position(point_straight_name);
+    }
+	bool Mico::point_right() {
+	ROS_INFO("in Mico.cpp point_right");
+	bool success=move_to_named_joint_position(point_right_name);
+	ROS_INFO("success= %d",success);
+	return success;
+  //      return move_to_named_joint_position(point_right_name);
+
+    }
+	bool Mico::point_left() {
+	ROS_INFO("in Mico.cpp point_left");
+	bool success=move_to_named_joint_position(point_left_name);
+	ROS_INFO("success= %d",success);
+	return success;
+ //       return move_to_named_joint_position(point_left_name);
+    }
+
+
+
+
 }
