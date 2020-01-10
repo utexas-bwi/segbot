@@ -1,7 +1,22 @@
+#global_costmap:
+#    static_map: true
+#    global_frame: level_mux_map 
+#    rolling_window: false
+#    track_unknown_space: true
+#    update_frequency: 5.0 
+#    publish_frequency: 5.0 
+#    plugins:
+#        - {name: static,                  type: "costmap_2d::StaticLayer"}
+#        - {name: inflation,               type: "costmap_2d::InflationLayer"}
 global_costmap:
    robot_base_frame: base_footprint
+   global_frame: level_mux_map
+   rolling_window: false
    update_frequency: 5.0
    publish_frequency: 5.0
    static_map: true
    transform_tolerance: 0.5
    footprint_padding: 0.05
+   plugins:
+      - {name: static,             type: "costmap_2d::StaticLayer", output: "screen"}
+      - {name: inflation,         type: "costmap_2d::InflationLayer", output: "screen"}
