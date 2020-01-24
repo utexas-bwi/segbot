@@ -1,17 +1,9 @@
 <launch>
 
-  <include file="$(find segbot_sensors)/launch/velodyne/velodyne.launch">
-  </include>
+  <include file="$(find segbot_sensors)/launch/velodyne/velodyne.launch"/>
 
   <include file="$(find segbot_sensors)/launch/velodyne/velodyne-laserscan.launch">
     <arg name="launch_nodelet_manager" value="false"/>
   </include>
-
-  <node pkg="ira_laser_tools" name="laserscan_multi_merger" type="laserscan_multi_merger" output="screen">
-      <param name="destination_frame" value="/base_footprint"/>
-      <param name="cloud_destination_topic" value="/cloud_merged"/>
-      <param name="scan_destination_topic" value="scan_filtered_merged"/>
-      <param name="laserscan_topics" value="/scan_filtered /velodyne/scan_filtered"/>
-  </node>
 
 </launch>

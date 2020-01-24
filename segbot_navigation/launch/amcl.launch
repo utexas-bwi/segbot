@@ -14,13 +14,13 @@
   <arg name="base_frame_id" default="base_footprint" />
   <arg name="odom_frame_id" default="odom" />
 
-  <arg name="odom_alpha1" default="0.4" />
-  <arg name="odom_alpha2" default="0.4" />
-  <arg name="odom_alpha3" default="0.4" />
-  <arg name="odom_alpha4" default="0.4" />
-  <arg name="odom_alpha5" default="0.4" />
+  <arg name="odom_alpha1" default="0.008" />
+  <arg name="odom_alpha2" default="0.040" />
+  <arg name="odom_alpha3" default="0.004" />
+  <arg name="odom_alpha4" default="0.025" />
+  <arg name="odom_alpha5" default="0.04" />
 
-  <arg name="laser_max_range" default="20.0" />
+  <arg name="laser_max_range" default="80.0" />
 
   <!-- run amcl -->
   <node pkg="amcl" type="amcl" name="amcl">
@@ -30,10 +30,10 @@
 
     <param name="min_particles" value="10000"/>
     <param name="max_particles" value="40000"/>
-    <param name="kld_err" value="0.05"/>
-    <param name="kld_z" value="0.99"/>
+    <param name="kld_err" value="0.15"/>
+    <param name="kld_z" value="0.85"/>
 
-    <param name="odom_model_type" value="diff"/>
+    <param name="odom_model_type" value="diff_corrected"/>
     <param name="odom_alpha5" value="$(arg odom_alpha5)"/>
 
     <param name="odom_alpha1" value="$(arg odom_alpha1)"/>
