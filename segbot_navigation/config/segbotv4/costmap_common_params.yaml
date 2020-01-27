@@ -10,7 +10,7 @@ publish_frequency: 1.0
 # unknown_threshold: 10
 # mark_threshold: 0
 
-obstacles_costmap2d:
+obstacle_costmap2d:
     footprint_clearing_enabled: false
     observation_sources: hokuyo_scan
     hokuyo_scan: {data_type: LaserScan, topic: scan_filtered, marking: true, clearing: true, inf_is_valid: true, obstacle_range: 3.75, raytrace_range: 4.0} #raytrace_range must be less than max range of sensor.
@@ -18,6 +18,12 @@ obstacles_costmap2d:
 inflation:
     inflation_radius: 1.0
     cost_scaling_factor: 10.0
+
+social_proxemic_layer:
+     cutoff: 126.0
+     amplitude: 254
+     covariance: 1.35
+     factor: 5.0
 
 transform_tolerance:        0.1
 robot_radius:               0.35

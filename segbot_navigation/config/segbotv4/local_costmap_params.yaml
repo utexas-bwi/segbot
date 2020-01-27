@@ -28,3 +28,5 @@ local_costmap:
    plugins:
       - {name: obstacle_costmap2d,         type: "costmap_2d::ObstacleLayer", output: "screen"}
       - {name: inflation,        type: "costmap_2d::InflationLayer", output: "screen"}
+      - {name: social_proxemic_layer,        type: "social_navigation_layers::ProxemicLayer", output: "screen"}
+     
