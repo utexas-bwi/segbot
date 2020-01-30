@@ -1,20 +1,5 @@
-#local_costmap:
-#    global_frame:               /odom
-#    robot_base_frame:           base_footprint
-#    update_frequency:           10.0
-#    publish_frequency:          10.0
-#    rolling_window:             true
-#    track_unknown_space:        false
-#    static_map:                 false
-#    resolution:                 0.025
-#    transform_tolerance:        0.1
-#    width: 7.0
-#    height: 7.0
-#    plugins:
-#        - {name: obstacle_costmap2d,       type: "costmap_2d::ObstacleLayer"}
-#        - {name: inflation,                 type: "costmap_2d::InflationLayer"}
 local_costmap:
-   global_frame: odom
+   #global_frame: odom
    robot_base_frame: base_footprint
    update_frequency: 5.0
    publish_frequency: 5.0
@@ -26,7 +11,7 @@ local_costmap:
    transform_tolerance: 0.25
    footprint_padding: 0.0
    plugins:
-      - {name: obstacle_costmap2d,         type: "costmap_2d::ObstacleLayer", output: "screen"}
-      - {name: inflation,        type: "costmap_2d::InflationLayer", output: "screen"}
-      - {name: social_proxemic_layer,        type: "social_navigation_layers::ProxemicLayer", output: "screen"}
+      - {name: obstacle_layer,         type: "costmap_2d::ObstacleLayer", output: "screen"}
+      - {name: inflation_layer,        type: "costmap_2d::InflationLayer", output: "screen"}
+#      - {name: social_proxemic_layer,        type: "social_navigation_layers::ProxemicLayer", output: "screen"}
      

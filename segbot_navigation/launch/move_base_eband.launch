@@ -22,11 +22,11 @@
     
     <param name="base_local_planner" value="eband_local_planner/EBandPlannerROS" />
 
-    <param name="global_costmap/static/map_topic" value="$(arg map_topic)"/>
+    <param name="global_costmap/static_layer/map_topic" value="$(arg map_topic)"/>
 
-    <!--param name="local_costmap/global_frame" value="$(arg global_frame)"/>
+    <param name="local_costmap/global_frame" value="$(arg global_frame)"/>
     <param name="global_costmap/global_frame" value="$(arg global_frame)"/>
-    -->
+    
     <param name="EBandPlannerROS/rotational_threshold_multiplier" value="$(arg eband_rotational_threshold_multiplier)" />
     <param name="EBandPlannerROS/disallow_hysteresis" value="$(arg eband_disallow_hysteresis)" />
 
