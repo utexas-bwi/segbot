@@ -1,5 +1,4 @@
 local_costmap:
-   #global_frame: odom
    robot_base_frame: base_footprint
    update_frequency: 5.0
    publish_frequency: 5.0
@@ -13,5 +12,5 @@ local_costmap:
    plugins:
       - {name: obstacle_layer,         type: "costmap_2d::ObstacleLayer", output: "screen"}
       - {name: inflation_layer,        type: "costmap_2d::InflationLayer", output: "screen"}
-#      - {name: social_proxemic_layer,        type: "social_navigation_layers::ProxemicLayer", output: "screen"}
+      - {name: social_proxemic_layer,        type: "social_navigation_layers::ProxemicLayer", output: "screen"}
      

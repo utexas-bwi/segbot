@@ -1,7 +1,12 @@
 global_costmap:
    robot_base_frame: base_footprint
+   rolling_window: false
    update_frequency: 5.0
    publish_frequency: 5.0
    static_map: true
    transform_tolerance: 0.5
    footprint_padding: 0.05
+   plugins:
+      - {name: static_layer,             type: "costmap_2d::StaticLayer", output: "screen"}
+      - {name: obstacle_layer,         type: "costmap_2d::ObstacleLayer", output: "screen"}
+      - {name: inflation_layer,         type: "costmap_2d::InflationLayer", output: "screen"}

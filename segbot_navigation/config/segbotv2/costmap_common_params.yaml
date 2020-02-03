@@ -1,18 +1,18 @@
 robot_base_frame: base_footprint
-update_frequency:
 publish_frequency: 1.0
-inflation_radius: 1.0
-obstacle_layer/footprint_clearing_enabled: false
 
-# publish_voxel_map: true
-#
-# map_type: voxel
-# origin_z: 0.0
-# z_resolution: 0.2
-# z_voxels: 10
-# unknown_threshold: 10
-# mark_threshold: 0
+obstacle_layer:
+    footprint_clearing_enabled: false
+    observation_sources: hokuyo_scan kinect_scan
+    hokuyo_scan: {data_type: LaserScan, topic: scan_filtered, marking: true, clearing: true, inf_is_valid: true, obstacle_range: 3.75, raytrace_range: 4.0} #raytrace_range must be less than max range of sensor.
+    kinect_scan: {data_type: LaserScan, topic: nav_kinect/scan_filtered, marking: true, clearing: true, inf_is_valid: true, obstacle_range: 2.75, raytrace_range: 2.95} #raytrace_range must be less than max range of sensor.
 
-observation_sources: scan kinect_scan
-scan: {data_type: LaserScan, topic: scan_filtered, marking: true, clearing: true, inf_is_valid: true, obstacle_range: 3.75, raytrace_range: 4.0}
-kinect_scan: {data_type: LaserScan, topic: nav_kinect/scan_filtered, marking: true, clearing: true, inf_is_valid: true, obstacle_range: 2.75, raytrace_range: 2.95} #raytrace_range must be less than max range of sensor.
+inflation_layer:
+    inflation_radius: 1.0
+    cost_scaling_factor: 10.0
+
+social_proxemic_layer:
+     cutoff: 126.0
+     amplitude: 254
+     covariance: 1.35
+     factor: 5.0
