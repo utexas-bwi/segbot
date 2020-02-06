@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import rospy
 from people_msgs.msg import People, Person
-from geometry_msgs.msg import Point, PointStamped, PoseWithCovarianceStamped, Twist
+from geometry_msgs.msg import Point, PointStamped, PoseWithCovarianceStamped, PoseStamped, Twist
+
 
 """
 This is a Robot to Person spoofing node that utilizes the estimated pose and commanded velocity of 
@@ -36,11 +37,12 @@ class MultiRobotPositionInterface:
 		person_position = Point()
 		person_velocity = Point()
 
+
 		# Stuff person data
 		person_position = self.robot_pos.pose.pose.position
-		person_velocity.x = self.robot_vel.linear.x
-		person_velocity.y = self.robot_vel.linear.y
-		person_velocity.z = self.robot_vel.linear.z
+		person_velocity.x = -1 * self.robot_vel.linear.x 
+		person_velocity.y = self.robot_vel.angular.z
+		person_velocity.z = 0
 
 		person = Person()
 		point_viz_msg = PointStamped()
@@ -52,7 +54,7 @@ class MultiRobotPositionInterface:
 		person.position = person_position
 		person.velocity = person_velocity
 		person.reliability = 0.99
-	
+
 		people_msg.people.append(person)       
 		
 		person_pub.publish(people_msg)
