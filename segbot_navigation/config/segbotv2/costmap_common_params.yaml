@@ -12,7 +12,7 @@ inflation_layer:
     cost_scaling_factor: 10.0
 
 social_proxemic_layer:
-     cutoff: 126.0
-     amplitude: 254
-     covariance: 1.35
-     factor: 5.0
+     cutoff: 32
+     amplitude: 95
+     covariance: 0.25
+     factor: 20.0

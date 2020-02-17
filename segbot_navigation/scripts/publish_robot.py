@@ -13,7 +13,8 @@ a robot, as exposed through a ROSBridge connection.
 """
 
 class MultiRobotPositionInterface:
-	WINDOW_SIZE = 5
+	WINDOW_SIZE = 3
+	ROBOTS = ["marvin","roberto"]
 
 	def __init__(self):
 	    self.robot_pos = PoseWithCovarianceStamped()
@@ -23,15 +24,14 @@ class MultiRobotPositionInterface:
 	    self.vel_window_y = np.zeros(self.WINDOW_SIZE)
 
 	def pose_callback(self, data):
-	    if self.last_robot_pos.pose.pose.position.x != data.pose.pose.position.x:
-		    self.last_robot_pos = copy.deepcopy(self.robot_pos)
-		    self.robot_pos = data
-		    # We track and smooth velocity data due to the large fluctuations between time steps
-		    x_diff  = (self.robot_pos.pose.pose.position.x - self.last_robot_pos.pose.pose.position.x) / (rospy.Time.now() - self.last_time).to_sec()
-		    y_diff  = (self.robot_pos.pose.pose.position.y - self.last_robot_pos.pose.pose.position.y) / (rospy.Time.now() - self.last_time).to_sec() 
-		    self.vel_window_x = self.push(self.vel_window_x, x_diff)
-		    self.vel_window_y = self.push(self.vel_window_y, y_diff)
-		    self.last_time = rospy.Time.now()
+	    self.last_robot_pos = copy.deepcopy(self.robot_pos)
+	    self.robot_pos = data
+	    # We track and smooth velocity data due to the large fluctuations between time steps
+	    x_diff  = (self.robot_pos.pose.pose.position.x - self.last_robot_pos.pose.pose.position.x) / (rospy.Time.now() - self.last_time).to_sec()
+	    y_diff  = (self.robot_pos.pose.pose.position.y - self.last_robot_pos.pose.pose.position.y) / (rospy.Time.now() - self.last_time).to_sec() 
+	    self.vel_window_x = self.push(self.vel_window_x, x_diff)
+	    self.vel_window_y = self.push(self.vel_window_y, y_diff)
+	    self.last_time = rospy.Time.now()
 
 	def push(self, a, n):
 	     a = np.roll(a, 1)
@@ -40,16 +40,24 @@ class MultiRobotPositionInterface:
 	
 	def run(self):
 	    rospy.init_node('person_publisher', anonymous=True)
-	    person_pub = rospy.Publisher('/people', People, queue_size=1)
-	    point_pub = rospy.Publisher('/person_point', PointStamped, queue_size=1)
-	    # TODO remove hardcoded hostnames...
-	    rospy.Subscriber("/connected_robots/pickles/amcl_pose", PoseWithCovarianceStamped, self.pose_callback)
-	    rate = rospy.Rate(10)
 	    self.last_time = rospy.Time.now()
+	    rospy.sleep(0.1)
+	    self.robot = rospy.get_param('~robot_id',0)
+	    if rospy.get_param("~robot_id") == 0:
+		self.me_robot = "marvin"
+		self.they_robot = "roberto"
+	    else:
+		self.me_robot = "roberto"
+		self.they_robot = "marvin"
+	    rospy.loginfo(self.robot)
+	    person_pub = rospy.Publisher(self.me_robot+'/people', People, queue_size=1)
+	    point_pub = rospy.Publisher(self.me_robot+'/person_point', PointStamped, queue_size=1)
+	    rospy.Subscriber(self.they_robot+"/amcl_pose", PoseWithCovarianceStamped, self.pose_callback)
+	    rate = rospy.Rate(20)
 	    
 	    while not rospy.is_shutdown():
 		people_msg = People()
-		people_msg.header.frame_id = "/level_mux_map"
+		people_msg.header.frame_id = self.they_robot+"/level_mux_map"
 		people_msg.header.stamp = rospy.Time.now()
 		person_position = Point()
 		person_velocity = Point()
@@ -68,7 +76,7 @@ class MultiRobotPositionInterface:
 		point_viz_msg.header = people_msg.header
 		point_viz_msg.point = person_position
 
-		person.name = "Robot"
+		person.name = self.they_robot
 		person.position = person_position
 		person.velocity = person_velocity
 		person.reliability = 0.99

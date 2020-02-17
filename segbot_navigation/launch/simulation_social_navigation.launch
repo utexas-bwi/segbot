@@ -1,0 +1,10 @@
+<launch>
+    <node name="publish_robot0" type="publish_robot.py" pkg="segbot_navigation">
+	<param name="~robot_id" value="0"/>
+    </node>
+    <node name="publish_robot1" type="publish_robot.py" pkg="segbot_navigation">
+	<param name="~robot_id" value="1"/>
+    </node>
+
+
+</launch>
