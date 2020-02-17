@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import numpy as np
 import rospy
+import copy
 from people_msgs.msg import People, Person
 from geometry_msgs.msg import Point, PointStamped, PoseWithCovarianceStamped, PoseStamped, Twist
 
@@ -22,9 +23,15 @@ class MultiRobotPositionInterface:
 	    self.vel_window_y = np.zeros(self.WINDOW_SIZE)
 
 	def pose_callback(self, data):
-	    self.last_robot_pos = self.robot_pos
-	    self.robot_pos = data
-	    self.last_time = rospy.Time.now()
+	    if self.last_robot_pos.pose.pose.position.x != data.pose.pose.position.x:
+		    self.last_robot_pos = copy.deepcopy(self.robot_pos)
+		    self.robot_pos = data
+		    # We track and smooth velocity data due to the large fluctuations between time steps
+		    x_diff  = (self.robot_pos.pose.pose.position.x - self.last_robot_pos.pose.pose.position.x) / (rospy.Time.now() - self.last_time).to_sec()
+		    y_diff  = (self.robot_pos.pose.pose.position.y - self.last_robot_pos.pose.pose.position.y) / (rospy.Time.now() - self.last_time).to_sec() 
+		    self.vel_window_x = self.push(self.vel_window_x, x_diff)
+		    self.vel_window_y = self.push(self.vel_window_y, y_diff)
+		    self.last_time = rospy.Time.now()
 
 	def push(self, a, n):
 	     a = np.roll(a, 1)
@@ -36,7 +43,7 @@ class MultiRobotPositionInterface:
 	    person_pub = rospy.Publisher('/people', People, queue_size=1)
 	    point_pub = rospy.Publisher('/person_point', PointStamped, queue_size=1)
 	    # TODO remove hardcoded hostnames...
-	    rospy.Subscriber("/connected_robots/hermes/amcl_pose", PoseWithCovarianceStamped, self.pose_callback)
+	    rospy.Subscriber("/connected_robots/pickles/amcl_pose", PoseWithCovarianceStamped, self.pose_callback)
 	    rate = rospy.Rate(10)
 	    self.last_time = rospy.Time.now()
 	    
@@ -50,12 +57,6 @@ class MultiRobotPositionInterface:
 
 		# Stuff person data
 		person_position = self.robot_pos.pose.pose.position
-
-		# We track and smooth velocity data due to the large fluctuations between time steps
-		x_diff  = (self.robot_pos.pose.pose.position.x - self.last_robot_pos.pose.pose.position.x) / (rospy.Time.now() - self.last_time).to_sec()
-		y_diff  = (self.robot_pos.pose.pose.position.y - self.last_robot_pos.pose.pose.position.y) / (rospy.Time.now() - self.last_time).to_sec() 
-		self.vel_window_x = self.push(self.vel_window_x, x_diff)
-		self.vel_window_y = self.push(self.vel_window_y, y_diff)
 
 		person_velocity.x = np.sum(self.vel_window_x) / self.vel_window_x.size
 		person_velocity.y = np.sum(self.vel_window_y) / self.vel_window_y.size
