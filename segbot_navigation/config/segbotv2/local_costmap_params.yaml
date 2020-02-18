@@ -13,3 +13,4 @@ local_costmap:
       - {name: obstacle_layer,         type: "costmap_2d::ObstacleLayer", output: "screen"}
       - {name: inflation_layer,        type: "costmap_2d::InflationLayer", output: "screen"}
       - {name: social_proxemic_layer,        type: "social_navigation_layers::ProxemicLayer", output: "screen"}
+      - {name: social_passing_layer,        type: "social_navigation_layers::PassingLayer", output: "screen"}

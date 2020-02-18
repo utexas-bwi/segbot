@@ -16,3 +16,10 @@ social_proxemic_layer:
      amplitude: 95
      covariance: 0.25
      factor: 20.0
+
+social_passing_layer:
+     cutoff: 32
+     amplitude: 95
+     covariance: 0.25
+     factor: 20.0
+
