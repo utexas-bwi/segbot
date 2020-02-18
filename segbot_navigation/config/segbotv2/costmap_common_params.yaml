@@ -1,5 +1,6 @@
 robot_base_frame: base_footprint
 publish_frequency: 1.0
+robot_radius: 0.3
 
 obstacle_layer:
     footprint_clearing_enabled: false
@@ -18,6 +19,7 @@ social_proxemic_layer:
      factor: 20.0
 
 social_passing_layer:
+     enabled: false
      cutoff: 32
      amplitude: 95
      covariance: 0.25
