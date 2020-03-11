@@ -6,6 +6,7 @@ global_costmap:
    static_map: true
    transform_tolerance: 0.5
    footprint_padding: 0.05
+   track_unknown_space: true
    plugins:
       - {name: static_layer,             type: "costmap_2d::StaticLayer", output: "screen"}
       - {name: obstacle_layer,         type: "costmap_2d::ObstacleLayer", output: "screen"}
