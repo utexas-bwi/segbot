@@ -14,6 +14,7 @@
   <arg name="robotid" default="segbot" />
   <arg name="tf_prefix" default="" />
   <arg name="use_full_gazebo_model" default="true" />
+  <arg name="non_gazebo_sim" default="false" />
 
   <!-- whether to launch autonomous stuff or not -->
   <arg name="launch_localization" default="false" />
@@ -31,19 +32,21 @@
   <arg name="map_frame_with_prefix" default="$(arg tf_prefix)/$(arg map_frame)" />
 
   <!-- push robot_description to factory and spawn robot in gazebo -->
-  <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
-    args="-param robot_description
-    -urdf
-    -x $(arg x)
-    -y $(arg y)
-    -z $(arg z)
-    -R $(arg roll)
-    -P $(arg pitch)
-    -Y $(arg yaw)
-    -model $(arg robotid)
-    -gazebo_namespace /$(arg world)"
-    respawn="false" output="screen">
-  </node>
+  <group unless="$(arg non_gazebo_sim)">
+      <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
+        args="-param robot_description
+        -urdf
+        -x $(arg x)
+        -y $(arg y)
+        -z $(arg z)
+        -R $(arg roll)
+        -P $(arg pitch)
+        -Y $(arg yaw)
+        -model $(arg robotid)
+        -gazebo_namespace /$(arg world)"
+        respawn="false" output="screen">
+      </node>
+  </group>
 
   <!-- launch localization -->
   <group if="$(arg launch_localization)">
