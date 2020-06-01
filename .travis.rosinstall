@@ -1,15 +1,15 @@
 - git:
     local-name: agile_grasp
     uri: https://github.com/utexas-bwi/agile_grasp.git
-    version: kinetic
+    version: melodic-devel
 - git:
     local-name: bwi_common
     uri: https://github.com/utexas-bwi/bwi_common.git
-    version: master
+    version: devel
 - git:
     local-name: kinova-ros
     uri: https://github.com/utexas-bwi/kinova-ros.git
-    version: kinetic
+    version: melodic-devel
 - git:
     local-name: libsegwayrmp
     uri: https://github.com/utexas-bwi/libsegwayrmp.git
@@ -19,4 +19,13 @@
 - git:
     local-name: segway_v3
     uri: https://github.com/utexas-bwi/segway_v3.git
+    version: melodic-devel
+- git:
+    local-name: camera1394
+    uri: https://github.com/ros-drivers/camera1394
     version: master
+- git:
+    local-name: frontier_exploration
+    uri: https://github.com/paulbovbel/frontier_exploration.git
+    version: melodic-devel
+

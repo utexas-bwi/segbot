@@ -11,7 +11,6 @@ env:
     - ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu
     - UPSTREAM_WORKSPACE=file
   matrix:
-    - ROS_DISTRO="melodic" ROS_REPOSITORY_PATH=http://packages.ros.org/ros/ubuntu
     - BUILD_PKGS_WHITELIST="only_segbot_base"
     #- BUILD_PKGS_WHITELIST="only_segbot_arm"
 install:
