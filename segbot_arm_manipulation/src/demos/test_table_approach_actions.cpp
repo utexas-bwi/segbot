@@ -39,7 +39,7 @@ void pressEnter(std::string message){
 
 int main(int argc, char **argv) {
 	// Intialize ROS with this node name
-	ros::init(argc, argv, "demo_grasp_action_client");
+	ros::init(argc, argv, "test_table_approach_actions");
 	
 	ros::NodeHandle n;
 
@@ -47,7 +47,7 @@ int main(int argc, char **argv) {
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
 	
-	pressEnter("Demo starting.");
+	pressEnter("Demo starting. Press enter...");
 	
 	actionlib::SimpleActionClient<segbot_arm_manipulation::TabletopApproachAction> ac("segbot_table_approach_as",true);
 	ac.waitForServer();	
@@ -55,6 +55,7 @@ int main(int argc, char **argv) {
 		
 	segbot_arm_manipulation::TabletopApproachGoal approach_goal;
 	approach_goal.command = "approach";
+    approach_goal.table_type = "rectangular";
 	
 	//send the goal
 	ROS_INFO("Sending goal to approach table...");

@@ -14,6 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
     bwi_msgs
     bwi_perception
     bwi_services
+ #   grounded_dialogue_agent_ros
     kinova_msgs
     pcl_ros
     pcl_conversions
@@ -58,8 +59,8 @@ include_directories(
 )
 
 
-add_executable(object_to_office_task src/object_to_office_task.cpp)
-target_link_libraries(object_to_office_task ${catkin_LIBRARIES} )
+#add_executable(object_to_office_task src/object_to_office_task.cpp)
+#target_link_libraries(object_to_office_task ${catkin_LIBRARIES} )
 
 add_executable(object_handover_delivery_task src/object_handover_delivery_task.cpp)
 target_link_libraries(object_handover_delivery_task ${catkin_LIBRARIES} )

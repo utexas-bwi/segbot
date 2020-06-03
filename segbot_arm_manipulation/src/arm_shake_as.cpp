@@ -10,8 +10,6 @@
 #include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/WrenchStamped.h>
 
-//get table scene and color histogram
-#include "bwi_perception/TabletopPerception.h"
 #include <bwi_perception/bwi_perception.h>
 
 //actions

@@ -7,7 +7,7 @@
 #include <segbot_arm_manipulation/Mico.h>
 
 //srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
+#include "bwi_perception/PerceiveTabletopScene.h"
 
 //srvs for ispy
 #include "segbot_arm_manipulation/iSpyTouch.h"
@@ -95,24 +95,24 @@ int main(int argc, char **argv) {
 	while (ros::ok()){
 	
 		//get the table scene
-		bwi_perception::TabletopPerception::Response table_scene;
+		bwi_perception::PerceiveTabletopScene::Response table_scene;
 		bool perception_success = false;
 		
 		
 		while (!perception_success){
 			
 			ROS_INFO("Waiting for service...");
-			ros::service::waitForService("tabletop_object_detection_service");
+			ros::service::waitForService("perceive_tabletop_scene");
 			ROS_INFO("...done!");
 			ROS_INFO("Waiting for service existg...");
-			bool result = ros::service::exists("tabletop_object_detection_service",true);
+			bool result = ros::service::exists("perceive_tabletop_scene",true);
 			ROS_INFO("...done!");
 			std::cout << result << "\n";
 			
-			ros::ServiceClient client_tabletop_perception = n.serviceClient<bwi_perception::TabletopPerception>("tabletop_object_detection_service");
+			ros::ServiceClient client_tabletop_perception = n.serviceClient<bwi_perception::PerceiveTabletopScene>("perceive_tabletop_scene");
 				
 				
-			bwi_perception::TabletopPerception srv_perception;
+			bwi_perception::PerceiveTabletopScene srv_perception;
 				
 			//to make sure we only see objects on the table in front of us
 			srv_perception.request.apply_x_box_filter = true;

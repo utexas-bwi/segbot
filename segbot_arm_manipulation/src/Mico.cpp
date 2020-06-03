@@ -21,11 +21,22 @@
 #include <bwi_moveit_utils/MoveitWaypoint.h>
 #include <moveit_msgs/GetPositionFK.h>
 
+
 using namespace std;
 
 
 namespace segbot_arm_manipulation {
+    const string Mico::side_view_position_name = "side_view";
+    const string Mico::side_view_approach_position_name = "side_view_approach";
+    const string Mico::handover_position_name = "handover_front";
 
+    const string Mico::point_straight_name = "point_straight";
+    const string Mico::point_right_name = "point_right";
+    const string Mico::point_left_name = "point_left";
+
+
+    const uint Mico::OPEN_FINGER_VALUE = 100;
+    const uint Mico::CLOSED_FINGER_VALUE = 7200;
     const string Mico::jointNames[] = {"m1n6s200_joint_1", "m1n6s200_joint_2", "m1n6s200_joint_3", "m1n6s200_joint_4",
                                        "m1n6s200_joint_5", "m1n6s200_joint_6", "m1n6s200_joint_finger_1",
                                        "m1n6s200_joint_finger_2"};
@@ -39,9 +50,9 @@ namespace segbot_arm_manipulation {
 
 
     const string Mico::j_pos_filename =
-            ros::package::getPath("segbot_arm_manipulation") + "/data/jointspace_position_db.txt";
+            ros::package::getPath("segbot_arm_manipulation") + "/data/mico_jointspace_position_db.txt";
     const string Mico::c_pos_filename =
-            ros::package::getPath("segbot_arm_manipulation") + "/data/toolspace_position_db.txt";
+            ros::package::getPath("segbot_arm_manipulation") + "/data/mico_toolspace_position_db.txt";
     const double Mico::arm_poll_rate = 100.0;
 
     Mico::Mico(ros::NodeHandle n) : pose_action(pose_action_topic, true),
@@ -70,7 +81,7 @@ namespace segbot_arm_manipulation {
         angular_velocity_pub = n.advertise<kinova_msgs::JointAngles>("/m1n6s200_driver/in/joint_velocity", 10);
         cartesian_velocity_pub = n.advertise<kinova_msgs::PoseVelocity>("/m1n6s200_driver/in/cartesian_velocity", 10);
 
-        position_db = new ArmPositionDB(j_pos_filename, c_pos_filename);
+        position_db = unique_ptr<bwi_manipulation::ArmPositionDB>(new bwi_manipulation::ArmPositionDB(j_pos_filename, c_pos_filename));
     }
 
 //Joint positions cb
@@ -285,6 +296,31 @@ namespace segbot_arm_manipulation {
 
         vector<moveit_msgs::CollisionObject> moveit_obstacles = segbot_arm_manipulation::get_collision_boxes(obstacles);
 
+        geometry_msgs::Pose pose;
+        pose.orientation.w = 1.0;
+        shape_msgs::SolidPrimitive primitive;
+        primitive.type = primitive.BOX;
+        primitive.dimensions.resize(3);
+        primitive.dimensions[0] = 0.0762;
+        primitive.dimensions[1] = 0.0762;
+        primitive.dimensions[2] = 0.762;
+
+        moveit_msgs::CollisionObject left_beam;
+        left_beam.header.frame_id = "left_sensor_beam_link";
+        left_beam.id = "fat_left_sensor_beam";
+        left_beam.primitives.push_back(primitive);
+        left_beam.primitive_poses.push_back(pose);
+
+        moveit_msgs::CollisionObject right_beam;
+        right_beam.header.frame_id = "right_sensor_beam_link";
+        right_beam.id = "fat_right_sensor_beam";
+        right_beam.primitives.push_back(primitive);
+        right_beam.primitive_poses.push_back(pose);
+        right_beam.primitive_poses.push_back(pose);
+
+        moveit_obstacles.push_back(left_beam);
+        moveit_obstacles.push_back(right_beam);
+
         req.target = target;
         req.collision_objects = moveit_obstacles;
         req.constraints = constraints;
@@ -299,6 +335,32 @@ namespace segbot_arm_manipulation {
         bwi_moveit_utils::MoveitJointPose::Response res;
 
         vector<moveit_msgs::CollisionObject> moveit_obstacles = segbot_arm_manipulation::get_collision_boxes(obstacles);
+
+        // HACK: Put collision boxes around the robot's beams to make self collision less probable
+        geometry_msgs::Pose pose;
+        pose.orientation.w = 1.0;
+        shape_msgs::SolidPrimitive primitive;
+        primitive.type = primitive.BOX;
+        primitive.dimensions.resize(3);
+        primitive.dimensions[0] = 0.0762;
+        primitive.dimensions[1] = 0.0762;
+        primitive.dimensions[2] = 0.762;
+
+        moveit_msgs::CollisionObject left_beam;
+        left_beam.header.frame_id = "left_sensor_beam_link";
+        left_beam.id = "fat_left_sensor_beam";
+        left_beam.primitives.push_back(primitive);
+        left_beam.primitive_poses.push_back(pose);
+
+        moveit_msgs::CollisionObject right_beam;
+        right_beam.header.frame_id = "right_sensor_beam_link";
+        right_beam.id = "fat_right_sensor_beam";
+        right_beam.primitives.push_back(primitive);
+        right_beam.primitive_poses.push_back(pose);
+        right_beam.primitive_poses.push_back(pose);
+
+        moveit_obstacles.push_back(left_beam);
+        moveit_obstacles.push_back(right_beam);
 
         vector<double> target_values;
         target_values.push_back(target.joint1);
@@ -337,26 +399,27 @@ namespace segbot_arm_manipulation {
     }
 
 
-    bool Mico::move_to_side_view() {
-        if (!position_db->hasCarteseanPosition("side_view")) {
+    bool Mico::move_to_named_tool_position(const string &name) {
+        if (!position_db->has_tool_position(name)) {
             return false;
         }
-        geometry_msgs::PoseStamped out_of_view_pose = position_db->getToolPositionStamped("side_view",
-                                                                                          "/m1n6s200_link_base");
-        return move_to_pose_moveit(out_of_view_pose);
+        geometry_msgs::PoseStamped pose = position_db->get_tool_position_stamped(name,
+                                                                                 "/m1n6s200_link_base");
+        return move_to_pose_moveit(pose);
 
     }
 
+    bool Mico::move_to_named_joint_position(const string &name) {
+	ROS_INFO("move_to_named_joint_position got position name = %s",name.c_str());
 
-    bool Mico::move_to_handover() {
-        if (!position_db->hasCarteseanPosition("handover_front")) {
+	bool success=position_db->has_joint_position(name);
+	ROS_INFO("position_db->has_joint_position(name)= %d",success);
+	//return success;
+        if (!position_db->has_joint_position(name)) {
             return false;
         }
-        geometry_msgs::PoseStamped handover_pose = position_db->getToolPositionStamped("handover_front",
-                                                                                       "m1n6s200_link_base");
-
-        return move_to_pose_moveit(handover_pose);
-
+        auto joint_values = position_db->get_joint_position(name);
+        return move_to_joint_state_moveit(values_to_joint_state(joint_values));
 
     }
 
@@ -422,4 +485,46 @@ namespace segbot_arm_manipulation {
         }
         return true;
     }
+
+    bool Mico::move_to_side_view() {
+	ROS_INFO("in Mico.cpp move_to_side_view");
+        return move_to_named_joint_position(side_view_position_name);
+    }
+
+    bool Mico::move_to_handover() {
+        return move_to_named_joint_position(handover_position_name);
+    }
+
+    bool Mico::move_to_side_view_approach() {
+        return move_to_named_joint_position(side_view_approach_position_name);
+
+    }
+
+
+	bool Mico::point_straight() {
+	ROS_INFO("in Mico.cpp point_straight");
+	bool success=move_to_named_joint_position(point_straight_name);
+	ROS_INFO("success= %d",success);
+	return success;
+  //      return move_to_named_joint_position(point_straight_name);
+    }
+	bool Mico::point_right() {
+	ROS_INFO("in Mico.cpp point_right");
+	bool success=move_to_named_joint_position(point_right_name);
+	ROS_INFO("success= %d",success);
+	return success;
+  //      return move_to_named_joint_position(point_right_name);
+
+    }
+	bool Mico::point_left() {
+	ROS_INFO("in Mico.cpp point_left");
+	bool success=move_to_named_joint_position(point_left_name);
+	ROS_INFO("success= %d",success);
+	return success;
+ //       return move_to_named_joint_position(point_left_name);
+    }
+
+
+
+
 }

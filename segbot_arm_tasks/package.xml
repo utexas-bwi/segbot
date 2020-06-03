@@ -22,6 +22,7 @@
   <depend>bwi_moveit_utils</depend>
   <depend>bwi_msgs</depend>
   <depend>bwi_services</depend>
+ <!-- <depend>grounded_dialogue_agent_ros</depend> -->
   <depend>kinova_msgs</depend>
   <depend>roscpp</depend>
   <depend>rospy</depend>

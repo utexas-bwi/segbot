@@ -9,8 +9,6 @@
 #include <geometry_msgs/PoseArray.h>
 #include <geometry_msgs/WrenchStamped.h>
 
-//for table scene and color histogram
-#include "bwi_perception/TabletopPerception.h"
 #include <bwi_perception/bwi_perception.h>
 
 //actions
@@ -158,7 +156,7 @@ public:
 	
 	bool not_on_table(Eigen::Vector4f center_vector, std::vector<double> orig_colorhist){
 		//check table for new objects
-		bwi_perception::TabletopPerception::Response new_scene = bwi_perception::getTabletopScene(nh_);
+		bwi_perception::PerceiveTabletopScene::Response new_scene = bwi_perception::getTabletopScene(nh_);
 		
 		double tolerance = 0.1; 
 		

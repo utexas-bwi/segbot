@@ -2,11 +2,12 @@
 <launch>
 
   <!-- set the tf prefix as necessary -->
-  <arg name="tf_prefix" default="" />
   <arg name="device_id" default="#1" />
-  <arg name="rviz" default="true" />
-  <arg name="gui" default="true" />
-  <arg name="use_nav_kinect" default="true" />
+  <arg name="gui" default="true"/>
+  <arg name="tf_prefix" default="" />
+  <arg name="use_arm" default="false"/>
+  <arg name="use_nav_kinect" default="true"/>
+  <arg name="use_perception" default="false"/>
 
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
@@ -30,20 +31,33 @@
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
     <arg name="publish_tf" value="false" /> <!-- already published by urdf -->
   </include>
-
+ 
   <!-- COMMON aux information -->
   <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v2.launch.xml">
-    <arg name="tf_prefix" default="$(arg tf_prefix)" />
-    <arg name="use_registered_topic" default="true" />
+    <arg name="tf_prefix" value="$(arg tf_prefix)" />
+    <arg name="use_arm" value="$(arg use_arm)" />
+    <arg name="urdf_file" value="$(find segbot_description)/robots/segbot_v2.arm.urdf.xacro" if="$(arg use_arm)" />
+    <arg name="urdf_file" value="$(find segbot_description)/robots/segbot_v2.urdf.xacro" unless="$(arg use_arm)" />
+    <arg name="use_nav_kinect" value="$(arg use_nav_kinect)" />
+    <arg name="use_perception" value="$(arg use_perception)" />
+    <arg name="use_registered_topic" value="true" />
   </include>
-
+  
   <!-- Arduino -->
   <include file="$(find segbot_sensors)/launch/arduino/arduino.launch">
     <arg name="port" value="/dev/arduino" />
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
 
-  <!-- Diagnostics and battery monitor -->
-  <include file="$(find segbot_sensors)/launch/diagnostic/diagnostics.launch"/>
+  <!-- Arm -->
+  <group if="$(arg use_arm)">
+    <include file="$(find kinova_bringup)/launch/kinova_robot.launch">
+        <arg name="kinova_robotType" value="m1n6s200" />
+        <arg name="load_robot_description" value="false" />
+    </include>
+  </group>
+
+   <!-- Diagnostics and battery monitor -->
+  <include file="$(find segbot_sensors)/launch/diagnostic/diagnostics.launch" if="$(arg gui)"/>
 
 </launch>

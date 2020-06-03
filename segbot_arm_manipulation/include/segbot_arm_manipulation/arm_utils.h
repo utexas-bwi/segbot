@@ -20,11 +20,9 @@
 #include <pcl_ros/impl/transforms.hpp>
 #include <pcl/common/common.h>
 
-#include "arm_positions_db.h"
+#include "bwi_manipulation/ArmPositionDB.h"
 
 
-#define OPEN_FINGER_VALUE 100
-#define CLOSED_FINGER_VALUE 7200
 #define NUM_JOINTS 8
 
 using namespace std;
@@ -41,6 +39,8 @@ namespace segbot_arm_manipulation {
     std::vector<double> getJointAngleDifferences(sensor_msgs::JointState A, sensor_msgs::JointState B);
 
     std::vector<double> getJointAngleDifferences(kinova_msgs::JointAngles A, kinova_msgs::JointAngles B);
+
+    double getDistanceDifferences(geometry_msgs::Pose A, Eigen::Vector4f B);
 
     // put the boxes around the collision objects
     std::vector<moveit_msgs::CollisionObject>

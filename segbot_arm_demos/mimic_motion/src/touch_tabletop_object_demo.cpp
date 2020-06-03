@@ -24,7 +24,7 @@
 #include "kinova_msgs/ArmJointAnglesAction.h"
 
 //srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
+#include "bwi_perception/PerceiveTabletopScene.h"
 
 // PCL specific includes
 //#include <pcl/conversions.h>
@@ -369,8 +369,8 @@ int main(int argc, char **argv) {
 	pressEnter();
 	
 	//step 1: query table_object_detection_node to segment the blobs on the table
-	ros::ServiceClient client_tabletop_perception = n.serviceClient<bwi_perception::TabletopPerception>("tabletop_object_detection_service");
-	bwi_perception::TabletopPerception srv; //the srv request is just empty
+	ros::ServiceClient client_tabletop_perception = n.serviceClient<bwi_perception::PerceiveTabletopScene>("tabletop_object_detection_service");
+	bwi_perception::PerceiveTabletopScene srv; //the srv request is just empty
 	if (client_tabletop_perception.call(srv))
 	{
 		ROS_INFO("[touch_tabletop_object_demo.cpp] Received Response from tabletop_object_detection_service");

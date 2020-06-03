@@ -1,39 +1,34 @@
 #include <vector>
 #include <sensor_msgs/JointState.h>
 #include <segbot_arm_manipulation/arm_utils.h>
-#include <kinova_msgs/JointAngles.h>
-#include <geometry_msgs/Pose.h>
-#include <shape_msgs/SolidPrimitive.h>
-#include <Eigen/src/Core/Matrix.h>
-#include <sensor_msgs/PointCloud2.h>
-#include <moveit_msgs/CollisionObject.h>
-#include <pcl/point_cloud.h>
-#include <pcl_ros/transforms.h>
 #include <segbot_arm_manipulation/Mico.h>
+#include <math.h>
 
 using namespace std;
 namespace segbot_arm_manipulation {
     vector<double> getJointAngleDifferences(sensor_msgs::JointState A, sensor_msgs::JointState B) {
         return segbot_arm_manipulation::getJointAngleDifferences(segbot_arm_manipulation::state_to_angles(A), segbot_arm_manipulation::state_to_angles(B));
     }
-
+    double getDistanceDifferences(geometry_msgs::Pose A, Eigen::Vector4f B) {
+        return std::sqrt(std::pow(A.position.x-B.x(),2)+ std::pow(A.position.y-B.y(),2));
+    }
     vector<double> getJointAngleDifferences(kinova_msgs::JointAngles A, kinova_msgs::JointAngles B) {
         vector<double> result;
         map<string, double> a_pos;
         map<string, double> b_pos;
-        a_pos.insert(pair<string, double>(Mico::jointNames[0], A.joint1));
-        a_pos.insert(pair<string, double>(Mico::jointNames[1], A.joint2));
-        a_pos.insert(pair<string, double>(Mico::jointNames[2], A.joint3));
-        a_pos.insert(pair<string, double>(Mico::jointNames[3], A.joint4));
-        a_pos.insert(pair<string, double>(Mico::jointNames[4], A.joint5));
-        a_pos.insert(pair<string, double>(Mico::jointNames[5], A.joint6));
+        a_pos.emplace(Mico::jointNames[0], A.joint1);
+        a_pos.emplace(Mico::jointNames[1], A.joint2);
+        a_pos.emplace(Mico::jointNames[2], A.joint3);
+        a_pos.emplace(Mico::jointNames[3], A.joint4);
+        a_pos.emplace(Mico::jointNames[4], A.joint5);
+        a_pos.emplace(Mico::jointNames[5], A.joint6);
 
-        b_pos.insert(pair<string, double>(Mico::jointNames[0], B.joint1));
-        b_pos.insert(pair<string, double>(Mico::jointNames[1], B.joint2));
-        b_pos.insert(pair<string, double>(Mico::jointNames[2], B.joint3));
-        b_pos.insert(pair<string, double>(Mico::jointNames[3], B.joint4));
-        b_pos.insert(pair<string, double>(Mico::jointNames[4], B.joint5));
-        b_pos.insert(pair<string, double>(Mico::jointNames[5], B.joint6));
+        b_pos.emplace(Mico::jointNames[0], B.joint1);
+        b_pos.emplace(Mico::jointNames[1], B.joint2);
+        b_pos.emplace(Mico::jointNames[2], B.joint3);
+        b_pos.emplace(Mico::jointNames[3], B.joint4);
+        b_pos.emplace(Mico::jointNames[4], B.joint5);
+        b_pos.emplace(Mico::jointNames[5], B.joint6);
 
         for (unsigned int i = 0; i < Mico::jointNames->length(); i++) {
             string name = Mico::jointNames[i];
@@ -45,13 +40,13 @@ namespace segbot_arm_manipulation {
                 d = fabs(a_p - b_p);
             else {
                 if (b_p > a_p) {
-                    if (b_p - a_p < a_p + 2 * PI - b_p)
+                    if (b_p - a_p < a_p + 2 * M_PI - b_p)
                         d = fabs(b_p - a_p);
                     else
-                        d = fabs(2 * PI - b_p + a_p);
+                        d = fabs(2 * M_PI - b_p + a_p);
                 } else {
-                    if (a_p - b_p > b_p + 2 * PI - a_p)
-                        d = fabs(b_p + 2 * PI - a_p);
+                    if (a_p - b_p > b_p + 2 * M_PI - a_p)
+                        d = fabs(b_p + 2 * M_PI - a_p);
                     else
                         d = fabs(a_p - b_p);
                 }

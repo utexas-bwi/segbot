@@ -14,7 +14,7 @@
   <arg name="robotid" default="segbot" />
   <arg name="tf_prefix" default="" />
   <arg name="use_full_gazebo_model" default="true" />
-  <arg name="configuration_file" default="$(find segbot_bringup)/launch/includes/auxiliary.segbot_v1.hokuyo_only.launch.xml" />
+  <arg name="non_gazebo_sim" default="false" />
 
   <!-- whether to launch autonomous stuff or not -->
   <arg name="launch_localization" default="false" />
@@ -31,26 +31,22 @@
   <arg name="odom_frame_id" default="$(arg tf_prefix)/odom" />
   <arg name="map_frame_with_prefix" default="$(arg tf_prefix)/$(arg map_frame)" />
 
-  <!-- launch robot description and robot internal tf tree, along with any common nodes between h/w and software -->
-  <include file="$(arg configuration_file)">
-    <arg name="use_full_gazebo_model" value="$(arg use_full_gazebo_model)" />
-    <arg name="tf_prefix" value="$(arg tf_prefix)" />
-  </include>
-
   <!-- push robot_description to factory and spawn robot in gazebo -->
-  <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
-    args="-param robot_description
-    -urdf
-    -x $(arg x)
-    -y $(arg y)
-    -z $(arg z)
-    -R $(arg roll)
-    -P $(arg pitch)
-    -Y $(arg yaw)
-    -model $(arg robotid)
-    -gazebo_namespace /$(arg world)"
-    respawn="false" output="screen">
-  </node>
+  <group unless="$(arg non_gazebo_sim)">
+      <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model"
+        args="-param robot_description
+        -urdf
+        -x $(arg x)
+        -y $(arg y)
+        -z $(arg z)
+        -R $(arg roll)
+        -P $(arg pitch)
+        -Y $(arg yaw)
+        -model $(arg robotid)
+        -gazebo_namespace /$(arg world)"
+        respawn="false" output="screen">
+      </node>
+  </group>
 
   <!-- launch localization -->
   <group if="$(arg launch_localization)">

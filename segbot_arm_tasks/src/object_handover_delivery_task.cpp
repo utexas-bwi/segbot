@@ -6,7 +6,6 @@
 #include <sensor_msgs/JointState.h>
 
 //srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
 #include "bwi_perception/bwi_perception.h"
 
 //action for grasping

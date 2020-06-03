@@ -16,9 +16,6 @@
 #include <tf_conversions/tf_eigen.h>
 #include <tf/transform_broadcaster.h>
 
-//srv for talking to table_object_detection_node.cpp
-#include "bwi_perception/TabletopPerception.h"
-
 // PCL specific includes
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/point_cloud.h>
@@ -52,11 +49,14 @@
 #include <nav_msgs/Odometry.h>
 
 #include <segbot_arm_manipulation/Mico.h>
-#include <segbot_arm_manipulation/arm_positions_db.h>
+#include <bwi_manipulation/ArmPositionDB.h>
 
 //for playing sounds when backing up
 #include <sound_play/sound_play.h>
 #include <sound_play/SoundRequest.h>
+#include <bwi_perception/BoundingBox.h>
+#include <bwi_perception/PerceiveTabletopScene.h>
+#include <bwi_perception/PerceiveLargestHorizontalPlane.h>
 
 /* define what kind of point clouds we're using */
 typedef pcl::PointXYZRGB PointT;
@@ -118,24 +118,13 @@ public:
   }
 
   ~TableApproachActionServer(void)
-  {
-  }
-  
-	//odom state cb
+  = default;
+
+    //odom state cb
 	void odom_cb(const nav_msgs::OdometryConstPtr& input){
 		current_odom = *input;
 		heard_odom = true;
 	}
-
-	void spinSleep(double duration){
-		int rateHertz = 40;	
-		ros::Rate r(rateHertz);
-		for(int i = 0; i < (int)duration * rateHertz; i++) {
-			ros::spinOnce();
-			r.sleep();
-		}
-	}
-	
 		
 	double getYaw(geometry_msgs::Pose pose){
 		tf::Quaternion q(pose.orientation.x, 
@@ -148,27 +137,163 @@ public:
 		m.getRPY(r, p, y);
 		return y;
 	}
-	
+
+    void servo_yaw(double amount_to_turn) {
+        ros::Rate r(30);
+
+        //first, wait for odometry
+        heard_odom = false;
+        while (!heard_odom){
+            r.sleep();
+            ros::spinOnce();
+        }
+
+        double initial_yaw = getYaw(current_odom.pose.pose);
+        double target_yaw = initial_yaw + amount_to_turn;
+        double turn_velocity = 0.5 * amount_to_turn / 2.0;
+
+        ROS_INFO("Turn angle = %f", amount_to_turn);
+
+
+        geometry_msgs::Twist v_i;
+        v_i.linear.x = 0; v_i.linear.y = 0; v_i.linear.z = 0;
+        v_i.angular.x = 0; v_i.angular.y = 0;
+
+        while (ros::ok()){
+            v_i.angular.z = turn_velocity;
+
+            pub_base_velocity.publish(v_i);
+
+            ros::spinOnce();
+
+            r.sleep();
+
+            double current_yaw = getYaw(current_odom.pose.pose);
+
+            if (fabs(current_yaw - target_yaw) < 0.05)
+                break;
+        }
+        v_i.angular.z = 0;
+        pub_base_velocity.publish(v_i);
+
+    }
+
+    void servo_linear(double distance_to_travel) {
+        ros::Rate r(30);
+        double start_odom_x = current_odom.pose.pose.position.x;
+        double start_odom_y = current_odom.pose.pose.position.y;
+
+        double x_vel = 0.15;
+
+        geometry_msgs::Twist v_i;
+        v_i.linear.x = 0; v_i.linear.y = 0; v_i.linear.z = 0;
+        v_i.angular.x = 0; v_i.angular.y = 0;
+        while (ros::ok()){
+            double distance_traveled = sqrt(  pow(current_odom.pose.pose.position.x - start_odom_x,2) +
+                                              pow(current_odom.pose.pose.position.y - start_odom_y,2));
+
+            ROS_INFO("Distance traveled = %f",distance_traveled);
+
+            if (distance_traveled > distance_to_travel){
+                break;
+            }
+
+
+            v_i.linear.x = x_vel;
+            pub_base_velocity.publish(v_i);
+
+            r.sleep();
+            ros::spinOnce();
+
+
+
+        }
+        v_i.linear.x = 0;
+        pub_base_velocity.publish(v_i);
+    }
+
+    void approach_circular_table(const PointCloudT::Ptr &cloud_plane) {
+        //find the point on the table closest to the robot's 0,0
+        int closest_point_index = -1;
+        double closest_point_distance = 0.0;
+        for (int i = 0; i < (int)cloud_plane->points.size(); i++){
+            double d_i = sqrt(   pow(cloud_plane->points.at(i).x,2) +   pow(cloud_plane->points.at(i).y,2));
+            if (closest_point_index == -1 || d_i < closest_point_distance){
+                closest_point_index = i;
+                closest_point_distance = d_i;
+            }
+        }
+
+        geometry_msgs::PoseStamped pose_debug;
+        pose_debug.header.frame_id = "/base_footprint";
+        pose_debug.header.seq = 1;
+        pose_debug.pose.position.x = cloud_plane->points.at(closest_point_index).x;
+        pose_debug.pose.position.y = cloud_plane->points.at(closest_point_index).y;
+        pose_debug.pose.position.z = cloud_plane->points.at(closest_point_index).z;
+        pose_debug.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0,0,0);
+        pose_pub.publish(pose_debug);
+
+
+		// Arm is assumed to be safe
+/*        //next, make arm safe to move again
+        mico.move_home();
+        bool safe = mico.make_safe_for_travel();
+        if (!safe) {
+            ROS_ERROR("[segbot_table_approach_as.cpp] Cannot make arm safe for travel! Aborting!");
+            result_.success = false;
+            result_.error_msg = "cannot_make_arm_safe";
+            as_.setAborted(result_);
+            return;
+        }
+*/
+
+        //calculate turn angle
+        double target_turn_angle = atan2( cloud_plane->points.at(closest_point_index).y, cloud_plane->points.at(closest_point_index).x);
+        servo_yaw(target_turn_angle);
+
+        heard_odom = false;
+        while (!heard_odom){
+            ros::spinOnce();
+        }
+        double final_yaw = getYaw(current_odom.pose.pose);
+
+
+        //now, approach table
+        double distance_to_travel = closest_point_distance - 0.35;
+        servo_linear(distance_to_travel);
+    }
+
+	void approach_rectangular_table(const PointCloudT::Ptr &cloud_plane) {
+		auto bounding_box = bwi_perception::BoundingBox::oriented_from_cloud<PointT>(cloud_plane);
+
+		geometry_msgs::PoseStamped pose_debug;
+		pose_debug.header.frame_id = "/base_footprint";
+		pose_debug.header.seq = 1;
+		pose_debug.pose.position.x = bounding_box.position.x();
+		pose_debug.pose.position.y = bounding_box.min.y();
+		pose_debug.pose.position.z = bounding_box.position.z();
+		pose_debug.pose.orientation.x = bounding_box.orientation.x();
+		pose_debug.pose.orientation.y = bounding_box.orientation.y();
+		pose_debug.pose.orientation.z = bounding_box.orientation.z();
+		pose_debug.pose.orientation.w = bounding_box.orientation.w();
+		pose_pub.publish(pose_debug);
+
+
+	}
+
 	void executeCB(const segbot_arm_manipulation::TabletopApproachGoalConstPtr &goal)
-	{
+    {
 		if (goal->command == "approach"){
 		
 			//step 1: query table_object_detection_node to segment the blobs on the table
 
-			//home the arm
-			mico.move_home();
-			mico.close_hand();
-	
+			ros::ServiceClient client_tabletop_perception = nh_.serviceClient<bwi_perception::PerceiveTabletopScene>("perceive_tabletop_scene");
+			bwi_perception::PerceiveTabletopScene srv; //the srv request is just empty
 
-            mico.move_to_side_view();
-			
-			
-			ros::ServiceClient client_tabletop_perception = nh_.serviceClient<bwi_perception::TabletopPerception>("tabletop_object_detection_service");
-			bwi_perception::TabletopPerception srv; //the srv request is just empty
-			
 			srv.request.override_filter_z = true;
-			srv.request.filter_z_value = FILTER_Z_VALUE;
-			
+			srv.request.max_z_value = FILTER_Z_VALUE;
+            ROS_INFO("Perceiving the table ...");
+
 			if (client_tabletop_perception.call(srv))
 			{
 				ROS_INFO("Received Response from tabletop_object_detection_service");
@@ -211,135 +336,19 @@ public:
 			
 			PointCloudT::Ptr cloud_plane (new PointCloudT);
 			pcl::fromROSMsg(plane_cloud_pc2, *cloud_plane);
-			
-			//find the point on the table closest to the robot's 0,0
-			int closest_point_index = -1;
-			double closest_point_distance = 0.0;
-			for (int i = 0; i < (int)cloud_plane->points.size(); i++){
-				double d_i = sqrt(   pow(cloud_plane->points.at(i).x,2) +   pow(cloud_plane->points.at(i).y,2));
-				if (closest_point_index == -1 || d_i < closest_point_distance){
-					closest_point_index = i;
-					closest_point_distance = d_i;
-				}
-			}
-			
-			geometry_msgs::PoseStamped pose_debug;
-			pose_debug.header.frame_id = "/base_footprint";
-			pose_debug.header.seq = 1;
-			pose_debug.pose.position.x = cloud_plane->points.at(closest_point_index).x;
-			pose_debug.pose.position.y = cloud_plane->points.at(closest_point_index).y;
-			pose_debug.pose.position.z = cloud_plane->points.at(closest_point_index).z;
-			pose_debug.pose.orientation = tf::createQuaternionMsgFromRollPitchYaw(0,0,0);
-			pose_pub.publish(pose_debug);
-			
-			//calculate turn angle
-			double target_turn_angle = atan2( cloud_plane->points.at(closest_point_index).y, cloud_plane->points.at(closest_point_index).x);
-			
-			
-			double duration = 2.0; //we want to take this many seconds to get there
-			double pub_rate = 30;
-			
-			double turn_velocity = 0.5*target_turn_angle/duration;
-			
-			
-			//next, make arm safe to move again
-			mico.move_home();
-			bool safe = mico.make_safe_for_travel();
-			if (!safe) {
-				ROS_ERROR("[segbot_table_approach_as.cpp] Cannot make arm safe for travel! Aborting!");
+
+            if (goal->table_type == "circular") {
+                approach_circular_table(cloud_plane);
+            } else if (goal->table_type == "rectangular") {
+                approach_rectangular_table(cloud_plane);
+            } else {
+				ROS_ERROR("Specify a table type");
 				result_.success = false;
-				result_.error_msg = "cannot_make_arm_safe";
 				as_.setAborted(result_);
-				return;
 			}
-			
-			
-			
-			ros::Rate r(pub_rate);
-			
-			//first, wait for odometry
-			heard_odom = false;
-			while (!heard_odom){
-				r.sleep();
-				ros::spinOnce();
-			}
-			
-			double initial_yaw = getYaw(current_odom.pose.pose);
-			double target_yaw = initial_yaw + target_turn_angle;
-			
-			ROS_INFO("Turn angle = %f",target_turn_angle);
-			
-			
-			geometry_msgs::Twist v_i;
-			v_i.linear.x = 0; v_i.linear.y = 0; v_i.linear.z = 0;
-			v_i.angular.x = 0; v_i.angular.y = 0;
-			
-			while (ros::ok()){
-				v_i.angular.z = turn_velocity;
-								
-				pub_base_velocity.publish(v_i);
-				
-				ros::spinOnce();
-				
-				r.sleep();
-				
-				double current_yaw = getYaw(current_odom.pose.pose);
-				
-				if (fabs(current_yaw - target_yaw) < 0.05)
-					break;
-			}
-			
-			
-			
-			v_i.angular.z = 0;
-			pub_base_velocity.publish(v_i);
-			
-			heard_odom = false;
-			while (!heard_odom){
-				r.sleep();
-				ros::spinOnce();
-			}
-			double final_yaw = getYaw(current_odom.pose.pose);
-			
-			
-			//now, approach table
-			
-			double distance_to_travel = closest_point_distance - 0.25;
-			double start_odom_x = current_odom.pose.pose.position.x;
-			double start_odom_y = current_odom.pose.pose.position.y;
-			
-			double x_vel = 0.15;
-			
-			while (ros::ok()){
-				double distance_traveled = sqrt(  pow(current_odom.pose.pose.position.x - start_odom_x,2) +
-												pow(current_odom.pose.pose.position.y - start_odom_y,2));
-												
-				ROS_INFO("Distance traveled = %f",distance_traveled);				
-												
-				if (distance_traveled > distance_to_travel){
-					break;
-				}
-				
-				
-				v_i.linear.x = x_vel;
-				pub_base_velocity.publish(v_i);
-				
-				r.sleep();
-				ros::spinOnce();
-				
-				
-				
-			}
-			v_i.linear.x = 0;
-			pub_base_velocity.publish(v_i);
-			
-			
-			ROS_INFO("Closest point distance = %f",closest_point_distance);
-			ROS_INFO("Turn angle = %f",target_turn_angle);
-			ROS_INFO("Target yaw = %f",target_yaw);
-			ROS_INFO("Initial Yaw:\t %f",initial_yaw);
-			ROS_INFO("Final Yaw:\t %f",final_yaw);
-			
+
+
+
 			result_.success = true;
 			as_.setSucceeded(result_);
 		}
@@ -356,14 +365,11 @@ public:
 			nav_msgs::Odometry start_odom = current_odom;
 			
 			float distance_to_travel = 0.25;
-			
 			double start_odom_x = current_odom.pose.pose.position.x;
 			double start_odom_y = current_odom.pose.pose.position.y;
 			
 			double x_vel = -0.15;
-			
-			
-			
+
 			geometry_msgs::Twist v_i;
 			v_i.linear.x = 0; v_i.linear.y = 0; v_i.linear.z = 0;
 			v_i.angular.x = 0; v_i.angular.y = 0;
@@ -431,5 +437,4 @@ int main(int argc, char** argv)
 
   return 0;
 }
-
 

@@ -33,7 +33,7 @@ def joint_cb (data):
 def get_table_scene():
 	rospy.wait_for_service('tabletop_object_detection_service')
 	try:
-		perception_client = rospy.ServiceProxy('tabletop_object_detection_service', TabletopPerception)
+		perception_client = rospy.ServiceProxy('tabletop_object_detection_service', PerceiveTabletopScene)
 	
 		table_scene_resp = perception_client(False, 0.0)
 		return table_scene_resp

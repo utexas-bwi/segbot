@@ -4,7 +4,6 @@
 #include <geometry_msgs/PoseStamped.h>
 #include <actionlib/client/simple_action_client.h>
 #include <segbot_arm_manipulation/Mico.h>
-#include "bwi_perception/TabletopPerception.h"
 #include <bwi_perception/bwi_perception.h>
 #include <segbot_arm_manipulation/HandoverAction.h>
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
@@ -68,15 +67,14 @@ int main(int argc, char **argv) {
 	//register ctrl-c
 	signal(SIGINT, sig_handler);
 
-	
-	//store out of table joint position
 	mico->wait_for_data();
 	mico->move_to_side_view();
 
 	while (ros::ok()){
-	
+
+        ROS_INFO("Perceiving tabletop scene...");
 		//get the table scene
-		bwi_perception::TabletopPerception::Response table_scene = bwi_perception::getTabletopScene(n);
+		bwi_perception::PerceiveTabletopScene::Response table_scene = bwi_perception::getTabletopScene(n);
 		
 		if ((int)table_scene.cloud_clusters.size() == 0){
 			ROS_WARN("No objects found on table.");

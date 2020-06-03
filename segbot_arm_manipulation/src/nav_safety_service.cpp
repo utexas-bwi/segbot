@@ -21,14 +21,13 @@
 #include <segbot_arm_manipulation/Mico.h>
 #include <segbot_arm_manipulation/arm_utils.h>
 
-using namespace boost::assign;
-
+using namespace std;
 
 bool debug = true;
 bool g_caught_sigint = false;
 bool safe = false;
 
-std::vector<double> q_safe;
+std::vector<float> q_safe;
 ros::Publisher pub;
 double inflationRad;
 std_msgs::Bool pub_data;
@@ -107,12 +106,8 @@ void joint_state_cb(const sensor_msgs::JointStateConstPtr &js) {
 };
 
 bool service_cb(segbot_arm_manipulation::NavSafety::Request &req, segbot_arm_manipulation::NavSafety::Response &res) {
-    vector<float> as_floats;
-    for (auto &value: q_safe) {
-        as_floats.push_back(value);
-    }
     ROS_INFO("[mico_nav_safety_service.cpp] making a call to moveit client...");
-    sensor_msgs::JointState target_state = segbot_arm_manipulation::values_to_joint_state(as_floats);
+    sensor_msgs::JointState target_state = segbot_arm_manipulation::values_to_joint_state(q_safe);
     if (mico->move_to_joint_state_moveit(target_state)) {
         ROS_INFO("Safety service call sent. Preparing to move arm to save location.");
         if (req.getSafe) {
@@ -149,9 +144,7 @@ int main(int argc, char **argv) {
     //service for enabling and disabling the safety mode
     ros::ServiceServer srv_mode = pnh.advertiseService("set_mode", set_mode_cb);
 
-
-    q_safe += -1.4918, -1.804, -0.1299, -2.1717, .5688, 2.6787; //defines the 'go-to' safe position
-
+    q_safe = mico->position_db->get_joint_position("safe");
     nh.param("inflation_radius", inflationRad, .195);
     ros::spin();
 }
