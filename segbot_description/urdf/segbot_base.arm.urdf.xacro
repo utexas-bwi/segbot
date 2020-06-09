@@ -49,9 +49,12 @@
       <joint_properties damping="0.0" friction="0.0"/>
     </joint>
 
-    <transmission type="pr2_mechanism_model/SimpleTransmission" name="base_caster_support_trans">
+    <transmission name="base_caster_support_trans">
+      <type>transmission_interface/SimpleTransmission</type>
       <actuator name="base_caster_support_motor"/>
-      <joint name="base_caster_support_joint"/>
+      <joint name="base_caster_support_joint">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
       <mechanicalReduction>1.0</mechanicalReduction>
     </transmission>
 
@@ -89,9 +92,12 @@
       <joint_properties damping="0.0" friction="0.0"/>
     </joint>
 
-    <transmission type="pr2_mechanism_model/SimpleTransmission" name="caster_wheel_trans">
+    <transmission name="caster_wheel_trans">
+      <type>transmission_interface/SimpleTransmission</type>
       <actuator name="caster_wheel_motor"/>
-      <joint name="caster_wheel_joint"/>
+      <joint name="caster_wheel_joint">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
       <mechanicalReduction>1.0</mechanicalReduction>
     </transmission>
 
@@ -125,9 +131,12 @@
       <joint_properties damping="0.0" friction="0.0"/>
     </joint>
 
-    <transmission type="pr2_mechanism_model/SimpleTransmission" name="base_caster_support_trans">
+    <transmission name="base_caster_support_trans">
+      <type>transmission_interface/SimpleTransmission</type>
       <actuator name="base_caster_support_motor"/>
-      <joint name="base_caster_support_joint_front"/>
+      <joint name="base_caster_support_joint_front">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
       <mechanicalReduction>1.0</mechanicalReduction>
     </transmission>
 
@@ -168,9 +177,12 @@
       <joint_properties damping="0.0" friction="0.0"/>
     </joint>
 
-    <transmission type="pr2_mechanism_model/SimpleTransmission" name="caster_wheel_trans">
+    <transmission name="caster_wheel_trans">
+      <type>transmission_interface/SimpleTransmission</type>
       <actuator name="caster_wheel_motor"/>
-      <joint name="caster_wheel_joint_front"/>
+      <joint name="caster_wheel_joint_front">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
       <mechanicalReduction>1.0</mechanicalReduction>
     </transmission>
 
