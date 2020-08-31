@@ -2,7 +2,7 @@ scan_filter_chain:
 # - name: nan_to_inf_filter
 #   type: segbot_sensors/NanToInfFilter
 - name: shadows
-  type: ScanShadowsFilter
+  type: laser_filters/ScanShadowsFilter
   params:
     min_angle: 10
     max_angle: 170

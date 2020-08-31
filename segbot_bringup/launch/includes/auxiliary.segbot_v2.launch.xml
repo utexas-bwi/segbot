@@ -8,6 +8,7 @@
   <arg name="use_nav_kinect" default="true"/>
   <arg name="use_perception" default="false" />
   <arg name="use_registered_topic" default="false" />
+  <arg name="simulation" default="false"/>
 
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
   <param name="robot_description" 
@@ -63,8 +64,13 @@
       <arg name="publish_robot_state" value="false" />
     </include>
     <!-- launch MoveIt! -->
-    <include file="$(find m1n6s200_segbot_moveit_config)/launch/m1n6s200_segbot_moveit_bringup.launch"/>
+    <group if="$(arg simulation)">
+        <include file="$(find m1n6s200_segbot_moveit_config)/launch/m1n6s200_segbot_moveit_simulation.launch"/>
+    </group>
 
+    <group unless="$(arg simulation)">
+        <include file="$(find m1n6s200_segbot_moveit_config)/launch/m1n6s200_segbot_moveit_bringup.launch"/>
+    </group>
     <include file="$(find bwi_moveit_utils)/launch/moveit_utils.launch" />
 
     <include file="$(find segbot_arm_manipulation)/launch/segbot_arm_manipulation.launch" />
