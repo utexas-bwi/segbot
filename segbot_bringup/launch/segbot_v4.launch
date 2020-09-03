@@ -6,7 +6,6 @@
   <arg name="device_id" default="#1" />
   <arg name="rviz" default="true" />
   <arg name="gui" default="true" />
-  <arg name="use_velodyne" default="false"/>
 
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
@@ -31,11 +30,16 @@
   </include>
 
   <!-- Velodyne -->
-  <!--  
+  
   <include file="$(find segbot_sensors)/launch/velodyne/velodyne.launch">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
-  -->
+  
+  <include file="$(find segbot_sensors)/launch/velodyne/velodyne-laserscan.launch">
+    <arg name="tf_prefix" value="$(arg tf_prefix)" />
+    <arg name="launch_nodelet_manager" value="false"/>
+  </include>
+  
   <!-- Diagnostics and battery monitor -->
   <include file="$(find segbot_sensors)/launch/diagnostic/diagnostics.launch"/>
   <param name="voltage_threshold" type="double" value="71.2" />
