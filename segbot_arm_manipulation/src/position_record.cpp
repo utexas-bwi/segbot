@@ -12,6 +12,7 @@
 //services
 #include "ros/ros.h"
 #include "geometry_msgs/Pose.h"
+#include "geometry_msgs/PoseStamped.h"
 
 #include <ros/package.h>
 #include <rosbag/bag.h>
