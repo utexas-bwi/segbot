@@ -20,6 +20,7 @@
 
   <!-- whether to launch autonomous stuff or not -->
   <arg name="launch_localization" default="false" />
+  <arg name="launch_slam" default="false" />
   <arg name="laser_max_range" default="scan_filtered" />
   <arg name="localization_scan_topic" default="scan_filtered" />
   <arg name="use_fake_localization" default="false" />
@@ -76,6 +77,15 @@
         <param name="odom_frame_id" value="$(arg odom_frame_id)" />
       </node>
     </group>
+  </group>
+
+  <!-- launch slam -->
+  <group if="$(arg launch_slam)">
+    <include file="$(find segbot_navigation)/launch/gmapping.launch">
+      <arg name="map_frame" value="$(arg map_frame)" />
+      <arg name="map_topic" value="$(arg map_topic)" />
+      <arg name="scan_topic" value="$(arg localization_scan_topic)" />
+    </include>
   </group>
 
   <!-- launch move base -->
