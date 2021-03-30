@@ -10,6 +10,7 @@
 
 #include <segbot_arm_manipulation/arm_utils.h>
 #include <segbot_arm_manipulation/Mico.h>
+#include <bwi_perception/convenience.h>
 
 
 typedef pcl::PointXYZRGB PointT;
