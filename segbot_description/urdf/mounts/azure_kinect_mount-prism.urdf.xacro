@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<root xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+      xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+      xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+      xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find segbot_description)/urdf/components/beam_8020.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/sensors/kinect_camera.urdf.xacro" />
+
+  <xacro:macro name="kinect_mount" params="name parent *origin length">
+    <xacro:beam_8020 name="${name}_sensor_beam" parent="${parent}" length="${length}">
+      <xacro:insert_block name="origin" />
+    </xacro:beam_8020>
+    <xacro:aluminium_sheet name="${name}_base_plate" parent="${name}_sensor_beam" 
+                           thickness="${0.0625*INCH_TO_M}" length="${4*INCH_TO_M}" width="${9*INCH_TO_M}">
+                           <origin xyz="${0.5*INCH_TO_M} 0 ${length/2}" rpy="${M_PI/2} 0 ${M_PI/2}" />
+    </xacro:aluminium_sheet>
+
+    <xacro:standoff radius="0.003175" name="${name}_standoff_1" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
+      <origin xyz="${1.5*INCH_TO_M} ${-4*INCH_TO_M} ${0.0625*INCH_TO_M}" 
+              rpy="0 0 0" />
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_standoff_2" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
+      <origin xyz="${1.5*INCH_TO_M} ${4*INCH_TO_M} ${0.0625*INCH_TO_M}" 
+              rpy="0 0 0" />
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_standoff_3" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
+      <origin xyz="${-1.5*INCH_TO_M} ${4*INCH_TO_M} ${0.0625*INCH_TO_M}" 
+              rpy="0 0 0" />
+    </xacro:standoff>
+    <xacro:standoff radius="0.003175" name="${name}_standoff_4" parent="${name}_base_plate" length="${2.0*INCH_TO_M}">
+      <origin xyz="${-1.5*INCH_TO_M} ${-4*INCH_TO_M} ${0.0625*INCH_TO_M}" 
+              rpy="0 0 0" />
+    </xacro:standoff>
+
+    <xacro:aluminium_sheet name="${name}_top_plate" parent="${name}_standoff_1" 
+                           thickness="${0.0625*INCH_TO_M}" length="${4*INCH_TO_M}" width="${9*INCH_TO_M}">
+      <origin xyz="${-1.5*INCH_TO_M} ${4*INCH_TO_M} ${2*INCH_TO_M}"
+              rpy="0 0 0" />
+    </xacro:aluminium_sheet>
+
+    <xacro:kinect_camera name="${name}" parent="${name}_top_plate">
+      <origin xyz="${1.23*INCH_TO_M} -${0.54*INCH_TO_M}0 ${0.88*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:kinect_camera>
+
+  </xacro:macro>
+
+</root>
+
+
