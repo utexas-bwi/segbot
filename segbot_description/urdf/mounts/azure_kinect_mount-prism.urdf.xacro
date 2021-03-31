@@ -7,9 +7,11 @@
   <xacro:include filename="$(find segbot_description)/urdf/components/beam_8020.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/sensors/kinect_camera.urdf.xacro" />
+  <!---->
+  <xacro:include filename="$(find segbot_description)/urdf/sensors/azure_camera.urdf.xacro" />
+  <!---->
 
-  <xacro:macro name="kinect_mount" params="name parent *origin length">
+  <xacro:macro name="azure_kinect_mount" params="name parent *origin length">
     <xacro:beam_8020 name="${name}_sensor_beam" parent="${parent}" length="${length}">
       <xacro:insert_block name="origin" />
     </xacro:beam_8020>
@@ -41,9 +43,20 @@
               rpy="0 0 0" />
     </xacro:aluminium_sheet>
 
+    <!--
     <xacro:kinect_camera name="${name}" parent="${name}_top_plate">
       <origin xyz="${1.23*INCH_TO_M} -${0.54*INCH_TO_M}0 ${0.88*INCH_TO_M}" rpy="0 0 0" />
     </xacro:kinect_camera>
+    -->
+    <!---->
+    <xacro:azure_kinect_camera name="${name}" parent="${name}_top_plate">
+      <origin xyz="${1.23*INCH_TO_M} -${0.54*INCH_TO_M}0 ${0.88*INCH_TO_M}" rpy="0 0 0" />
+    </xacro:azure_kinect_camera>
+    <!---->
+
+    <!--
+    <xacro:command="xacro $(find azure_kinect_ros_driver)/urdf/azure_kinect.urdf.xacro" />
+    -->
 
   </xacro:macro>
 

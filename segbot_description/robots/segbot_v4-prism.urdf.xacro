@@ -10,8 +10,9 @@
   <xacro:include filename="$(find segbot_description)/urdf/mounts/velodyne_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/gazebo/segbot.gazebo.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/mounts/kinect_mount.urdf.xacro" />   
-  
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/kinect_mount.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/azure_kinect_mount-prism.urdf.xacro" />
+
   <xacro:property name="SENSOR_BEAM_LENGTH" value="10.75" /> <!-- inches -->
  
    
@@ -33,6 +34,11 @@
     -->
     <origin xyz="${15*INCH_TO_M} -${0.5*INCH_TO_M} ${31.5*INCH_TO_M}" rpy="-${M_PI/2} -${M_PI/2} 0" />
   </xacro:kinect_mount>
+
+  <!-- Add the forward facing azure kinect sensor for navigation -->
+  <xacro:azure_kinect_mount name="azure_kinect" parent="back_right_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}">
+    <origin xyz="${15*INCH_TO_M} -${0.5*INCH_TO_M} ${21.5*INCH_TO_M}" rpy="-${M_PI/2} -${M_PI/2} 0" />
+  </xacro:azure_kinect_mount>
 
   <xacro:hokuyo_mount 
     name="nav_hokuyo" 
