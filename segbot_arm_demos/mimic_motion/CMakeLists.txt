@@ -3,6 +3,7 @@ project(mimic_motion)
 
 add_compile_options(-std=c++11)
 
+if( $ENV{SEGBOT_HAS_ARM} )
 find_package(catkin REQUIRED COMPONENTS
         agile_grasp
   bwi_moveit_utils
@@ -49,3 +50,4 @@ target_link_libraries(touch_tabletop_object_demo ${catkin_LIBRARIES} )
 
 add_executable(touch_detect_tabletop_demo src/touch_detect_tabletop_demo.cpp)
 target_link_libraries(touch_detect_tabletop_demo ${catkin_LIBRARIES} )
+endif()

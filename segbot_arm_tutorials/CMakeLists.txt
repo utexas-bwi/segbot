@@ -3,6 +3,7 @@ project(segbot_arm_tutorials)
 
 add_compile_options(-std=c++11)
 
+if( $ENV{SEGBOT_HAS_ARM} )
 find_package(catkin REQUIRED COMPONENTS
     actionlib_msgs
     actionlib
@@ -56,3 +57,4 @@ target_link_libraries(ex8_joint_angles_control ${catkin_LIBRARIES} )
 
 add_executable(ex9_waypoints src/ex9_waypoints.cpp)
 target_link_libraries(ex9_waypoints ${catkin_LIBRARIES} )
+endif()
