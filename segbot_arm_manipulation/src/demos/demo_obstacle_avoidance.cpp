@@ -5,6 +5,7 @@
 #include <segbot_arm_manipulation/arm_utils.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <segbot_arm_manipulation/Mico.h>
+#include <bwi_perception/convenience.h>
 
 //true if Ctrl-C is pressed
 bool g_caught_sigint=false;

@@ -15,6 +15,8 @@
 #include <visualization_msgs/Marker.h>
 
 #include <bwi_perception/bwi_perception.h>
+#include <bwi_perception/features.h>
+#include <bwi_perception/convenience.h>
 
 //actions
 #include <actionlib/server/simple_action_server.h>

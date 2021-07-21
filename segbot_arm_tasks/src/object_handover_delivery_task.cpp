@@ -7,6 +7,7 @@
 
 //srv for talking to table_object_detection_node.cpp
 #include "bwi_perception/bwi_perception.h"
+#include <bwi_perception/convenience.h>
 
 //action for grasping
 #include "segbot_arm_manipulation/TabletopGraspAction.h"
