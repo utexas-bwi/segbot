@@ -5,3 +5,5 @@ lib
 *.swp
 *.swo
 *.pyc
+.idea
+cmake-build-debug

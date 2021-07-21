@@ -2,11 +2,12 @@
 
   <arg name="tf_prefix" default="" />
   <arg name="use_full_gazebo_model" default="false" />
-  <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_v3.urdf.xacro" />
+    <!--  <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_v3.urdf.xacro" /> -->
+  <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_v4.urdf.xacro" />
 
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
   <param name="robot_description"
-    command="$(find xacro)/xacro.py '$(arg urdf_file)' use_full_gazebo_model:=$(arg use_full_gazebo_model)" />
+    command="$(find xacro)/xacro '$(arg urdf_file)' use_full_gazebo_model:=$(arg use_full_gazebo_model)" />
 
   <!-- launch the tf tree -->
   <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">

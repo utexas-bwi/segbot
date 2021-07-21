@@ -1,0 +1,204 @@
+<?xml version="1.0"?>
+<root xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+      xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+      xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+      xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find segbot_description)/urdf/sensors/xtion_camera.gazebo.xacro" />
+
+  <xacro:macro name="xtion_camera" params="name parent *origin">
+  <joint name="${name}_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}_link"/>
+      <child link="${name}_mount_base_link"/>
+    </joint>
+    <link name="${name}_mount_base_link">
+        <inertial>
+        <origin
+			xyz="-9.77737269646951E-18 -7.75752901409229E-08 0.0182920184014135" rpy="0 0 0" />
+		  <mass	value="0.0443555628344615" />
+		  <inertia
+			ixx="7.55035394643695E-06"
+			ixy="1.24994584390547E-12"
+			ixz="2.58277160886273E-11"
+			iyy="8.77400695011705E-06"
+			iyz="2.97707991588884E-08"
+			izz="5.61870162101485E-06" />
+		</inertial>
+		<visual>
+		  <origin xyz="0 0 0" rpy="0 0 0" />
+		  <geometry>
+			<mesh filename="package://segbot_description/meshes/xtion/xtion_mount_base_link.STL" />
+		  </geometry>
+		  <material name="">
+			<color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+		  </material>
+		</visual>
+		<collision>
+		  <origin xyz="0 0 0" rpy="0 0 0" />
+		  <geometry>
+			<mesh filename="package://segbot_description/meshes/xtion/xtion_mount_base_link.STL" />
+		  </geometry>
+		</collision>
+    </link>
+	<link name="${name}_pivot_link">
+    <inertial>
+      <origin
+        xyz="-6.0291269113433E-05 0.00109921178961533 0.0158828961288141" rpy="0 0 0" />
+      <mass
+        value="0.202231188470424" />
+      <inertia
+        ixx="3.34461283796179E-05"
+        ixy="-5.34866113971366E-07"
+        ixz="8.67170252038436E-09"
+        iyy="0.000597098891733533"
+        iyz="1.92350019754026E-07"
+        izz="0.000608308099791285" />
+    </inertial>
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+		<mesh filename="package://segbot_description/meshes/xtion/xtion_pivot_link.STL" />
+      </geometry>
+      <material name="">
+        <color rgba="0.752941176470588 0.752941176470588 0.752941176470588 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+		<mesh filename="package://segbot_description/meshes/xtion/xtion_pivot_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint name="${name}_pivot_joint" type="fixed">
+    <origin xyz="0 1.27000000000721E-05 0.02921" rpy="0.785 0 0" />
+    <parent link="${name}_mount_base_link" />
+    <child link="${name}_pivot_link" />
+    <!-- axis xyz="1 0 0" />
+    <limit lower="-1.58" upper="1.58" effort="0" velocity="0" />
+	-->
+  </joint>
+
+  <!--- visual frames -->
+    <link name="${name}_link">
+    <inertial>
+      <origin xyz="-0.0187871333667723 -0.00020103238415331 -0.0167798361475048"
+        rpy="0 0 0" />
+      <mass value="0.150306955527936" />
+      <inertia
+        ixx="2.36182089627434E-05"
+        ixy="8.67618422001746E-09"
+        ixz="5.34870767194675E-07"
+        iyy="0.000406064964123578"
+        iyz="1.37242873517297E-08"
+        izz="0.000399282187419621" />
+    </inertial>
+  </link>
+   <link name="${name}_rgb_frame">
+    <inertial>
+      <origin xyz="0.0282128666332277 -0.000201032384153303 -0.0167798361475048"
+        rpy="0 0 0" />
+      <mass value="0.150306955527936" />
+      <inertia
+        ixx="2.36182089627434E-05"
+        ixy="8.67618422001752E-09"
+        ixz="5.34870767194675E-07"
+        iyy="0.000406064964123578"
+        iyz="1.37242873517297E-08"
+        izz="0.000399282187419621" />
+    </inertial>
+  </link>
+  <link name="${name}_rgb_optical_frame">
+    <inertial>
+      <origin
+        xyz="0.0282128666332277 -0.000201032384153303 -0.0167798361475048"
+        rpy="0 0 0" />
+      <mass
+        value="0.150306955527936" />
+      <inertia
+        ixx="2.36182089627434E-05"
+        ixy="8.67618422001752E-09"
+        ixz="5.34870767194675E-07"
+        iyy="0.000406064964123578"
+        iyz="1.37242873517297E-08"
+        izz="0.000399282187419621" />
+    </inertial>
+   </link>
+   <link name="${name}_depth_frame">
+    <inertial>
+      <origin xyz="-0.0187871333667723 -0.000201032384153303 -0.0167798361475048"
+        rpy="0 0 0" />
+      <mass value="0.150306955527936" />
+      <inertia
+        ixx="2.36182089627434E-05"
+        ixy="8.67618422001834E-09"
+        ixz="5.34870767194675E-07"
+        iyy="0.000406064964123578"
+        iyz="1.37242873517299E-08"
+        izz="0.000399282187419621" />
+    </inertial>
+  </link>
+  <link name="${name}_depth_optical_frame">
+    <inertial>
+      <origin xyz="-0.0187871333667723 -0.000201032384153303 -0.0167798361475048"
+        rpy="0 0 0" />
+      <mass value="0.150306955527936" />
+      <inertia
+        ixx="2.36182089627434E-05"
+        ixy="8.67618422001834E-09"
+        ixz="5.34870767194675E-07"
+        iyy="0.000406064964123578"
+        iyz="1.37242873517299E-08"
+        izz="0.000399282187419621" />
+    </inertial>
+  </link>
+  <joint name="${name}_link_joint"
+    type="fixed">
+    <origin xyz="0.0447059999999999 -0.016 0.0214843769443396"
+      rpy="0 0 -1.57" />
+    <parent
+      link="${name}_pivot_link" />
+    <child
+      link="${name}_link" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+ <joint name="${name}_rgb_frame_joint"
+    type="fixed">
+    <origin xyz="-0.0282940000000001 -0.016 0.0214843769443396"
+      rpy="0 0 -1.57" />
+    <parent link="${name}_pivot_link" />
+    <child link="${name}_rgb_frame" />
+    <axis xyz="0 0 0" />
+  </joint>
+  <joint name="${name}_rgb_optical_frame_joint"
+    type="fixed">
+    <origin xyz="-0.0282940000000001 -0.016 0.0214843769443396"
+      rpy="1.570 3.1415 0" />
+    <parent link="${name}_pivot_link" />
+    <child link="${name}_rgb_optical_frame" />
+    <axis xyz="0 0 0" />
+  </joint>
+  <joint name="${name}_depth_frame_joint"
+    type="fixed">
+    <origin xyz="0.0187059999999999 -0.016 0.0214843769443396"
+      rpy="0 0 -1.57" />
+    <parent link="${name}_pivot_link" />
+    <child link="${name}_depth_frame" />
+    <axis xyz="0 0 0" />
+  </joint>
+  <joint name="${name}_depth_optical_frame_joint"
+    type="fixed">
+    <origin xyz="0.0187059999999999 -0.016 0.0214843769443396"
+      rpy="1.570 3.1415 0" />
+    <parent link="${name}_pivot_link" />
+    <child link="${name}_depth_optical_frame" />
+    <axis xyz="0 0 0" />
+  </joint>
+
+
+
+  </xacro:macro>
+</root>

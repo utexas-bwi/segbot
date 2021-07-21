@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<root xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+      xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+      xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+      xmlns:xacro="http://ros.org/wiki/xacro">
+ 
+  <xacro:macro name="laptop" params="name parent *origin">
+
+    <!-- laptop base -->
+    <joint name="${name}_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}_link" />
+      <child link="${name}_link" />
+    </joint>
+    <link name="${name}_link">
+      <inertial>
+        <mass value="0.1" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
+                 iyy="0.01"  iyz="0.0"
+                 izz="0.01" />
+      </inertial>
+      <visual>
+        <origin xyz="0 0 ${0.375*INCH_TO_M}" rpy="0 0 0"/>
+        <geometry>
+          <box size="${9*INCH_TO_M} ${12*INCH_TO_M} ${2*INCH_TO_M}" />
+        </geometry>
+        <material name="almost_black" />
+      </visual>
+
+      <xacro:laptop_collision />
+    </link>
+
+    <gazebo reference="${name}_link">
+      <material>Gazebo/Grey</material>
+      <mu1 value="100.0" />
+      <mu2 value="100.0" />
+      <kp  value="1000000.0" />
+      <kd  value="1.0" />
+    </gazebo>
+
+    <!-- laptop screen -->
+    <joint name="${name}_screen_joint" type="fixed">
+      <origin xyz="${-3.0*INCH_TO_M} 0 ${2*INCH_TO_M}" rpy="0 -${16/48*M_PI} 0"/>
+      <parent link="${name}_link" />
+      <child link="${name}_screen_link" />
+    </joint>
+
+    <link name="${name}_screen_link">
+      <inertial>
+        <mass value="0.1" />
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.01"  ixy="0.0"  ixz="0.0"
+                 iyy="0.01"  iyz="0.0"
+                 izz="0.01" />
+      </inertial>
+      <visual>
+        <origin xyz="${4.5*INCH_TO_M} 0 -${0.375*INCH_TO_M}" rpy="0 0 -${M_PI/2}"/>
+        <geometry>
+          <box size="${12*INCH_TO_M} ${9*INCH_TO_M} ${2*INCH_TO_M}" />
+        </geometry>
+        <material name="almost_black" />
+      </visual>
+      <xacro:laptop_screen_collision />
+    </link>
+
+    <gazebo reference="${name}_screen_link">
+      <visual>
+        <plugin name="${name}_video_controller" filename="libgazebo_ros_video.so">
+          <height>120</height>
+          <width>160</width>
+          <topicName>image</topicName>
+        </plugin>
+      </visual>
+      <material>Gazebo/Grey</material>
+      <mu1 value="100.0" />
+      <mu2 value="100.0" />
+      <kp  value="1000000.0" />
+      <kd  value="1.0" />
+    </gazebo>
+
+  </xacro:macro>
+
+</root>
+

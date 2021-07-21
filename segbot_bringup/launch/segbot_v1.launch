@@ -1,8 +1,11 @@
+<?xml version="1.0"?>
 <launch>
 
   <!-- set the tf prefix as necessary -->
   <arg name="tf_prefix" default="" />
   <arg name="device_id" default="#1" />
+  <arg name="rviz" default="true" />
+  <arg name="gui" default="true" />
   <param name="tf_prefix" value="$(arg tf_prefix)" />
 
   <!-- launch the segway base -->

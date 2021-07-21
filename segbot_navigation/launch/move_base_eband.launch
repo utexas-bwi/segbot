@@ -9,6 +9,7 @@
   <arg name="config" default="segbotv2" />
 
   <arg name="global_frame" default="map" />
+  <arg name="robot_base_frame" default="base_footprint" />
   <arg name="eband_rotational_threshold_multiplier" default="1.0" />
   <arg name="eband_disallow_hysteresis" default="false" />
 
@@ -24,7 +25,9 @@
 
     <param name="global_costmap/map_topic" value="$(arg map_topic)"/>
 
+    <param name="local_costmap/robot_base_frame" value="$(arg robot_base_frame)"/>
     <param name="local_costmap/global_frame" value="$(arg global_frame)"/>
+    <param name="global_costmap/robot_base_frame" value="$(arg robot_base_frame)"/>
     <param name="global_costmap/global_frame" value="$(arg global_frame)"/>
 
     <param name="EBandPlannerROS/rotational_threshold_multiplier" value="$(arg eband_rotational_threshold_multiplier)" />

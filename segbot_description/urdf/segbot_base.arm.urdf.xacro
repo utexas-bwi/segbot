@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Included URDF Files -->
+  <xacro:include filename="$(find segbot_description)/urdf/segbot_wheel.urdf.xacro"/>
+
+  <xacro:macro name="segbot">
+
+    <!-- root link, on the ground just below the robot origin -->
+    <link name="base_footprint">
+     <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <box size="0.001 0.001 0.001"/>
+        </geometry>
+      </visual>
+    </link>
+
+    <joint name="base_footprint_joint" type="fixed">
+      <origin xyz="0.0 0 0.2165" rpy="0 0 0"/>
+      <parent link="base_footprint"/>
+      <child link="base_link"/>
+    </joint>
+
+    <!-- This is the robot origin, center of the 2 wheels (axis of rotation) -->
+    <link name="base_link">
+      <xacro:segbot_base_link_inertial/>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://segbot_description/meshes/rmp50-base-link.dae" scale="0.0254 0.0254 0.0254"/>
+        </geometry>
+      </visual>
+      <xacro:segbot_base_link_collision/>
+    </link>
+
+    <xacro:gazebo_laser_obstacle/>
+
+    <xacro:gazebo_segbot_base_link_surface/>
+ <!-- back castor joint -->
+    <joint name="base_caster_support_joint" type="continuous">
+      <origin xyz="-0.3292 0 -0.0485" rpy="0 0 0"/>
+      <parent link="base_link"/>
+      <child link="base_caster_support_link"/>
+
+      <axis xyz="0 0 1"/>
+      <anchor xyz="0.01 0 0"/>
+      <limit effort="100" velocity="100" k_velocity="0"/>
+      <joint_properties damping="0.0" friction="0.0"/>
+    </joint>
+
+    <transmission name="base_caster_support_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="base_caster_support_motor"/>
+      <joint name="base_caster_support_joint">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <mechanicalReduction>1.0</mechanicalReduction>
+    </transmission>
+
+    <link name="base_caster_support_link">
+      <inertial>
+        <mass value="1"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="0.00375" ixy="0.0" ixz="0.0" iyy="0.00375" iyz="0.0" izz="0.00375"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://segbot_description/meshes/rmp50-castor-link.dae" scale="0.0254 0.0254 0.0254"/>
+        </geometry>
+      </visual>
+      <xacro:segbot_castor_support_link_collision/>
+    </link>
+
+    <gazebo reference="base_caster_support_link">
+      <mu1 value="100.0"/>
+      <mu2 value="100.0"/>
+      <kp value="1000000.0"/>
+      <kd value="1.0"/>
+    </gazebo>
+
+    <!-- caster wheel back-->
+    <joint name="caster_wheel_joint" type="continuous">
+      <origin xyz="-0.0397 0 -0.0918" rpy="0 0 0"/>
+      <parent link="base_caster_support_link"/>
+      <child link="caster_wheel_link"/>
+
+      <axis xyz="0 1 0"/>
+      <anchor xyz="0 0 0"/>
+      <limit effort="100" velocity="100" k_velocity="0"/>
+      <joint_properties damping="0.0" friction="0.0"/>
+    </joint>
+
+    <transmission name="caster_wheel_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="caster_wheel_motor"/>
+      <joint name="caster_wheel_joint">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <mechanicalReduction>1.0</mechanicalReduction>
+    </transmission>
+
+    <link name="caster_wheel_link">
+      <inertial>
+        <mass value="2"/> 
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.003" ixy="0.0" ixz="0.0" iyy="0.00581" iyz="0.0" izz="0.003"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://segbot_description/meshes/rmp50-castor-wheel.dae" scale="0.0254 0.0254 0.0254"/>
+        </geometry>
+      </visual>
+      <xacro:segbot_castor_wheel_link_collision/>
+    </link>
+
+    <xacro:gazebo_segbot_castor_wheel_link_surface/>
+
+
+    <!-- front caster joint -->
+    <joint name="base_caster_support_joint_front" type="continuous">
+      <origin xyz="0.3292 0 -0.0485" rpy="0 0 0"/>     <!-- changed x to positive 0.3292 -->
+      <parent link="base_link"/>
+      <child link="base_caster_support_link_front"/>
+
+      <axis xyz="0 0 1"/>
+      <anchor xyz="0.01 0 0"/>
+      <limit effort="100" velocity="100" k_velocity="0"/>
+      <joint_properties damping="0.0" friction="0.0"/>
+    </joint>
+
+    <transmission name="base_caster_support_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="base_caster_support_motor"/>
+      <joint name="base_caster_support_joint_front">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <mechanicalReduction>1.0</mechanicalReduction>
+    </transmission>
+
+    <link name="base_caster_support_link_front">
+      <inertial>
+        <mass value="1"/>
+        <origin xyz="0 0 0"/>
+        <inertia ixx="0.00375" ixy="0.0" ixz="0.0" iyy="0.00375" iyz="0.0" izz="0.00375"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://segbot_description/meshes/rmp50-castor-link.dae" scale="0.0254 0.0254 0.0254"/>
+        </geometry>
+      </visual>
+      <xacro:segbot_castor_support_link_collision/>
+    </link>
+
+    <gazebo reference="base_caster_support_link_front">
+      <mu1 value="100.0"/>
+      <mu2 value="100.0"/>
+      <kp value="1000000.0"/>
+      <kd value="1.0"/>
+    </gazebo>
+
+    <!-- caster wheel front -->
+    <joint name="caster_wheel_joint_front" type="continuous">
+<!-- changed x to positive 0.0397 -->
+      <origin xyz="0.0397 0 -0.0918" rpy="0 0 0"/>
+      <parent link="base_caster_support_link_front"/>
+      <child link="caster_wheel_link_front"/>
+
+
+
+      <axis xyz="0 1 0"/>
+      <anchor xyz="0 0 0"/>
+      <limit effort="100" velocity="100" k_velocity="0"/>
+      <joint_properties damping="0.0" friction="0.0"/>
+    </joint>
+
+    <transmission name="caster_wheel_trans">
+      <type>transmission_interface/SimpleTransmission</type>
+      <actuator name="caster_wheel_motor"/>
+      <joint name="caster_wheel_joint_front">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <mechanicalReduction>1.0</mechanicalReduction>
+    </transmission>
+
+    <link name="caster_wheel_link_front">
+      <inertial>
+        <mass value="2"/> 
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <inertia ixx="0.003" ixy="0.0" ixz="0.0" iyy="0.00581" iyz="0.0" izz="0.003"/>
+      </inertial>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+        <geometry>
+          <mesh filename="package://segbot_description/meshes/rmp50-castor-wheel.dae" scale="0.0254 0.0254 0.0254"/>
+        </geometry>
+      </visual>
+      <xacro:segbot_castor_wheel_link_collision/>
+    </link>
+
+    <xacro:gazebo_segbot_castor_wheel_link_surface/>
+
+    <!-- left wheel -->
+    <xacro:segbot_wheel suffix="left" parent="base_link">
+      <origin xyz="0 0.2689 0.0239" rpy="0 0 0"/>
+    </xacro:segbot_wheel>
+
+    <!-- right wheel -->
+    <xacro:segbot_wheel suffix="right" parent="base_link">
+      <origin xyz="0 -0.2689 0.0239" rpy="0 0 0"/>
+    </xacro:segbot_wheel>
+
+  </xacro:macro>
+</root>
