@@ -3,6 +3,7 @@ project(segbot_arm_joystick)
 
 add_compile_options(-std=c++11)
 
+if( $ENV{SEGBOT_HAS_ARM} )
 find_package(catkin REQUIRED COMPONENTS
   actionlib
   actionlib_msgs
@@ -45,3 +46,4 @@ target_link_libraries(${PROJECT_NAME}
 install(TARGETS ${PROJECT_NAME}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+endif()

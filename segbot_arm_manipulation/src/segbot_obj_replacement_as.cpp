@@ -31,8 +31,8 @@
 #include "segbot_arm_manipulation/ObjReplacementAction.h"
 #include "segbot_arm_manipulation/Mico.h"
 
-#include "bwi_perception/bwi_perception.h"
-
+#include <bwi_perception/bwi_perception.h>
+#include <bwi_perception/convenience.h>
 
 #include <bwi_manipulation/grasp_utils.h>
 #include <segbot_arm_manipulation/arm_utils.h>

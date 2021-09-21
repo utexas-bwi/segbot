@@ -3,6 +3,7 @@ project(segbot_arm_manipulation)
 
 set(CMAKE_CXX_STANDARD 11)
 
+if( $ENV{SEGBOT_HAS_ARM} )
 find_package(catkin QUIET COMPONENTS
         actionlib
         actionlib_msgs
@@ -198,3 +199,4 @@ install(DIRECTORY include/${PROJECT_NAME}/
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
         FILES_MATCHING PATTERN "*.h"
         PATTERN ".svn" EXCLUDE)
+endif()

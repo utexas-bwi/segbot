@@ -3,6 +3,7 @@ project(segbot_arm_tasks)
 
 add_compile_options(-std=c++11)
 
+if( $ENV{SEGBOT_HAS_ARM} )
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
@@ -67,3 +68,4 @@ target_link_libraries(object_handover_delivery_task ${catkin_LIBRARIES} )
 
 add_executable(object_table_delivery_task src/object_table_delivery_task.cpp)
 target_link_libraries(object_table_delivery_task ${catkin_LIBRARIES} )
+endif()

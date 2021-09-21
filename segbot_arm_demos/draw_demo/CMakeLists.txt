@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
 project(draw_demo)
+
+if( $ENV{SEGBOT_HAS_ARM} )
 find_package(catkin REQUIRED COMPONENTS
         actionlib
         geometry_msgs
@@ -57,3 +59,4 @@ target_link_libraries(approach_board ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 add_executable (movement_demo src/movement_demo.cpp)
 target_link_libraries(movement_demo ${catkin_LIBRARIES})
 
+endif()
