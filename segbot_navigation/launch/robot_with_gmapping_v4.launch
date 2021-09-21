@@ -1,15 +1,24 @@
 <launch>
 
-  <arg name="map_file" default="$(find utexas_gdc)/maps/3ne-real-new.yaml" />
-  <arg name="robot_configuration" 
-       default="$(find segbot_bringup)/launch/segbot_v4.launch"/>
+  <arg name="localization_scan_topic" default="scan_filtered"/>
+  <arg name="rviz" default="true"/>
+  <arg name="gui" default="true"/>
 
-  <include file="$(arg robot_configuration)" />
+  <include file="$(find bwi_launch)/launch/includes/prism_segbot.launch.xml">
+    <arg name="laser_max_range" value="20.0" />
+    <arg name="localization_scan_topic" value="$(arg localization_scan_topic)" />
+    <arg name="move_base_config" value="segbotv4" />
+    <arg name="rviz" value="$(arg rviz)" />
+    <arg name="gui" value="$(arg gui)" />
+  </include>
 
   <include file="$(find segbot_navigation)/launch/gmapping_v3.launch">
-    <arg name="scan_topic" value="scan_filtered" />
+    <arg name="scan_topic" value="velodyne/scan_filtered" />
   </include>
-  <include file="$(find segbot_navigation)/launch/rviz.launch" />
+
+  <include file="$(find segbot_bringup)/launch/segbot_v4.launch">
+    <arg name="gui" value="$(arg gui)" />
+  </include>
 
   <include file="$(find bwi_logging)/launch/record.launch" />
 

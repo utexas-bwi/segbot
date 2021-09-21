@@ -43,6 +43,7 @@ namespace segbot_sensors
 		
 		//compute the start and end index in the original vector of values
 		if (!computed_indeces){
+			includes_intensity = input_scan.ranges.size() == input_scan.intensities.size();
 			
 			if (angle_param_max > input_scan.angle_max){ //check if requested range is outside the actual range
 				angle_param_max = input_scan.angle_max;
@@ -71,11 +72,13 @@ namespace segbot_sensors
 		}
         
 		filtered_scan.ranges.resize(end_index-start_index+1);
-		filtered_scan.intensities.resize(end_index-start_index+1);
+		if (includes_intensity)
+			filtered_scan.intensities.resize(end_index-start_index+1);
 		
 		for(unsigned int count = 0; count < filtered_scan.ranges.size(); ++count){
-          filtered_scan.ranges[count] = input_scan.ranges[count+start_index];
-          filtered_scan.intensities[count] = input_scan.intensities[count+start_index];
+			filtered_scan.ranges[count] = input_scan.ranges[count+start_index];
+			if (includes_intensity)
+				filtered_scan.intensities[count] = input_scan.intensities[count+start_index];
         }
     
 
@@ -100,6 +103,7 @@ namespace segbot_sensors
 		double angle_out_min, angle_out_max;
 		int start_index,end_index;
 		bool computed_indeces;
+		bool includes_intensity;
 		
   };
 }

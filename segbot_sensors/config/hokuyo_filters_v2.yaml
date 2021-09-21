@@ -1,4 +1,11 @@
 scan_filter_chain:
+- name: nan_to_inf_filter
+  type: segbot_sensors/NanToInfFilter
+- name: angle
+  type: segbot_sensors/AngleRangeFilter
+  params:
+    angle_min: -2.09234976768
+    angle_max:  2.09234976768
 - name: shadows
   type: laser_filters/ScanShadowsFilter
   params:
@@ -6,8 +13,6 @@ scan_filter_chain:
     max_angle: 170
     neighbors: 1
     window: 1
-- name: nan_to_inf_filter
-  type: segbot_sensors/NanToInfFilter
 - name: footprint_filter
   type: segbot_sensors/SegbotFootprintFilter
   params:

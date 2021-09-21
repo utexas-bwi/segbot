@@ -39,4 +39,5 @@
     <remap from="/map" to="$(arg map_topic)" />
   </node>
 
+
 </launch>

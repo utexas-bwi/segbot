@@ -13,5 +13,10 @@ obstacle_layer/footprint_clearing_enabled: false
 # unknown_threshold: 10
 # mark_threshold: 0
 
+# observation_sources: hokuyo_scan kinect_scan #azure_kinect
 observation_sources: hokuyo_scan
 hokuyo_scan: {data_type: LaserScan, topic: scan_filtered, marking: true, clearing: true, inf_is_valid: true, obstacle_range: 3.75, raytrace_range: 4.0} #raytrace_range must be less than max range of sensor.
+
+kinect_scan: {data_type: LaserScan, topic: kinect_scan, marking: true, clearing: true, inf_is_valid: true, obstacle_range: 1.0, raytrace_range: 2.1}
+
+azure_kinect: {data_type: PointCloud2, topic: points2, marking: true, clearing: true, in33f_is_valid: true, obstacle_range: 3.75, raytrace_range: 4.0, sensor_frame: azure_kinect_depth_camera_link}
