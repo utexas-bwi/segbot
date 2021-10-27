@@ -1,9 +1,9 @@
-vel_limit_mps:            0.8
-accel_limit_mps2:         0.500000
-decel_limit_mps2:         0.500000
+vel_limit_mps:            0.4
+accel_limit_mps2:         0.100000
+decel_limit_mps2:         0.800000
 dtz_decel_limit_mps2:     1.000000
-yaw_rate_limit_rps:       1.000000
-yaw_accel_limit_rps2:     1.5
+yaw_rate_limit_rps:       0.800000
+yaw_accel_limit_rps2:     0.5
 lateral_accel_limit_mps2: 4.905000
 tire_rolling_diameter_m:  0.462280
 wheel_base_length_m:      0.584200
