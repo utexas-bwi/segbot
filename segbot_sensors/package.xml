@@ -51,6 +51,7 @@
   <exec_depend>urg_node</exec_depend>
   <exec_depend>velodyne_driver</exec_depend>
   <exec_depend>velodyne_pointcloud</exec_depend>
+  <exec_depend>sick_tim</exec_depend>
   <exec_depend>pointcloud_to_laserscan</exec_depend>
 
   <test_depend>roslaunch</test_depend>
