@@ -1,6 +1,6 @@
 <launch>
 
-  <arg name="map_file" default="$(find utexas_gdc)/maps/real/kishanmap_v4.yaml" />
+  <arg name="map_file" default="$(find bu_eb)/maps/eb_3rd_floor_map.yaml" />
   <arg name="robot_configuration" default="$(find segbot_bringup)/launch/segbot_bu.launch"/>
 
   <include file="$(arg robot_configuration)" />
