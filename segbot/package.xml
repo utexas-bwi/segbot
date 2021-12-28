@@ -19,7 +19,6 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
-  <exec_depend>only_segbot_arm</exec_depend>
   <exec_depend>only_segbot_base</exec_depend>
 
   <export>
