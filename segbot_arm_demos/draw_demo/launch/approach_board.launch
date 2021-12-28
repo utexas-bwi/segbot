@@ -1,4 +1,0 @@
-<launch>
-  <node pkg="bwi_perception" type="planar_segmentation" name="planar_segmentation" output="screen"/>
-   <include file="$(find moveit_utils)/launch/mico_moveit.launch">/> </include>
-</launch>

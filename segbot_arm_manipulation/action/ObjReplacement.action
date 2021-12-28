@@ -1,8 +1,0 @@
-# Goal
----
-# Result
-bool success
-string error_msg
----
-# Feedback
-bool status
