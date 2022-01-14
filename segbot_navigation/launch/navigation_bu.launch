@@ -1,6 +1,7 @@
 <launch>
 
-  <arg name="map_file" default="$(find bu_eb)/maps/eb_3rd_floor_map.yaml" />
+  <arg name="move_base_config" default="segbotbu" />
+  <arg name="map_file" default="$(find bu_eb)/maps/3/eb_3rd_floor_map.yaml" />
   <arg name="robot_configuration" default="$(find segbot_bringup)/launch/segbot_bu.launch"/>
 
   <include file="$(arg robot_configuration)" />
@@ -9,9 +10,13 @@
 
   <include file="$(find segbot_navigation)/launch/amcl.launch">
     <arg name="laser_max_range" value="20.0" />
+  </include> 
+  
+  <include file="$(find segbot_navigation)/launch/move_base_eband.launch">
+    <arg name="config" default="$(arg move_base_config)" />
+    <arg name="global_frame" value="map" />
   </include>
 
-  <include file="$(find segbot_navigation)/launch/move_base_eband.launch" />
   <include file="$(find segbot_navigation)/launch/rviz.launch" />
 
 </launch>
