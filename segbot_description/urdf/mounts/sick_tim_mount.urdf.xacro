@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<root xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
+      xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
+      xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
+      xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/components/aluminium_sheet.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/sensors/sick_tim.urdf.xacro" />
+
+  <xacro:macro name="sick_tim_mount" params="name parent *origin ros_topic">
+
+    <joint name="${name}_mount_joint" type="fixed">
+      <parent link="${parent}_link" />
+      <child link="${name}_mount_link" />
+      <xacro:insert_block name="origin" />
+    </joint>
+
+    <xacro:sick_tim551 name="${name}" ros_topic="${ros_topic}">
+    </xacro:sick_tim551>
+
+  </xacro:macro>
+
+</root>
+
+

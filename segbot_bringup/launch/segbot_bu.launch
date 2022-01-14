@@ -5,9 +5,6 @@
 
   <!-- set the tf prefix as necessary -->
   <arg name="tf_prefix" default="" />
-  <arg name="device_id" default="#1" />
-  <arg name="rviz" default="true" />
-  <arg name="gui" default="true" />
   <param name="tf_prefix" value="$(arg tf_prefix)" />
   <!-- Segway Base platform ROS Driver -->
   <node pkg="segway_ros" ns="segway" type="segway_driver" name="segway_driver" respawn="true" output="screen">
@@ -28,14 +25,15 @@
   <!-- common aux nodes -->
   <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_bu.launch.xml">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
+    <arg name="use_full_gazebo_model" default="false" />
+    <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_bu.urdf.xacro" />
   </include>
 
-  <!-- Velodyne -->
-  <!--
-  <include file="$(find segbot_sensors)/launch/velodyne/velodyne.launch">
+  <!-- sick_tim -->  
+  <include file="$(find segbot_sensors)/launch/sick_tim/sick_tim.launch">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
-  -->
+ 
 
   <!-- Diagnostics and battery monitor -->
   <!-- <include file="$(find segbot_sensors)/launch/diagnostic/diagnostics.launch"/>
@@ -60,7 +58,12 @@
   <!--
   <include file="$(find segbot_led)/launch/segbot_led_v3.launch">
   </include>
-  -->
+  -->  
   
+  <!-- USE THIS FOR TEST -->
+  <!-- <arg name="config_file" default="$(find segbot_bringup)/rviz/bringup.rviz" />
+  <node name="rviz" pkg="rviz" type="rviz" 
+        args="-d $(arg config_file)" 
+        launch-prefix="$(optenv OPTIRUN_LAUNCH_PREFIX)" /> -->
         
 </launch>
