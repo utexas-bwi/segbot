@@ -1,5 +1,5 @@
 robot_base_frame: base_footprint
-update_frequency:
+update_frequency: 1.0
 publish_frequency: 1.0
 inflation_radius: 1.0
 
@@ -16,7 +16,8 @@ observation_sources: sick_tim_scan #velodyne_scan # Don't have both velodyne sca
 
 sick_tim_scan: {
   data_type: LaserScan, 
-  topic: /scan, 
+  topic: scan_filtered, 
+  # topic: scan,
   marking: true, 
   clearing: true, 
   inf_is_valid: true, 
