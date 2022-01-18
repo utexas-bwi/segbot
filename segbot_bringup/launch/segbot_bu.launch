@@ -25,7 +25,6 @@
   <!-- common aux nodes -->
   <include file="$(find segbot_bringup)/launch/includes/auxiliary.segbot_bu.launch.xml">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
-    <arg name="use_full_gazebo_model" default="false" />
     <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_bu.urdf.xacro" />
   </include>
 
@@ -33,6 +32,8 @@
   <include file="$(find segbot_sensors)/launch/sick_tim/sick_tim.launch">
     <arg name="tf_prefix" value="$(arg tf_prefix)" />
   </include>
+  <!-- Called in auxiliary.segbot_bu.launch.xml -->
+  <!-- <include file="$(find segbot_sensors)/launch/sick_tim/sick_tim-filters.launch"></include> -->
  
 
   <!-- Diagnostics and battery monitor -->

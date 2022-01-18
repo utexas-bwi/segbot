@@ -4,8 +4,6 @@
   <arg name="use_full_gazebo_model" default="false" />
   <arg name="urdf_file" default="$(find segbot_description)/robots/segbot_bu.urdf.xacro" />
 
-  <arg name="launch_velodyne_nodelet_manager" default="true" />
-
   <!-- launch the appropriate urdf description, as well as the corresponding tf tree -->
   <param name="robot_description"
     command="$(find xacro)/xacro '$(arg urdf_file)' use_full_gazebo_model:=$(arg use_full_gazebo_model)" />
@@ -22,13 +20,6 @@
     <arg name="filters"
          value="$(find segbot_sensors)/config/sick_tim_filters.yaml" />
   </include>
-
-  <!-- Velodyne specific: launch the laserscan converter -->
-  <!-- <include file="$(find segbot_sensors)/launch/velodyne/velodyne-laserscan.launch">
-    <arg name="tf_prefix" value="$(arg tf_prefix)" />
-    <arg name="in_topic" value="velodyne/points_filtered" />
-    <arg name="launch_nodelet_manager" value="$(arg launch_velodyne_nodelet_manager)" />
-  </include> -->
 
 </launch>
 
