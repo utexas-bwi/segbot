@@ -4,8 +4,10 @@
 
   <!-- Included URDF Files -->
   <xacro:include filename="$(find segbot_description)/urdf/segway_110_base.urdf.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/v3/common.urdf.xacro" />
-  <xacro:include filename="$(find segbot_description)/urdf/v3/segbot_chassis.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/vbu/common.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/vbu/segbot_chassis.urdf.xacro" />
+  <!-- <xacro:include filename="$(find segbot_description)/urdf/v3/common.urdf.xacro" /> -->
+  <!-- <xacro:include filename="$(find segbot_description)/urdf/v3/segbot_chassis.urdf.xacro" /> -->
   <xacro:include filename="$(find segbot_description)/urdf/mounts/sick_tim_mount.urdf.xacro" />
   <xacro:include filename="$(find segbot_description)/gazebo/segbot.gazebo.xacro" />
   
@@ -13,14 +15,19 @@
     
   <!-- Add the segbot base -->
   <xacro:segway_robot />
+  <!-- Segway Caster Assembly-->
+  <xacro:caster_assembly caster_prefix="front" parent="base_chassis_link">
+    <origin xyz="0.31472057 0 0.02425235" rpy="0 0 ${M_PI}" />
+  </xacro:caster_assembly>
+
   <xacro:segbot_chassis parent="base">
     <origin xyz="${BASE_PLATE_X_OFFSET*INCH_TO_M} 0 ${BASE_PLATE_Z_OFFSET*INCH_TO_M}"/>
   </xacro:segbot_chassis>
 
   <!-- Add the forward facing sick_tim  for navigation -->
-  <xacro:sick_tim_mount name="sick_tim" parent="back_left_vertical_beam" ros_topic="sick_tim/scan">
-    <origin xyz="0 0 ${0.125*INCH_TO_M}" rpy="0 0 0" />
-  </xacro:sick_tim_mount>
+  <!-- <xacro:sick_tim_mount name="sick_tim" parent="back_left_vertical_beam" ros_topic="sick_tim/scan"> -->
+    <!-- <origin xyz="0 0 ${0.125*INCH_TO_M}" rpy="0 0 0" /> -->
+  <!-- </xacro:sick_tim_mount> -->
 
 
 
