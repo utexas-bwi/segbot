@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<robot name="segbot"
+<robot name="segbot_v4"
        xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- Included URDF Files -->

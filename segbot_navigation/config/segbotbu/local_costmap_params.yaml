@@ -1,12 +1,28 @@
 local_costmap:
+   plugins: 
+      - {name: obstacle_layer, type: 'costmap_2d::ObstacleLayer'}
+      - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
    global_frame: odom
-   robot_base_frame: base_footprint
-   update_frequency: 1.0
-   publish_frequency: 1.0
-   static_map: false
    rolling_window: true
    width: 6.0
    height: 6.0
    resolution: 0.05
    transform_tolerance: 0.25
    footprint_padding: 0.0
+
+   obstacle_layer:
+      observation_sources: sick_tim_scan #velodyne_scan # Don't have both velodyne scan and velodyne cloud.
+
+      sick_tim_scan: {
+      data_type: LaserScan, 
+      topic: scan_filtered, 
+      # topic: scan,
+      marking: true, 
+      clearing: true, 
+      inf_is_valid: true, 
+      obstacle_range: 3.75, 
+      raytrace_range: 4.0
+      } #raytrace_range must be less than max range of sensor.
+
+   inflation_layer: 
+      inflation_radius: 0.1 # must be smaller than that in global

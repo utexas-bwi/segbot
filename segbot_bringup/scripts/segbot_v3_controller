@@ -67,8 +67,8 @@ class Controller():
         msg.child_frame_id = self.robot_frame_id
 
         # Modify position appropriately.
-        msg.pose.pose.position.x = -msg.pose.pose.position.x # reverse x
-        msg.pose.pose.position.y = -msg.pose.pose.position.y # reverse y
+        msg.pose.pose.position.x = msg.pose.pose.position.x # reverse x
+        msg.pose.pose.position.y = msg.pose.pose.position.y # reverse y
         quaternion = (msg.pose.pose.orientation.x,
                       msg.pose.pose.orientation.y,
                       msg.pose.pose.orientation.z,
@@ -78,7 +78,7 @@ class Controller():
         msg.pose.pose.orientation = Quaternion(*quaternion)
 
         # Modify velocity appropriately.
-        msg.twist.twist.linear.x = msg.twist.twist.linear.x
+        msg.twist.twist.linear.x = -msg.twist.twist.linear.x
 
         if self.publish_tf:
             br = tf.TransformBroadcaster()
@@ -94,8 +94,8 @@ class Controller():
         self.target_angular_vel = 0
 
     def cmd_callback(self, msg):
-        self.target_linear_vel = msg.linear.x
-        self.target_angular_vel = -msg.angular.z
+        self.target_linear_vel = -msg.linear.x
+        self.target_angular_vel = msg.angular.z
         if self.stop_timer is not None:
            self.stop_timer.shutdown()
         self.stop_timer = rospy.Timer(rospy.Duration(0.5), self.timer_callback)
@@ -155,7 +155,7 @@ class Controller():
                     angular_vel -= self.angular_neg_accel_limit
 
             twist = Twist()
-            twist.linear.x = -linear_vel
+            twist.linear.x = linear_vel
             twist.angular.z = angular_vel
             self.cmd_pub.publish(twist)
             rate.sleep()

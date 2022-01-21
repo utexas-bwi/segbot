@@ -1,19 +1,50 @@
+# Visit https://www.wiki.ros.org/eband_local_planner for more detail
+
 EBandPlannerROS:
-
-  # TRAJECTORY CONTROL
-  differential_drive: true
-
-  # velocity limits
-  max_vel_lin: 1.0
-  max_vel_th: 0.5
-  min_vel_lin: 0.4
-  min_in_place_vel_th: 0.25
-
-  # goal tolerance
+  ############################
+  # Common parameters
+  ############################
   xy_goal_tolerance: 0.2
   yaw_goal_tolerance: 0.2
+  rot_stopped_vel: 0.01
+  trans_stopped_vel: 0.01
 
-  # angular velocity PID
-  k_prop: 0.75
+  ############################
+  # Visualization parameters
+  ############################
+  marker_lifetime: 0.5
 
-  #eband parameters
+  ############################
+  # Elastic Band parameters
+  ############################
+  eband_min_relative_overlap: 0.7
+  eband_tiny_bubble_distance: 0.01
+  eband_tiny_bubble_expantion: 0.01
+  eband_internal_force_gain: 3.0  # default 1.0
+  eband_external_force_gain: 2.0  
+  num_iteration_eband_optimization: 3  # default 3
+  eband_equilibrium_relative_obershoot: 0.75
+  eband_significant_force_lower_bound: 0.15
+  costmap_weight: 15 # default 10.0
+
+  ######################################
+  # Trajectory Controller parameters
+  ######################################
+  max_vel_lin: 1.0  # default 0.75
+  max_vel_th: 0.1  # 1.0
+  min_vel_lin: 0.4  # 0.1
+  min_vel_th: 0.0
+  min_in_place_vel_th: 0.25  # default 0.0
+  k_prop: 0.5  # default 4.0 # gain of the PID controller
+  k_damp: 3.5 # gain of the PID controller
+  Ctrl_Rate: 10.0
+  max_acceleration: 0.5
+  virtual_mass: 0.75
+  max_translational_acceleration: 0.5
+  max_rotational_acceleration: 1.5
+  rotation_correction_threshold: 0.5
+  differential_drive: true  # TRAJECTORY CONTROL
+  bubble_velocity_multiplier: 2.0  # default 2.0  # Multiplier of bubble radius
+  rotation_threshold_multiplier: 1.0
+  disallow_hysteresis: false
+

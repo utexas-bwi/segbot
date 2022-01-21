@@ -15,11 +15,5 @@
     <param name="publish_frequency" type="double" value="5.0" />
   </node>
 
-  <!-- sick_tim specific: filter out readings from the robot itself -->
-  <include file="$(find segbot_sensors)/launch/sick_tim/sick_tim-filters.launch">
-    <arg name="filters"
-         value="$(find segbot_sensors)/config/sick_tim_filters.yaml" />
-  </include>
-
 </launch>
 

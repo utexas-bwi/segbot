@@ -5,6 +5,7 @@ Panels:
     Property Tree Widget:
       Expanded:
         - /Global Options1
+        - /Global_Costmap1
       Splitter Ratio: 0.49679499864578247
     Tree Height: 501
   - Class: rviz/Selection
@@ -88,7 +89,17 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        bottom_box_plate_link:
+        front_caster_plate_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_caster_swivel_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        front_caster_wheel_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -123,11 +134,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        left_box_plate_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         left_spacer_link:
           Alpha: 1
           Show Axes: false
@@ -158,11 +164,6 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
-        right_box_plate_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
         right_spacer_link:
           Alpha: 1
           Show Axes: false
@@ -182,11 +183,6 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
-        top_box_plate_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: RobotModel
       Robot Description: robot_description
       TF Prefix: ""
@@ -263,12 +259,12 @@ Visualization Manager:
       Class: rviz/Map
       Color Scheme: costmap
       Draw Behind: true
-      Enabled: false
+      Enabled: true
       Name: Local_Costmap
       Topic: /move_base/local_costmap/costmap
       Unreliable: false
       Use Timestamp: false
-      Value: false
+      Value: true
     - Alpha: 0.20000000298023224
       Class: rviz/Map
       Color Scheme: costmap
