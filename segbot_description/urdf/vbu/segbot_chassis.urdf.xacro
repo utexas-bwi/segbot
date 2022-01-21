@@ -10,6 +10,10 @@
   <xacro:include filename="$(find segbot_description)/urdf/components/standoff.urdf.xacro" />
 
   <xacro:macro name="segbot_chassis" params="parent *origin">
+    <!-- Segway Caster Assembly-->
+    <xacro:caster_assembly caster_prefix="front" parent="${parent}_link">
+      <origin xyz="0.31472057 0 0.02425235" rpy="0 0 ${M_PI}" />
+    </xacro:caster_assembly>
 
     <!-- bottom box plate -->
     <!-- <xacro:aluminium_sheet name="bottom_box_plate" parent="${parent}"
@@ -37,28 +41,28 @@
 
     <!-- 80/20 vertical beams -->
     <xacro:beam_8020 name="back_left_vertical_beam" parent="${parent}" length="${24*INCH_TO_M}">
-      <origin xyz="-${5.5*INCH_TO_M} ${5.5*INCH_TO_M} ${10.2*INCH_TO_M}" rpy="0 0 0" />
+      <origin xyz="-${5.0*INCH_TO_M} ${6.0*INCH_TO_M} ${2.25*INCH_TO_M}" rpy="0 0 0" />
     </xacro:beam_8020>
     <xacro:beam_8020 name="front_left_vertical_beam" parent="${parent}" length="${24*INCH_TO_M}">
-      <origin xyz="${5.5*INCH_TO_M} ${5.5*INCH_TO_M} ${10.2*INCH_TO_M}" rpy="0 0 0" />
+      <origin xyz="${5.0*INCH_TO_M} ${6.0*INCH_TO_M} ${2.25*INCH_TO_M}" rpy="0 0 0" />
     </xacro:beam_8020>
     <xacro:beam_8020 name="back_right_vertical_beam" parent="${parent}" length="${24*INCH_TO_M}">
-      <origin xyz="-${5.5*INCH_TO_M} -${5.5*INCH_TO_M} ${10.2*INCH_TO_M}" rpy="0 0 0" />
+      <origin xyz="-${5.0*INCH_TO_M} -${6.0*INCH_TO_M} ${2.25*INCH_TO_M}" rpy="0 0 0" />
     </xacro:beam_8020>
     <xacro:beam_8020 name="front_right_vertical_beam" parent="${parent}" length="${24*INCH_TO_M}">
-      <origin xyz="${5.5*INCH_TO_M} -${5.5*INCH_TO_M} ${10.2*INCH_TO_M}" rpy="0 0 0" />
+      <origin xyz="${5.0*INCH_TO_M} -${6.0*INCH_TO_M} ${2.25*INCH_TO_M}" rpy="0 0 0" />
     </xacro:beam_8020>
 
     <!-- laptop base plate -->
     <!-- from the left laptop support beam -->
     <xacro:aluminium_sheet name="laptop_base_plate" parent="${parent}" 
-                           thickness="${0.125*INCH_TO_M}" length="${12*INCH_TO_M}" width="${14*INCH_TO_M}">
-      <origin xyz="0 0 ${24.25*INCH_TO_M}" rpy="0 0 0" />
+                           thickness="${0.125*INCH_TO_M}" length="${11*INCH_TO_M}" width="${13*INCH_TO_M}">
+      <origin xyz="0 0 ${26.25*INCH_TO_M}" rpy="0 0 0" />
     </xacro:aluminium_sheet>
 
     <!-- laptop -->
     <xacro:laptop name="laptop" parent="laptop_base_plate"> 
-      <origin xyz="-${2.1*INCH_TO_M} 0 ${0.125*INCH_TO_M}" rpy="0 0 0" />
+      <origin xyz="0 0 ${0.125*INCH_TO_M}" rpy="0 0 0" />
     </xacro:laptop>
 
   </xacro:macro>
