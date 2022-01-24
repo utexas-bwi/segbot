@@ -21,7 +21,7 @@
   <!-- Add the forward facing sick_tim  for navigation -->
   <xacro:sick_tim_mount name="sick_tim" parent="base_chassis" ros_topic="sick_tim/scan">
     <!-- <origin xyz="${0.125*INCH_TO_M} 0 0" rpy="0 0 0" /> -->
-    <origin xyz="${12.75*INCH_TO_M} 0 -${2.25*INCH_TO_M}" rpy="0 0 0"/>
+    <origin xyz="${12.75*INCH_TO_M} 0 ${2.25*INCH_TO_M}" rpy="0 0 0"/>
   </xacro:sick_tim_mount>
 
 
