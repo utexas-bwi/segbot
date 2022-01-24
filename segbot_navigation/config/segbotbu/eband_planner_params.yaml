@@ -30,9 +30,9 @@ EBandPlannerROS:
   ######################################
   # Trajectory Controller parameters
   ######################################
-  max_vel_lin: 1.0  # default 0.75
-  max_vel_th: 0.1  # 1.0
-  min_vel_lin: 0.4  # 0.1
+  max_vel_lin: 0.5  # default 0.75
+  max_vel_th: 0.5  # 1.0
+  min_vel_lin: 0.1  # 0.1
   min_vel_th: 0.0
   min_in_place_vel_th: 0.25  # default 0.0
   k_prop: 0.5  # default 4.0 # gain of the PID controller

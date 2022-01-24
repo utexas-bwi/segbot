@@ -25,4 +25,4 @@ local_costmap:
       } #raytrace_range must be less than max range of sensor.
 
    inflation_layer: 
-      inflation_radius: 0.1 # must be smaller than that in global
+      inflation_radius: 0.2 # must be smaller than that in global

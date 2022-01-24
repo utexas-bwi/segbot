@@ -12,4 +12,4 @@ global_costmap:
       subscribe_to_update: true
 
    inflation_layer: 
-      inflation_radius: 0.25
+      inflation_radius: 0.4
