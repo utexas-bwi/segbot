@@ -74,7 +74,7 @@ class Controller():
                       msg.pose.pose.orientation.z,
                       msg.pose.pose.orientation.w)
         euler = tf.transformations.euler_from_quaternion(quaternion)
-        quaternion = tf.transformations.quaternion_from_euler(euler[0], euler[1], euler[2] + math.pi)
+        quaternion = tf.transformations.quaternion_from_euler(euler[0], euler[1], euler[2])
         msg.pose.pose.orientation = Quaternion(*quaternion)
 
         # Modify velocity appropriately.
