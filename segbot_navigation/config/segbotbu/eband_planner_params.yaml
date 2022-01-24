@@ -4,7 +4,7 @@ EBandPlannerROS:
   ############################
   # Common parameters
   ############################
-  xy_goal_tolerance: 0.2
+  xy_goal_tolerance: 0.1
   yaw_goal_tolerance: 0.2
   rot_stopped_vel: 0.01
   trans_stopped_vel: 0.01
@@ -20,7 +20,7 @@ EBandPlannerROS:
   eband_min_relative_overlap: 0.7
   eband_tiny_bubble_distance: 0.01
   eband_tiny_bubble_expantion: 0.01
-  eband_internal_force_gain: 3.0  # default 1.0
+  eband_internal_force_gain: 1.0  # default 1.0
   eband_external_force_gain: 2.0  
   num_iteration_eband_optimization: 3  # default 3
   eband_equilibrium_relative_obershoot: 0.75
@@ -38,9 +38,9 @@ EBandPlannerROS:
   k_prop: 0.5  # default 4.0 # gain of the PID controller
   k_damp: 3.5 # gain of the PID controller
   Ctrl_Rate: 10.0
-  max_acceleration: 0.5
+  max_acceleration: 0.3
   virtual_mass: 0.75
-  max_translational_acceleration: 0.5
+  max_translational_acceleration: 0.3
   max_rotational_acceleration: 1.5
   rotation_correction_threshold: 0.5
   differential_drive: true  # TRAJECTORY CONTROL

@@ -2,8 +2,8 @@
 
   <arg name="move_base_config" default="segbotbu" />
   <!-- <arg name="map_file" default="$(find bu_eb)/maps/3/eb_3rd_floor_map.yaml" /> -->
-  <!-- <arg name="map_file" default="$(find bu_ispc)/maps/bu_ispc_2nd_floor.yaml" /> -->
-  <arg name="map_file" default="$(find bu_ispc)/maps/map.yaml" />
+  <arg name="map_file" default="$(find bu_ispc)/maps/bu_ispc_2nd_floor.yaml" />
+  <!-- <arg name="map_file" default="$(find bu_ispc)/maps/map.yaml" /> -->
   <arg name="robot_configuration" default="$(find segbot_bringup)/launch/segbot_bu.launch"/>
 
   <include file="$(arg robot_configuration)" />
