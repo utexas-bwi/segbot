@@ -1,0 +1,1 @@
+SUBSYSTEMS=="usb", KERNEL=="ttyACM[0-9]*", ACTION=="add", ATTRS{idVendor}=="0808", ATTRS{idProduct}=="00eb", MODE="666", SYMLINK+="segway_rmp", GROUP="dialout"
