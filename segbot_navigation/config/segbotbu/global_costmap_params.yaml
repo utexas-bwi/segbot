@@ -9,7 +9,9 @@ global_costmap:
    static_layer:
       map_topic: "map"
       track_unknow_space: false
-      subscribe_to_update: true
+      subscribe_to_update: true  
 
    inflation_layer: 
       inflation_radius: 1.2
+
+

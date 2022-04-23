@@ -2,7 +2,7 @@ local_costmap:
    plugins: 
       - {name: obstacle_layer, type: 'costmap_2d::ObstacleLayer'}
       - {name: inflation_layer, type: "costmap_2d::InflationLayer"}
-   global_frame: odom
+   global_frame: map
    rolling_window: true
    width: 8.0
    height: 8.0

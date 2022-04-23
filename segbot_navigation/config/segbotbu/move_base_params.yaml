@@ -1,8 +1,22 @@
-footprint: [[0.265, 0.285], [0.265, -0.285], [-0.265, -0.285], [-0.38, 0], [-0.265, 0.285]]
+# footprint: [[0.265, 0.285], [0.265, -0.285], [-0.265, -0.285], [-0.38, 0], [-0.265, 0.285]]
+footprint: [[0.32, 0.39], [0.32, -0.39], [-0.32, -0.39], [-0.32, 0.39]]
 
-planner_frequency: 1.0
+# control_frequency: 5.0
+control_patience: 3.0
+
+planner_frequency: 3.0
+planner_patience: 5.0
+
+oscillation_timeout: 10.0
+oscillation_distance: 0.2
+
+recovery_behavior_enabled: true
+clearing_rotation_allowed: true
+max_planning_retries: 5
 
 recovery_behaviors:
+  # - name: 'move_slow_and_clear'
+  #   type: 'move_slow_and_clear/MoveSlowAndClear'
   - name: 'conservative_reset'
     type: 'clear_costmap_recovery/ClearCostmapRecovery'
   - name: 'rotate_recovery'
@@ -10,10 +24,16 @@ recovery_behaviors:
   - name: 'aggressive_reset'
     type: 'clear_costmap_recovery/ClearCostmapRecovery'
 
+# move_slow_and_clear:
+#   clearing_distance: 0.5
+#   limited_trans_speed: 0.25
+#   limited_rot_speed: 0.45
+#   limited_distance: 0.3
+
 conservative_reset:
   reset_distance: 3.0
-  layer_names: ['obstacle_layer']
+  layer_names: ['local_costmap/obstacle_layer', 'global_costmap/obstacle_layer']
 
 aggressive_reset:
   reset_distance: 0.0
-  layer_names: ['obstacle_layer']
+  layer_names: ['local_costmap/obstacle_layer', 'global_costmap/obstacle_layer']

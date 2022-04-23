@@ -4,7 +4,7 @@ EBandPlannerROS:
   ############################
   # Common parameters
   ############################
-  xy_goal_tolerance: 0.1
+  xy_goal_tolerance: 0.2
   yaw_goal_tolerance: 0.2
   rot_stopped_vel: 0.01
   trans_stopped_vel: 0.01
@@ -17,25 +17,25 @@ EBandPlannerROS:
   ############################
   # Elastic Band parameters
   ############################
-  eband_min_relative_overlap: 0.7
-  eband_tiny_bubble_distance: 0.01
-  eband_tiny_bubble_expantion: 0.01
-  eband_internal_force_gain: 1.0  # default 1.0
-  eband_external_force_gain: 2.0  
-  num_iteration_eband_optimization: 3  # default 3
-  eband_equilibrium_relative_obershoot: 0.75
-  eband_significant_force_lower_bound: 0.15
-  costmap_weight: 15 # default 10.0
+  # eband_min_relative_overlap: 0.7  # 0.7
+  # eband_tiny_bubble_distance: 0.01
+  # eband_tiny_bubble_expantion: 0.01
+  # eband_internal_force_gain: 1.0  # default 1.0
+  # eband_external_force_gain: 2.0  
+  # num_iteration_eband_optimization: 3  # default 3
+  # eband_equilibrium_relative_obershoot: 0.75
+  # eband_significant_force_lower_bound: 0.15
+  costmap_weight: 20 # default 10.0
 
   ######################################
   # Trajectory Controller parameters
   ######################################
-  max_vel_lin: 0.5  # default 0.75
+  max_vel_lin: 1.0  # default 0.75
   max_vel_th: 0.5  # 1.0
   min_vel_lin: 0.1  # 0.1
   min_vel_th: 0.0
   min_in_place_vel_th: 0.25  # default 0.0
-  k_prop: 0.5  # default 4.0 # gain of the PID controller
+  k_prop: 0.75  # default 4.0 # gain of the PID controller
   k_damp: 3.5 # gain of the PID controller
   Ctrl_Rate: 10.0
   max_acceleration: 0.3
