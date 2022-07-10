@@ -1,9 +1,0 @@
-# sensory data (i.e., the response of table top object detection)
-sensor_msgs/PointCloud2 cloud_plane
-float32[4] cloud_plane_coef
-sensor_msgs/PointCloud2[] objects
-
-# which object to touch (-1 for retract)
-int32 touch_index
----
-bool success
