@@ -33,7 +33,7 @@
   <build_depend>message_generation</build_depend>
   <build_depend>roslint</build_depend>
 
-  <exec_depend>camera1394</exec_depend>
+  <!-- exec_depend>camera1394</exec_depend -->
   <exec_depend>depthimage_to_laserscan</exec_depend>
   <exec_depend>diagnostic_aggregator</exec_depend>
   <exec_depend>filters</exec_depend>
