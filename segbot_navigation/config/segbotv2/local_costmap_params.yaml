@@ -1,9 +1,9 @@
 local_costmap:
-   plugins:
-      - {name: static_map, type: "costmap_2d::StaticLayer"}
-      - {name: obstacles, type: "costmap_2d::ObstacleLayer"}
-      - {name: inflation, type: "costmap_2d::InflationLayer"}
-   map_topic: level_mux/map
+   # plugins:
+   #    - {name: static_map, type: "costmap_2d::StaticLayer"}
+   #    - {name: obstacles, type: "costmap_2d::ObstacleLayer"}
+   #    - {name: inflation, type: "costmap_2d::InflationLayer"}
+   # map_topic: level_mux/map
 
    global_frame: odom
    robot_base_frame: base_footprint
