@@ -1,6 +1,0 @@
-string axis
-bool forward
-string frame_id
-sensor_msgs/PointCloud2[] clouds
----
-sensor_msgs/PointCloud2[] ordered_clouds

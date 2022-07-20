@@ -1,4 +1,0 @@
-# which table to face
-int32 table_index
----
-bool success

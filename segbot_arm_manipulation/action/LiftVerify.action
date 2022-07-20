@@ -1,9 +1,0 @@
-#goal definition
-sensor_msgs/PointCloud2 tgt_cloud
-int8 bins
----
-#result definition
-bool success
----
-#feedback
-bool success
