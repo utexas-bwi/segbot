@@ -32,6 +32,7 @@
     <param name="llsamplestep" value="0.01"/>
     <param name="lasamplerange" value="0.005"/>
     <param name="lasamplestep" value="0.005"/>
+    <param name="transform_publish_period" value="0.02"/>
     <remap from="scan" to="$(arg scan_topic)"/>
   </node>
 
