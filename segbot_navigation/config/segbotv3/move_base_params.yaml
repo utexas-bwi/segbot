@@ -9,6 +9,8 @@ recovery_behaviors:
     type: 'rotate_recovery/RotateRecovery'
   - name: 'aggressive_reset'
     type: 'clear_costmap_recovery/ClearCostmapRecovery'
+  - name: 'rotate_backaway_recovery'
+    type: 'rotate_backaway_recovery/RotateBackawayRecovery'
 
 conservative_reset:
   reset_distance: 3.0
@@ -17,3 +19,4 @@ conservative_reset:
 aggressive_reset:
   reset_distance: 0.0
   layer_names: ['obstacle_layer']
+

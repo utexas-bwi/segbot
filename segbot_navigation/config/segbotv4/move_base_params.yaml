@@ -9,7 +9,7 @@ recovery_behaviors:
     type: 'rotate_recovery/RotateRecovery'
   - name: 'aggressive_reset'
     type: 'clear_costmap_recovery/ClearCostmapRecovery'
-  - name: 'rotate_recovery'
+  - name: 'rotate_backaway_recovery'
     type: 'rotate_backaway_recovery/RotateBackawayRecovery'
 
 conservative_reset:
