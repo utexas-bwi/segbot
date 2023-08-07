@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+
+<robot name="segbot"
+       xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Included URDF Files -->
+
+
+  <xacro:include filename="$(find segbot_description)/urdf/v2/common.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/gazebo/segbot.gazebo.xacro" />
+<!-- calling segot_base.arm.urdf to add front wheel 
+  <xacro:include filename="$(find segbot_description)/urdf/segbot_base.urdf.xacro" /> -->
+<xacro:include filename="$(find segbot_description)/urdf/segbot_base.arm.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/v2/segbot_chassis.urdf.arm.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/hokuyo_mount.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/kinect_mount.urdf.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/mounts/sensor_plate_mount.urdf.xacro" />
+  <xacro:include filename="$(find kinova_description)/urdf/m1n6s200.xacro" />
+  <xacro:include filename="$(find segbot_description)/urdf/sensors/xtion_camera.urdf.xacro"/>
+  <!--  <xacro:include filename="$(find segbot_description)/urdf/components/fat_beam_8020.urdf.xacro" /> -->
+
+  <!-- Add the segbot base -->
+  <xacro:segbot />
+  <xacro:segbot_chassis_arm parent="base">
+    <origin xyz="${BASE_PLATE_X_OFFSET*INCH_TO_M} 0 ${BASE_PLATE_Z_OFFSET*INCH_TO_M}"/>
+  </xacro:segbot_chassis_arm>
+
+  <!-- Add the forward facing kinect sensor for navigation -->
+  <xacro:kinect_mount name="nav_kinect" parent="back_right_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}">
+    <origin xyz="${1*INCH_TO_M} -${0.5*INCH_TO_M} ${11.5*INCH_TO_M}" rpy="-${M_PI/2} -${M_PI/2} 0" />
+  </xacro:kinect_mount>
+
+  <!-- Add the shared beam between the hokuyo and the sensor plate -->
+  <xacro:beam_8020 name="hokuyo_sonar_sensor_beam" parent="front_left_vertical_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}">
+    <origin xyz="${1*INCH_TO_M} ${0.5*INCH_TO_M} ${4.5*INCH_TO_M}" rpy="${M_PI/2} ${M_PI/2} 0" />
+  </xacro:beam_8020>
+
+  <!-- Add the hokuyo mount without the beam -->
+  <xacro:hokuyo_mount_without_beam name="nav_hokuyo" parent="hokuyo_sonar_sensor_beam" ros_topic="scan" update_rate="10" min_angle="${-(5 * M_PI)/12}" max_angle="${(5 * M_PI)/12}" range="20.0">
+    <origin xyz="${0.5*INCH_TO_M} 0 ${SENSOR_BEAM_LENGTH/2*INCH_TO_M}" rpy="${M_PI/2} 0 ${M_PI/2}" />
+  </xacro:hokuyo_mount_without_beam>
+
+  <!-- Add the sensor plate mount -->
+  <xacro:sensor_plate_mount_without_beam parent="hokuyo_sonar_sensor_beam" length="${SENSOR_BEAM_LENGTH*INCH_TO_M}"/>
+
+  <!-- Add the left sensor beam -->
+  <xacro:beam_8020 name="left_sensor_beam" parent="laptop_base_plate" length="${30*INCH_TO_M}">
+    <origin xyz="${-4.5*INCH_TO_M} ${8.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
+  </xacro:beam_8020>
+
+  <!-- Add the right sensor beam -->
+  <xacro:beam_8020 name="right_sensor_beam" parent="laptop_base_plate" length="${30*INCH_TO_M}">
+    <origin xyz="${-4.5*INCH_TO_M} -${8.5*INCH_TO_M} ${0.125*INCH_TO_M}" rpy="0 0 0" />
+  </xacro:beam_8020>
+
+  <!-- Add the top sensor beam -->
+  <xacro:beam_8020 name="top_sensor_beam" parent="right_sensor_beam" length="${18*INCH_TO_M}">
+    <origin xyz="0 -${0.5*INCH_TO_M} ${30.5*INCH_TO_M}" rpy="-${M_PI/2} 0 0" />
+  </xacro:beam_8020>
+
+  <!-- add the arm -->
+
+  <!--this is needed as the mico_arm xacro file doesn't accept origin as argument -->
+  <joint name="arm_fixed_joint" type="fixed">
+	  <origin xyz="${6*INCH_TO_M} 0 ${1.5*INCH_TO_M}" rpy="0 0 ${0.0*M_PI/2}" />
+      <parent link="laptop_base_plate_link"/>
+      <child link="arm_link"/>
+    </joint>
+
+	<link name="arm_link">
+      <visual>
+	<origin xyz="0 0 0" rpy="0 0 0" />
+	<geometry>
+	  <box size = "0.001 0.001 0.001"/> <!--making it slightly bigger in x and z direction-->
+	</geometry>
+	<!--<material name="Black" /> -->
+      </visual>
+
+    <collision>
+	<origin xyz="0 0 0" rpy="0 0 0" />
+
+	<geometry>
+	  <box size = "0.001 0.001 0.001"/>
+	</geometry>
+      </collision>
+    </link>
+
+
+  <!-- The TF prefix that we're setting here must match the prefix to the 
+       the joint names on the /out/joint_states topic
+	-->
+  <xacro:m1n6s200 base_parent="arm_link"/>
+
+  <!-- add the xtion -->
+  <xacro:xtion_camera name="xtion_camera" parent="arm">
+      <origin xyz="-0.267 0.0955 0.7525" rpy="0 0 1.57" />
+  </xacro:xtion_camera>
+
+
+  <xacro:gazebo_segbot_ros_controllers />
+
+</robot>

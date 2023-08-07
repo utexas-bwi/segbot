@@ -38,7 +38,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSI
   <xacro:include filename="$(find segway_description)/urdf/segway_components/ui_box_spacer_mount.urdf.xacro" />
   <xacro:include filename="$(find segway_description)/urdf/accessories.urdf.xacro" />
 
-  <property name="M_PI" value="3.14159"/>
+  <xacro:property name="M_PI" value="3.14159"/>
 
   <!-- Wheel Mounting Positions -->
   <xacro:property name="track" value="0.479111" />

@@ -15,12 +15,13 @@
     </include>
   </group>
 
-  <!-- run the hokuyo driver with the laser link as the frame id -->
-  <node name="$(arg name)_node" pkg="hokuyo_node" type="hokuyo_node">
-    <param name="port" value="/dev/hokuyo" />
+  <!-- run the URG driver with the laser link as the frame id -->
+  <node name="$(arg name)_node" pkg="urg_node" type="urg_node">
+    <param name="serial_port" value="/dev/hokuyo" />
+    <param name="serial_baud" value="115200" />
     <param name="frame_id" value="$(arg tf_prefix)/$(arg name)_laser_link" />
-    <param name="min_ang" value="-1.309" /> <!-- -5pi/12-->
-    <param name="max_ang" value="1.309" /> <!-- 5pi/12 -->
+    <param name="angle_min" value="-1.309" /> <!-- -5pi/12-->
+    <param name="angle_max" value="1.309" /> <!-- 5pi/12 -->
     <remap from="scan" to="$(arg topic)" />
   </node>
   
