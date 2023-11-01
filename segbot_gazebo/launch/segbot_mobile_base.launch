@@ -127,18 +127,6 @@
       </include>
     </group>
 
-    <group if="$(eval local_planner == 'mpc')">
-      <include file="$(find segbot_navigation)/launch/move_base_mpc.launch">
-        <arg name="robot_base_frame" value="$(arg base_frame_id)" />
-        <arg name="global_frame" value="$(arg map_frame)" />
-        <arg name="move_base_server" value="$(arg move_base_server)" />
-        <arg name="map_topic" value="$(arg navigation_map_topic)" />
-        <arg name="eband_rotational_threshold_multiplier" value="0.25" />
-        <arg name="eband_disallow_hysteresis" value="true" />
-        <arg name="config" value="$(arg move_base_config)" />
-      </include>
-    </group>
-
     <group if="$(eval local_planner == 'graphnav')">
     </group>
   </group>
