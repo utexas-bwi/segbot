@@ -52,7 +52,7 @@
     <xacro:beam_8020 name="front_right_vertical_beam" parent="${parent}" length="${24*INCH_TO_M}">
       <origin xyz="${5.0*INCH_TO_M} -${6.0*INCH_TO_M} ${2.25*INCH_TO_M}" rpy="0 0 0" />
     </xacro:beam_8020>
-
+  
     <!-- laptop base plate -->
     <!-- from the left laptop support beam -->
     <xacro:aluminium_sheet name="laptop_base_plate" parent="${parent}" 
