@@ -37,7 +37,9 @@
   <exec_depend>depthimage_to_laserscan</exec_depend>
   <exec_depend>diagnostic_aggregator</exec_depend>
   <exec_depend>filters</exec_depend>
-  <exec_depend>freenect_launch</exec_depend>
+  <!-- freenect_launch must be cloned from source for ROS noetic -->
+  <!-- https://github.com/ros-drivers/freenect_stack -->
+  <!-- <exec_depend>freenect_launch</exec_depend> -->
   <exec_depend>message_runtime</exec_depend>
   <exec_depend>openni_launch</exec_depend>
   <exec_depend>openni2_launch</exec_depend>
