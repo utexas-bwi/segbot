@@ -26,7 +26,6 @@
   <depend>std_srvs</depend>
 
   <exec_depend>amcl</exec_depend>
-  <exec_depend>eband_local_planner</exec_depend>
   <exec_depend>gmapping</exec_depend>
   <exec_depend>map_server</exec_depend>
   <exec_depend version_gte="1.11.15">move_base</exec_depend>
